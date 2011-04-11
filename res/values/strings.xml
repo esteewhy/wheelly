@@ -76,7 +76,7 @@
 	<string name="select_project">Please select project..</string>	
 	<string name="warning">Warning</string>
 	<string name="no_accounts">You should start with creating an account. Tap the green \'+\' at the bottom..</string>
-	<string name="no_budgets">No budgets</string>
+	<string name="no_heartbeats">No heartbeats</string>
 	<string name="no_transactions">No transactions</string>
 	<string name="no_categories">No categories</string>
 	<string name="no_currencies">No currencies</string>
@@ -617,5 +617,7 @@
     <string name="donate">Make a donation</string>
     <string name="donate_error">Android Market is not available on your device</string>
     <string name="type">Type</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 
 </resources>

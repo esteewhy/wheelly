@@ -13,7 +13,7 @@ package ru.orangesoftware.financisto.view;
 
 import java.io.File;
 
-import ru.orangesoftware.financisto.R;
+import com.wheelly.R;
 import ru.orangesoftware.financisto.utils.ThumbnailUtil;
 import android.content.Context;
 import android.content.Intent;

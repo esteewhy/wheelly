@@ -41,20 +41,21 @@
 		android:text="-25.4"
 		android:textColor="@color/negative_amount"/>
 	
-	<TextView android:id="@+id/name"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:gravity="center_vertical"
+	<TextView
+		android:id				="@+id/name"
+		android:layout_height	="wrap_content"
+		android:layout_width	="wrap_content"
+		android:gravity			="center_vertical"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"
-		android:layout_above="@id/date"
-		android:layout_toLeftOf="@id/consumption"
+		android:layout_above	="@id/date"
+		android:layout_toLeftOf	="@id/consumption"
 		android:layout_alignWithParentIfMissing="true"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:singleLine="true"
-		android:text="Kaniv, Rzhyschiv, Hryschentsi"
+		android:textAppearance	="?android:attr/textAppearanceLarge"
+		android:singleLine		="true"
+		android:text			="Kaniv, Rzhyschiv, Hryschentsi"
 		android:layout_marginLeft="11dip"
-		android:ellipsize="marquee"/>
+		android:ellipsize		="marquee"/>
 	
 	<TextView android:id="@+id/date"
 		android:layout_width="wrap_content"

@@ -3,6 +3,10 @@ package com.wheelly.db;
 import android.provider.BaseColumns;
 
 public final class DatabaseSchema {
+	public static final String DateFormat = "yyyy-MM-dd";
+	public static final String TimeFormat = "HH:mm:ss";
+	public static final String DateTimeFormat = DateFormat + " " + TimeFormat;
+	
 	public static final class Mileages {
 		public static final String Create = 
 			"CREATE TABLE mileages ("
@@ -12,8 +16,11 @@ public final class DatabaseSchema {
 			+ "name			TEXT,"
 			+ "track_id		LONG,"
 			
-			+ "start_heartbeat_id	LONG NOT NULL,"
-			+ "stop_heartbeat_id	LONG"
+			+ "start_heartbeat_id	LONG,"
+			+ "stop_heartbeat_id	LONG,"
+			
+			+ "start_time	TIMESTAMP,"
+			+ "stop_time	TIMESTAMP,"
 			
 			+ "mileage		NUMERIC,"
 			+ "amount		NUMERIC,"
@@ -22,27 +29,38 @@ public final class DatabaseSchema {
 			+ "calc_amount	NUMERIC);";
 		
 		public static final String Select =
-			"SELECT name, h._created start_time, mileage, calc_cost, calc_amount"
+			"SELECT m." + BaseColumns._ID + ", name, h._created start_time, mileage, calc_cost, calc_amount"
 			+ " FROM mileages m"
-			+ " INNER JOIN heartbeats h"
-			+ " ON m.start_heartbeat_id = h." + BaseColumns._ID;
+			+ " LEFT OUTER JOIN heartbeats h"
+			+ " ON m.start_heartbeat_id = h." + BaseColumns._ID
+			+ " ORDER BY m._created";
 		
 		public static final String Single =
 			"SELECT "
-			+ "name,"
+			+ "m." + BaseColumns._ID + ","
+			+ "m._created, name,"
 			+ "track_id,"
-			+ "h1._created start_time,"
-			+ "h1.place_id start_place_id,"
-			+ "h2._created stop_time,"
-			+ "h2.place_id stop_place_id,"
+			+ "start_time,"
+			+ "start_heartbeat_id,"
+			+ "stop_time,"
+			+ "stop_heartbeat_id,"
 			+ "mileage,"
 			+ "amount,"
 			+ "calc_cost,"
 			+ "calc_amount"
 			+ " FROM mileages m"
-			+ " INNER JOIN heartbeats h1 ON m.start_heartbeat_id = h1." + BaseColumns._ID
-			+ " OUTER JOIN heartbeats h2 ON m.stop_heartbeat_id = h2." + BaseColumns._ID
-			+ " WHERE " + BaseColumns._ID + " = ?";
+			+ " WHERE m." + BaseColumns._ID + " = ?";
+		
+		public static final String Defaults =
+			"SELECT -1 " + BaseColumns._ID
+			+ ", (select max(h.odometer) from heartbeats h) mileage"
+			+ ", CURRENT_TIMESTAMP start_time"
+			+ ", NULL stop_time"
+			+ ", CURRENT_TIMESTAMP _created"
+			+ ", MAX(m.amount) amount, NULL track_id"
+			+ ", NULL start_heartbeat_id, NULL stop_heartbeat_id"
+			+ ", 0 calc_cost, 0 calc_amount"
+			+ ", CURRENT_TIMESTAMP name FROM mileages m;";
 	}
 	
 	public static final class Refuels {
@@ -59,7 +77,7 @@ public final class DatabaseSchema {
 			+ "place_id		INTEGER,"
 			+ "transaction_id INTEGER,"
 			+ "is_full		INTEGER NOT NULL DEFAULT 1,"
-			+ "heartbeat_id	LONG"
+			+ "heartbeat_id	LONG,"
 			
 			+ "calc_mileage	NUMERIC)";
 	}
@@ -71,8 +89,18 @@ public final class DatabaseSchema {
 			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			+ "odometer		NUMERIC NOT NULL,"
 			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG"
+			+ "place_id		LONG,"
 			+ "latitude		DOUBLE,"
 			+ "longitude	DOUBLE);";
+		
+		public static final String Select =
+			"SELECT * FROM heartbeats ORDER BY _created DESC";
+		
+		public static final String Defaults =
+			"SELECT * FROM heartbeats ORDER BY _created DESC LIMIT 1";
+		
+		public static final String Single =
+			"SELECT * FROM heartbeats"
+			+ " WHERE " + BaseColumns._ID + " = ?";
 	}
 }

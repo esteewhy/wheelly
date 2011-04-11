@@ -1,0 +1,54 @@
+<!--
+  Copyright (c) 2010 Denis Solonenko.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the GNU Public License v2.0
+  which accompanies this distribution, and is available at
+  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  
+  Contributors:
+      Denis Solonenko - initial API and implementation
+	
+	2011-02-27: Adapted for Wheelly by esteewhy.
+-->
+<LinearLayout
+	xmlns:android			="http://schemas.android.com/apk/res/android"
+	android:layout_width	="fill_parent"
+	android:layout_height	="fill_parent"
+	android:orientation		="vertical">
+	
+	<ScrollView
+		android:layout_width	="fill_parent"
+		android:layout_height	="wrap_content"
+		android:layout_weight	="1"
+		android:scrollbarStyle	="outsideInset">
+		
+		<LinearLayout
+			xmlns:android			="http://schemas.android.com/apk/res/android"
+			android:layout_width	="fill_parent"
+			android:layout_height	="fill_parent"
+			android:orientation		="vertical"
+			android:id				="@+id/list">
+			
+			<fragment
+				class					="com.wheelly.app.TripControlBar"
+				android:id				="@+id/heartbeats"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" /> 
+			
+			<include
+				layout		="@layout/select_entry_payee" />
+			
+			<include
+				layout		="@layout/edit_divider" />
+			
+			<com.wheelly.widget.NumberInput
+				android:id				="@+id/mileage"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
+			
+		</LinearLayout>
+	</ScrollView>
+	
+	<include layout="@layout/save_and_new_buttons" />
+	
+</LinearLayout>	

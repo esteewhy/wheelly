@@ -10,8 +10,8 @@
       Denis Solonenko - initial API and implementation
 -->
 <resources>
-    <string name="app_name">Financisto</string>
-    <string name="app_description">Open-source personal budget manager</string>
+    <string name="app_name">Wheelly</string>
+    <string name="app_description">Open-source personal car manager</string>
     <string name="about_copyright1">Released under GNU GPL v2</string>
 	<color name="scheduled">#7cc623</color>
 	<color name="positive_amount">#39b54a</color>
