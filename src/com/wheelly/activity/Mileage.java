@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010 Denis Solonenko.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v2.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * 
- * Contributors:
- *     Denis Solonenko - initial API and implementation
- *     Abdsandryk - adding bill filtering parameters
- ******************************************************************************/
 package com.wheelly.activity;
 
 import java.util.ArrayList;
@@ -35,6 +24,11 @@ import com.wheelly.widget.NumberInput;
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.model.*;
 
+/**
+ * Edit single trip properties and manipulate associated heartbeats.
+ * 
+ * @author esteewhy
+ */
 public class Mileage extends FragmentActivity implements ActivityLayoutListener {
 	
 	@Override
@@ -117,6 +111,9 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		
 	}
 	
+	/**
+	 * Encapsulates UI objects.
+	 */
 	static class Controls {
 		public final EditText Name;
 		public final NumberInput Mileage;

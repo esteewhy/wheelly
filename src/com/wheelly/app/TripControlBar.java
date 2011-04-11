@@ -18,6 +18,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Button;
 
+/**
+ * A user control consisting of 2 buttons each of which spawn start or stop
+ * heartbeat editing or creation.
+ * 
+ * @author esteewhy
+ */
 public class TripControlBar extends Fragment {
 	
 	Controls c;
@@ -26,12 +32,9 @@ public class TripControlBar extends Fragment {
 	int editStartHeartbeatRequestId;
 	int editStopHeartbeatRequestId;
 	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-	}
-	
+	/**
+	 * Constructs UI and wire up event handlers.
+	 */
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		View view = inflater.inflate(R.layout.start_and_stop_buttons, container, true);
@@ -60,6 +63,9 @@ public class TripControlBar extends Fragment {
 		return view;
 	}
 	
+	/**
+	 * Update state after edit activities finished.
+	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -78,6 +84,9 @@ public class TripControlBar extends Fragment {
 		}
 	}
 	
+	/**
+	 * Returns a pair of heartbeats been edited.
+	 */
 	public TripControlBarValue getValue() {
 		TripControlBarValue result = new TripControlBarValue();
 		result.StartId = (Long)c.StartButton.getTag();
@@ -85,6 +94,9 @@ public class TripControlBar extends Fragment {
 		return result;
 	}
 	
+	/**
+	 * Initialise both heartbeats to edit and updates UI.
+	 */
 	public void setValue(TripControlBarValue value) {
 		c.StartButton.setTag(value.StartId);
 		c.StopButton.setTag(value.StopId);
@@ -99,6 +111,9 @@ public class TripControlBar extends Fragment {
 				: R.drawable.btn_stop, 0, 0, 0);
 	}
 	
+	/**
+	 * Encapsulates UI objects.
+	 */
 	static class Controls {
 		final Button StartButton;
 		final Button StopButton;

@@ -5,6 +5,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+/**
+ * Higher level abstraction over trip persistence to accommodate
+ * database connection management.
+ * 
+ * @author esteewhy
+ */
 public class TripController {
 	
 	final Context context;

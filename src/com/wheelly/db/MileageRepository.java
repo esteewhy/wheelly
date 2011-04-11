@@ -7,6 +7,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+/**
+ * Basic persistance operations over trip entity.
+ * 
+ * @author esteewhy
+ */
 public final class MileageRepository {
 	final SQLiteDatabase database;
 	
