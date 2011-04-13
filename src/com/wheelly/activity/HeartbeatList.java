@@ -29,7 +29,7 @@ public class HeartbeatList extends ListActivity {
 		super.startManagingCursor(cursor);
 		
 		final SimpleCursorAdapter adapter =
-			new SimpleCursorAdapter(this, R.layout.heartbeat, cursor,
+			new SimpleCursorAdapter(this, R.layout.heartbeat_list_item, cursor,
 				new String[] { "odometer", "_created", "fuel", "fuel" },
 				new int[] { R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge }
 			); 

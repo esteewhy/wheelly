@@ -16,7 +16,7 @@ import com.wheelly.R;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.MileageRepository;
+import com.wheelly.db.RefuelRepository;
 import com.wheelly.db.TripController;
 import com.wheelly.widget.MileageInput;
 
@@ -26,7 +26,7 @@ import ru.orangesoftware.financisto.model.*;
 /**
  * Edit single trip properties and manipulate associated heartbeats.
  */
-public class Mileage extends FragmentActivity implements ActivityLayoutListener {
+public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		//components
 		final Intent intent = this.getIntent();
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final MileageRepository repository = new MileageRepository(new DatabaseHelper(Mileage.this).getReadableDatabase());
+		final RefuelRepository repository = new RefuelRepository(new DatabaseHelper(Refuel.this).getReadableDatabase());
 		final ContentValues values = id > 0 ? repository.load(id) : repository.getDefaults();
 		
 		final Controls c = new Controls(this);
@@ -60,7 +60,7 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 					values.put("stop_heartbeat_id", heartbeats.StopId);
 					values.put("name", c.Name.getText().toString());
 					
-					intent.putExtra(BaseColumns._ID, new TripController(Mileage.this).updateTrip(values));
+					intent.putExtra(BaseColumns._ID, new TripController(Refuel.this).updateTrip(values));
 					
 					setResult(RESULT_OK, intent);
 					finish();

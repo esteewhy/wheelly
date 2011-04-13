@@ -13,8 +13,6 @@ import com.wheelly.widget.MileageInput;
 
 /**
  * Reusable heartbeat editing control.
- * 
- * @author esteewhy
  */
 public final class HeartbeatInput extends Fragment {
 	

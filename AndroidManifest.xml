@@ -22,6 +22,8 @@
 		<activity android:name=".activity.Heartbeat" android:theme="@android:style/Theme.Dialog" />
 		<activity android:name=".activity.MileageList"></activity>
 		<activity android:name=".activity.Mileage"></activity>
+		<activity android:name=".activity.RefuelList"></activity>
+		<activity android:name=".activity.Refuel"></activity>
 		<activity android:name=".widget.QuickMultiNumberInput"
 			android:label="@string/amount"
 			android:theme="@android:style/Theme.Dialog"/>
