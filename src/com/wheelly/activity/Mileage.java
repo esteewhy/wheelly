@@ -19,7 +19,7 @@ import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.TripController;
-import com.wheelly.widget.NumberInput;
+import com.wheelly.widget.MileageInput;
 
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.model.*;
@@ -116,14 +116,14 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 	 */
 	static class Controls {
 		public final EditText Name;
-		public final NumberInput Mileage;
+		public final MileageInput Mileage;
 		public final TripControlBar Heartbeats; 
 		public final Button Save;
 		public final Button Cancel;
 		
 		public Controls(FragmentActivity view) {
 			Name		= (EditText)view.findViewById(R.id.payee);
-			Mileage		= (NumberInput)view.findViewById(R.id.mileage);
+			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
 			Heartbeats	= (TripControlBar)view.getSupportFragmentManager().findFragmentById(R.id.heartbeats);
 			Save		= (Button)view.findViewById(R.id.bSave);
 			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);

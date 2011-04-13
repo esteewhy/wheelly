@@ -11,17 +11,17 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
-public final class AmountEditor extends LinearLayout {
+public final class FuelInput extends LinearLayout {
 	
 	SeekBar seekBar;
 	EditText editText;
 	
-	public AmountEditor(Context context, AttributeSet attrs) {
+	public FuelInput(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		initialize(context);
 	}
 
-	public AmountEditor(Context context) {
+	public FuelInput(Context context) {
 		super(context);
 		initialize(context);
 	}

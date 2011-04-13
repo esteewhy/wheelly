@@ -9,13 +9,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
-
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.HeartbeatRepository;
-import com.wheelly.widget.AmountEditor;
+import com.wheelly.widget.FuelInput;
 import com.wheelly.widget.DateTimeBar;
+import com.wheelly.widget.MileageInput;
 
 public final class Heartbeat extends Activity {
 	
@@ -33,7 +32,7 @@ public final class Heartbeat extends Activity {
 		
 		final Controls c = new Controls(this);
 		
-		c.OdometerEditText.setText(values.getAsString("odometer"));
+		c.OdometerEditText.setAmount(values.getAsLong("odometer"));
 		c.FuelAmountEditor.setAmount(values.getAsInteger("fuel"));
 		c.CreatedDateTimeBar.setDateTime(values.getAsString("_created"));
 		
@@ -42,7 +41,7 @@ public final class Heartbeat extends Activity {
 				@Override
 				public void onClick(View v) {
 					
-					values.put("odometer", Integer.parseInt(c.OdometerEditText.getText().toString()));
+					values.put("odometer", c.OdometerEditText.getAmount());
 					values.put("fuel", c.FuelAmountEditor.getAmount());
 					values.put("_created", c.CreatedDateTimeBar.getDateTime());
 					
@@ -72,15 +71,15 @@ public final class Heartbeat extends Activity {
 	}
 	
 	static class Controls {
-		final EditText OdometerEditText;
-		final AmountEditor FuelAmountEditor;
+		final MileageInput OdometerEditText;
+		final FuelInput FuelAmountEditor;
 		final DateTimeBar CreatedDateTimeBar;
 		final Button SaveButton;
 		final Button CancelButton;
 		
 		public Controls(Activity view) {
-			OdometerEditText	= (EditText)view.findViewById(R.id.value);
-			FuelAmountEditor	= (AmountEditor)view.findViewById(R.id.fuel);
+			OdometerEditText	= (MileageInput)view.findViewById(R.id.odometer);
+			FuelAmountEditor	= (FuelInput)view.findViewById(R.id.fuel);
 			CreatedDateTimeBar	= (DateTimeBar)view.findViewById(R.id.datetimebar);
 			SaveButton			= (Button)view.findViewById(R.id.bSave);
 			CancelButton		= (Button)view.findViewById(R.id.bSaveAndNew);

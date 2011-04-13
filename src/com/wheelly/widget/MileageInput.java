@@ -32,7 +32,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 
-public class NumberInput extends LinearLayout {
+public class MileageInput extends LinearLayout {
 
 	private static final AtomicInteger EDIT_AMOUNT_REQUEST = new AtomicInteger(2000);
 
@@ -43,12 +43,12 @@ public class NumberInput extends LinearLayout {
 	private int requestId;
 	private OnAmountChangedListener onAmountChangedListener;
 
-	public NumberInput(Context context, AttributeSet attrs) {
+	public MileageInput(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		initialize(context, attrs);
 	}
 
-	public NumberInput(Context context) {
+	public MileageInput(Context context) {
 		super(context);
 		initialize(context, null);
 	}

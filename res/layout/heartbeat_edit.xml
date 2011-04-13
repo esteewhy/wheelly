@@ -35,13 +35,15 @@
 				android:layout_width	="fill_parent"
 				style					="@style/ButtonBar"/>
 			
-			<include
-				layout ="@layout/select_entry_numeric" />
+			<com.wheelly.widget.MileageInput
+				android:id				="@+id/odometer"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
 				
 			<include
 				layout	="@layout/edit_divider" />
 			
-			<com.wheelly.widget.AmountEditor
+			<com.wheelly.widget.FuelInput
 				android:id				="@+id/fuel"
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent"/>

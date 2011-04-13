@@ -41,7 +41,7 @@
 			<include
 				layout		="@layout/edit_divider" />
 			
-			<com.wheelly.widget.NumberInput
+			<com.wheelly.widget.MileageInput
 				android:id				="@+id/mileage"
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" />
