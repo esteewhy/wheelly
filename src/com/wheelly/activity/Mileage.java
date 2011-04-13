@@ -2,7 +2,6 @@ package com.wheelly.activity;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
