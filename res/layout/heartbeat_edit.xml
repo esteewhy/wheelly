@@ -22,34 +22,12 @@
 		android:layout_weight="1"
 		android:scrollbarStyle="outsideInset">
 		
-		<LinearLayout
-			xmlns:android="http://schemas.android.com/apk/res/android"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:orientation="vertical"
-			android:id="@+id/list">
-			
-			<com.wheelly.widget.DateTimeBar
-				android:id				="@+id/datetimebar"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent"
-				style					="@style/ButtonBar"/>
-			
-			<com.wheelly.widget.MileageInput
-				android:id				="@+id/odometer"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
-				
-			<include
-				layout	="@layout/edit_divider" />
-			
-			<com.wheelly.widget.FuelInput
-				android:id				="@+id/fuel"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent"/>
-				
-			
-		</LinearLayout>
+		<fragment
+			class		="com.wheelly.app.HeartbeatInput"
+			android:id	="@+id/heartbeat"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent" />
+		
 	</ScrollView>
 	
 	<include layout="@layout/save_and_new_buttons" />

@@ -11,6 +11,11 @@ import com.wheelly.widget.FuelInput;
 import com.wheelly.widget.DateTimeBar;
 import com.wheelly.widget.MileageInput;
 
+/**
+ * Reusable heartbeat editing control.
+ * 
+ * @author esteewhy
+ */
 public final class HeartbeatInput extends Fragment {
 	
 	Controls c;
@@ -46,9 +51,9 @@ public final class HeartbeatInput extends Fragment {
 	}
 	
 	/**
-	 * Assign values to controls.
+	 * Assign values to controls. Preserves original values.
 	 */
-	public void setValue(ContentValues values) {
+	public void setValues(ContentValues values) {
 		this.values = values;
 		c.OdometerEditText.setAmount(values.getAsLong("odometer"));
 		c.FuelAmountEditor.setAmount(values.getAsInteger("fuel"));
@@ -57,7 +62,6 @@ public final class HeartbeatInput extends Fragment {
 	
 	/**
 	 * Holds control references.
-	 * @author esteewhy
 	 */
 	static class Controls {
 		final MileageInput OdometerEditText;
