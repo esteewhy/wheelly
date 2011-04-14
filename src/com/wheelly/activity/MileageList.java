@@ -19,7 +19,6 @@ public class MileageList extends ListActivity {
 	private static final int NEW_MILEAGE_REQUEST = 1;
 	protected static final int EDIT_MILEAGE_REQUEST = 2;
 	
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -51,7 +50,7 @@ public class MileageList extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView listView, View view, int position, final long id) {
-		Intent intent = new Intent(MileageList.this, Mileage.class);
+		Intent intent = new Intent(this, Mileage.class);
 		intent.putExtra(BaseColumns._ID, id);
 		startActivityForResult(intent, EDIT_MILEAGE_REQUEST);
 	}

@@ -9,10 +9,8 @@ import android.provider.BaseColumns;
 
 /**
  * Basic persistance operations over trip entity.
- * 
- * @author esteewhy
  */
-public final class MileageRepository {
+public final class MileageRepository implements IRepository {
 	final SQLiteDatabase database;
 	
 	public MileageRepository(SQLiteDatabase database) {

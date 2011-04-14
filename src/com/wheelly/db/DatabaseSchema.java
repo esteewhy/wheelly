@@ -80,6 +80,26 @@ public final class DatabaseSchema {
 			+ "heartbeat_id	LONG,"
 			
 			+ "calc_mileage	NUMERIC)";
+		
+		public static final String Select =
+			"SELECT f._id, f.name, f.calc_mileage, f.cost, f.amount"
+			+", IFNULL(f._created, h._created) _created"
+			+" FROM refuels f"
+			+" LEFT OUTER JOIN heartbeats h ON f.heartbeat_id = h._id;";
+		
+		public static final String Defaults =
+			"SELECT 1 is_full, '' name, NULL calc_mileage"
+			+", (60 - h.fuel) amount"
+			+", CURRENT_TIMESTAMP _created"
+			+", NULL transaction_id"
+			+", NULL heartbeat_id"
+			+", (SELECT f.cost * (60 - h.fuel) / f.amount FROM refuels f"
+			+" 		LEFT OUTER JOIN heartbeats hh"
+			+"		ON hh._id = f.heartbeat_id"
+			+"		ORDER BY IFNULL(hh._created, f._created) DESC LIMIT 1"
+			+") cost"
+			+" FROM heartbeats h"
+			+" ORDER BY h._created DESC LIMIT 1";
 	}
 	
 	public static final class Heartbeats {

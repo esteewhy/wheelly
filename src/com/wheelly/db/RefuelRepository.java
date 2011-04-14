@@ -1,6 +1,7 @@
 package com.wheelly.db;
 
 import com.wheelly.db.DatabaseSchema.Mileages;
+import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -8,11 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * Basic persistance operations over trip entity.
- * 
- * @author esteewhy
+ * Basic persistence operations over fuel refill entity.
  */
-public final class RefuelRepository {
+public final class RefuelRepository implements IRepository {
 	final SQLiteDatabase database;
 	
 	public RefuelRepository(SQLiteDatabase database) {
@@ -20,7 +19,7 @@ public final class RefuelRepository {
 	}
 	
 	public Cursor list() {
-		return this.database.rawQuery(Mileages.Select, null);
+		return this.database.rawQuery(Refuels.Select, null);
 	}
 	
 	public ContentValues load(long id) {
@@ -36,7 +35,7 @@ public final class RefuelRepository {
 	}
 	
 	public ContentValues getDefaults() {
-		Cursor cursor = this.database.rawQuery(DatabaseSchema.Mileages.Defaults, null);
+		Cursor cursor = this.database.rawQuery(DatabaseSchema.Refuels.Defaults, null);
 		try {
 			cursor.moveToFirst();
 			return deserialize(cursor);
@@ -69,13 +68,11 @@ public final class RefuelRepository {
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));
 		values.put("_created",		cursor.getString(cursor.getColumnIndexOrThrow("_created")));
-		values.put("track_id",		cursor.getInt(cursor.getColumnIndex("track_id")));
-		values.put("start_heartbeat_id", cursor.getLong(cursor.getColumnIndexOrThrow("start_heartbeat_id")));
-		values.put("stop_heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("stop_heartbeat_id")));
-		values.put("mileage",		cursor.getFloat(cursor.getColumnIndexOrThrow("mileage")));
+		values.put("transaction_id",cursor.getInt(cursor.getColumnIndex("transaction_id")));
+		values.put("heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("heartbeat_id")));
+		values.put("calc_mileage",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_mileage")));
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
-		values.put("calc_cost",		cursor.getFloat(cursor.getColumnIndexOrThrow("calc_cost")));
-		values.put("calc_amount",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_amount")));
+		values.put("cost",			cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
 		return values;
 	}
 }

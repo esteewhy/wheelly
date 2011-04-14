@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-public final class HeartbeatRepository {
+public final class HeartbeatRepository implements IRepository {
 	final SQLiteDatabase database;
 	
 	public HeartbeatRepository(SQLiteDatabase database) {

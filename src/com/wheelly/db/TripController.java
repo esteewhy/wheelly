@@ -8,8 +8,6 @@ import android.provider.BaseColumns;
 /**
  * Higher level abstraction over trip persistence to accommodate
  * database connection management.
- * 
- * @author esteewhy
  */
 public class TripController {
 	
@@ -26,7 +24,7 @@ public class TripController {
 		
 		try {
 			
-			MileageRepository repository = new MileageRepository(
+			IRepository repository = new MileageRepository(
 				db = new DatabaseHelper(context).getWritableDatabase()
 			);
 		

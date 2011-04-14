@@ -65,9 +65,9 @@ public class HeartbeatList extends ListActivity {
 	
 	@Override
 	protected void onListItemClick(ListView listView, View view, int position, final long id) {
-		Intent intent = new Intent(HeartbeatList.this, Heartbeat.class);
+		Intent intent = new Intent(this, Heartbeat.class);
 		intent.putExtra(BaseColumns._ID, id);
-		HeartbeatList.this.startActivityForResult(intent, EDIT_HEARTBEAT_REQUEST);
+		startActivityForResult(intent, EDIT_HEARTBEAT_REQUEST);
 	}
 	
 	@Override
