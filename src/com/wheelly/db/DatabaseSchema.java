@@ -88,7 +88,7 @@ public final class DatabaseSchema {
 			+" LEFT OUTER JOIN heartbeats h ON f.heartbeat_id = h._id;";
 		
 		public static final String Defaults =
-			"SELECT 1 is_full, '' name, NULL calc_mileage"
+			"SELECT 0 _id, 1 is_full, '' name, NULL calc_mileage"
 			+", (60 - h.fuel) amount"
 			+", CURRENT_TIMESTAMP _created"
 			+", NULL transaction_id"

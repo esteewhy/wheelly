@@ -19,18 +19,18 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 		final Resources res = getResources();
 		
 		tabHost.addTab(tabHost.newTabSpec("mileages")
-			.setIndicator("Mileages", res.getDrawable(R.drawable.ic_tab_mileage)
-			).setContent(new Intent(this, MileageList.class))
+			.setIndicator("Mileages", res.getDrawable(R.drawable.ic_tab_mileage))
+			.setContent(new Intent(this, MileageList.class))
 		);
 		
 		tabHost.addTab(tabHost.newTabSpec("heartbeats")
-			.setIndicator("Heartbeats", res.getDrawable(R.drawable.ic_tab_heartbeat)
-			).setContent(new Intent(this, HeartbeatList.class))
+			.setIndicator("Heartbeats", res.getDrawable(R.drawable.ic_tab_heartbeat))
+			.setContent(new Intent(this, HeartbeatList.class))
 		);
 		
 		tabHost.addTab(tabHost.newTabSpec("refuels")
-			.setIndicator("Refuels", res.getDrawable(R.drawable.ic_tab_refuel)
-			).setContent(new Intent(this, RefuelList.class))
+			.setIndicator("Refuels", res.getDrawable(R.drawable.ic_tab_refuel))
+			.setContent(new Intent(this, RefuelList.class))
 		);
 		
 		tabHost.setOnTabChangedListener(this);

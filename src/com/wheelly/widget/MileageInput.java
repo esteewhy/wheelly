@@ -36,8 +36,6 @@ public class MileageInput extends LinearLayout {
 
 	private static final AtomicInteger EDIT_AMOUNT_REQUEST = new AtomicInteger(2000);
 
-	private ToggleButton toggleView;
-	private TextView currencyView;
 	private EditText primary;
 	
 	private int requestId;
@@ -53,22 +51,6 @@ public class MileageInput extends LinearLayout {
 		initialize(context, null);
 	}
 	
-    public void disableIncomeExpenseButton() {
-        toggleView.setEnabled(false);
-    }
-
-    public void setIncome() {
-        toggleView.setChecked(true);
-    }
-
-    public void setExpense() {
-        toggleView.setChecked(false);
-    }
-
-    public boolean isExpense() {
-        return toggleView.isEnabled() && !toggleView.isChecked();
-    }
-
     public static interface OnAmountChangedListener {
 		void onAmountChanged(long oldAmount, long newAmount);
 	}
@@ -185,17 +167,6 @@ public class MileageInput extends LinearLayout {
 			}
 		});
 		
-		currencyView = (TextView) findViewById(R.id.currency);
-		toggleView = (ToggleButton) findViewById(R.id.toggle);
-        toggleView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (onAmountChangedListener != null) {
-                    long amount = getAmount();
-                    onAmountChangedListener.onAmountChanged(-amount, amount);
-                }
-            }
-        });
 		primary = (EditText) findViewById(R.id.primary);
 		primary.setKeyListener(keyListener);
 		primary.addTextChangedListener(textWatcher);
@@ -208,17 +179,6 @@ public class MileageInput extends LinearLayout {
 		
 		@Override
 		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-			if (end - start == 1) {
-				char c = source.charAt(0);
-                if (c == '-') {
-                    setExpense();
-					return "";
-				}
-                if (c == '+') {
-                    setIncome();
-                    return "";
-                }
-			}
 			return super.filter(source, start, end, dest, dstart, dend);
 		}
 		
@@ -248,9 +208,6 @@ public class MileageInput extends LinearLayout {
 		if (requestCode == requestId) {
 			int amount = data.getIntExtra(AmountInput.EXTRA_AMOUNT, 0);
 			setAmount(amount);
-			//if (isExpense) {
-				setExpense();
-			//}
 			return true;
 		}
 		return false;
@@ -258,13 +215,6 @@ public class MileageInput extends LinearLayout {
 
 	public void setAmount(long amount) {
 		primary.setText(String.valueOf(amount));
-        if (amount != 0) {
-            if (amount > 0) {
-                setIncome();
-            } else {
-                setExpense();
-            }
-        }
 	}
 
 	public long getAmount() {

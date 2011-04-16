@@ -29,9 +29,13 @@ public class Utils {
 					if (cursor.getLong(pos) == id) {
 						return cursor.getPosition();
 					}
-				} while(cursor.moveToNext());				
+				} while(cursor.moveToNext());
 			}
 		}
 		return -1;
+	}
+	
+	public static boolean isNotEmpty(String s) {
+		return s != null && s.length() > 0;
 	}
 }

@@ -27,6 +27,12 @@
 		<activity android:name=".widget.QuickMultiNumberInput"
 			android:label="@string/amount"
 			android:theme="@android:style/Theme.Dialog"/>
+			
+		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
+			android:label="@string/amount" android:theme="@android:style/Theme.Dialog"/>
+		
+		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
+			android:label="@string/calculator" android:theme="@android:style/Theme.Dialog"/>
 	</application>
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
@@ -38,19 +44,16 @@
 		android:anyDensity="true"/>
 
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-	<uses-feature android:name="android.hardware.camera" android:required="false" />
 	<uses-feature android:name="android.hardware.location" android:required="false" />
 	<uses-feature android:name="android.hardware.location.network" android:required="false" />
 	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<uses-permission android:name="android.permission.CAMERA" /> 
+
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />	
-	<uses-permission android:name="android.permission.VIBRATE"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
-	<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>	
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	
 </manifest> 

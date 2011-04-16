@@ -46,7 +46,7 @@ public final class RefuelRepository implements IRepository {
 	
 	public long insert(ContentValues values) {
 		values.remove(BaseColumns._ID);
-		return this.database.insert("mileages", null, values);
+		return this.database.insert("refuels", null, values);
 	}
 	
 	public void update(ContentValues values) {
@@ -57,7 +57,7 @@ public final class RefuelRepository implements IRepository {
 		}
 		
 		this.database.update(
-			"mileages",
+			"refuels",
 			values,
 			BaseColumns._ID + " = ?",
 			new String[] { Long.toString(id) });
@@ -65,10 +65,10 @@ public final class RefuelRepository implements IRepository {
 
 	static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
-		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
+		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));
 		values.put("_created",		cursor.getString(cursor.getColumnIndexOrThrow("_created")));
-		values.put("transaction_id",cursor.getInt(cursor.getColumnIndex("transaction_id")));
+		values.put("transaction_id",cursor.getInt(cursor.getColumnIndexOrThrow("transaction_id")));
 		values.put("heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("heartbeat_id")));
 		values.put("calc_mileage",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_mileage")));
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
