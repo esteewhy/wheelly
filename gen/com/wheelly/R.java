@@ -39,6 +39,14 @@ public final class R {
         public static final int ui_language_values=0x7f090007;
     }
     public static final class attr {
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int label=0x7f010000;
     }
     public static final class color {
         public static final int category_type_expense=0x7f07000b;
@@ -263,61 +271,61 @@ public final class R {
         public static final int active_icon=0x7f0a0077;
         public static final int add_attribute=0x7f0a001e;
         public static final int amount=0x7f0a0075;
-        public static final int amount_input=0x7f0a003d;
+        public static final int amount_input=0x7f0a003b;
         public static final int attach_picture=0x7f0a0034;
         public static final int attributes=0x7f0a001c;
-        public static final int b0=0x7f0a0061;
-        public static final int b1=0x7f0a005c;
-        public static final int b2=0x7f0a005d;
-        public static final int b3=0x7f0a005e;
-        public static final int b4=0x7f0a0057;
-        public static final int b5=0x7f0a0058;
-        public static final int b6=0x7f0a0059;
-        public static final int b7=0x7f0a0052;
-        public static final int b8=0x7f0a0053;
-        public static final int b9=0x7f0a0054;
-        public static final int bAdd=0x7f0a0055;
-        public static final int bCancel=0x7f0a0041;
-        public static final int bCheckAll=0x7f0a004b;
-        public static final int bClear=0x7f0a0056;
+        public static final int b0=0x7f0a0060;
+        public static final int b1=0x7f0a005b;
+        public static final int b2=0x7f0a005c;
+        public static final int b3=0x7f0a005d;
+        public static final int b4=0x7f0a0056;
+        public static final int b5=0x7f0a0057;
+        public static final int b6=0x7f0a0058;
+        public static final int b7=0x7f0a0051;
+        public static final int b8=0x7f0a0052;
+        public static final int b9=0x7f0a0053;
+        public static final int bAdd=0x7f0a0054;
+        public static final int bCancel=0x7f0a0040;
+        public static final int bCheckAll=0x7f0a004a;
+        public static final int bClear=0x7f0a0055;
         public static final int bClose=0x7f0a0095;
-        public static final int bDelete=0x7f0a005b;
-        public static final int bDivide=0x7f0a0064;
-        public static final int bDot=0x7f0a0063;
+        public static final int bDelete=0x7f0a005a;
+        public static final int bDivide=0x7f0a0063;
+        public static final int bDot=0x7f0a0062;
         public static final int bEdit=0x7f0a0094;
-        public static final int bFilter=0x7f0a004a;
+        public static final int bFilter=0x7f0a0049;
         public static final int bHelp=0x7f0a0090;
-        public static final int bMultiply=0x7f0a005f;
-        public static final int bNoFilter=0x7f0a0040;
-        public static final int bOK=0x7f0a003f;
-        public static final int bPercent=0x7f0a0060;
-        public static final int bPeriod=0x7f0a0066;
-        public static final int bPeriodFrom=0x7f0a0070;
-        public static final int bPeriodTo=0x7f0a0071;
-        public static final int bPlusMinus=0x7f0a0062;
-        public static final int bResult=0x7f0a0065;
+        public static final int bMultiply=0x7f0a005e;
+        public static final int bNoFilter=0x7f0a003f;
+        public static final int bOK=0x7f0a003e;
+        public static final int bPercent=0x7f0a005f;
+        public static final int bPeriod=0x7f0a0065;
+        public static final int bPeriodFrom=0x7f0a006f;
+        public static final int bPeriodTo=0x7f0a0070;
+        public static final int bPlusMinus=0x7f0a0061;
+        public static final int bResult=0x7f0a0064;
         public static final int bSave=0x7f0a00ad;
         public static final int bSaveAndNew=0x7f0a00ae;
         public static final int bStart=0x7f0a00b8;
         public static final int bStop=0x7f0a00b9;
-        public static final int bSubtract=0x7f0a005a;
-        public static final int bUncheckAll=0x7f0a004c;
-        public static final int bottom=0x7f0a0046;
+        public static final int bSubtract=0x7f0a0059;
+        public static final int bUncheckAll=0x7f0a004b;
+        public static final int bottom=0x7f0a0045;
         public static final int bt_filter_next=0x7f0a00a5;
         public static final int bt_filter_previous=0x7f0a00a3;
         public static final int bt_month_next=0x7f0a009d;
         public static final int bt_month_previous=0x7f0a009b;
         public static final int budget_mode=0x7f0a0029;
-        public static final int calculator=0x7f0a003e;
+        public static final int calculator=0x7f0a003c;
         public static final int card_issuer=0x7f0a0024;
         public static final int card_type=0x7f0a0025;
         public static final int category=0x7f0a0004;
         public static final int category_add=0x7f0a0006;
         public static final int category_clear=0x7f0a0005;
-        public static final int cb=0x7f0a004e;
-        public static final int center=0x7f0a0045;
+        public static final int cb=0x7f0a004d;
+        public static final int center=0x7f0a0044;
         public static final int checkbox=0x7f0a00b0;
-        public static final int checkboxIncludeHeader=0x7f0a006b;
+        public static final int checkboxIncludeHeader=0x7f0a006a;
         public static final int click_attribute=0x7f0a0022;
         public static final int consumption=0x7f0a0098;
         public static final int consumptionUom=0x7f0a0097;
@@ -329,7 +337,7 @@ public final class R {
         public static final int currency_add=0x7f0a000f;
         public static final int currency_clear=0x7f0a000e;
         public static final int data=0x7f0a0096;
-        public static final int date=0x7f0a0073;
+        public static final int date=0x7f0a0072;
         public static final int datetimebar=0x7f0a007d;
         public static final int decrement=0x7f0a00a2;
         public static final int delete_picture=0x7f0a0035;
@@ -347,19 +355,19 @@ public final class R {
         public static final int include_credit=0x7f0a0032;
         public static final int include_subcategories=0x7f0a0018;
         public static final int increment=0x7f0a00a0;
-        public static final int indicator=0x7f0a0042;
+        public static final int indicator=0x7f0a0041;
         public static final int is_ccard_payment=0x7f0a0037;
-        public static final int is_default=0x7f0a006f;
+        public static final int is_default=0x7f0a006e;
         public static final int is_included_into_totals=0x7f0a0026;
         public static final int itemLeftBottom=0x7f0a0085;
         public static final int itemLeftTop=0x7f0a0084;
         public static final int itemRightBottom=0x7f0a0087;
         public static final int itemRightTop=0x7f0a0086;
-        public static final int label=0x7f0a0039;
-        public static final int layout=0x7f0a0038;
+        public static final int label=0x7f0a0074;
+        public static final int layout=0x7f0a003d;
         public static final int layout1=0x7f0a0079;
         public static final int line1=0x7f0a008b;
-        public static final int list=0x7f0a004f;
+        public static final int list=0x7f0a004e;
         public static final int location=0x7f0a0019;
         public static final int location_add=0x7f0a001b;
         public static final int location_clear=0x7f0a001a;
@@ -371,7 +379,7 @@ public final class R {
         public static final int monthly_result_label=0x7f0a009e;
         public static final int monthly_view_title=0x7f0a009c;
         public static final int more_button=0x7f0a00b4;
-        public static final int name=0x7f0a006d;
+        public static final int name=0x7f0a006c;
         public static final int negative_opening_amount=0x7f0a0036;
         public static final int new_attribute=0x7f0a0021;
         public static final int note=0x7f0a00bc;
@@ -381,7 +389,7 @@ public final class R {
         public static final int notification_vibra=0x7f0a0030;
         public static final int odometer=0x7f0a007e;
         public static final int okButton=0x7f0a008a;
-        public static final int op=0x7f0a0051;
+        public static final int op=0x7f0a0050;
         public static final int opt_menu_add=0x7f0a00c0;
         public static final int parent_attributes=0x7f0a001d;
         public static final int payee=0x7f0a000a;
@@ -398,8 +406,8 @@ public final class R {
         public static final int picture=0x7f0a00b5;
         public static final int place=0x7f0a0080;
         public static final int plus_minus=0x7f0a00b1;
-        public static final int primary=0x7f0a003b;
-        public static final int proceed=0x7f0a004d;
+        public static final int primary=0x7f0a0039;
+        public static final int proceed=0x7f0a004c;
         public static final int progress=0x7f0a007a;
         public static final int progress_text=0x7f0a007b;
         public static final int project=0x7f0a0007;
@@ -419,31 +427,31 @@ public final class R {
         public static final int report_min_result=0x7f0a00ab;
         public static final int report_period=0x7f0a00a6;
         public static final int report_sum_result=0x7f0a00aa;
-        public static final int result=0x7f0a0050;
+        public static final int result=0x7f0a004f;
         public static final int result1=0x7f0a008d;
         public static final int result2=0x7f0a008e;
-        public static final int right=0x7f0a0048;
-        public static final int right_center=0x7f0a0043;
-        public static final int right_center2=0x7f0a0047;
-        public static final int secondary=0x7f0a003c;
+        public static final int right=0x7f0a0047;
+        public static final int right_center=0x7f0a0042;
+        public static final int right_center2=0x7f0a0046;
+        public static final int secondary=0x7f0a003a;
         public static final int sort_order=0x7f0a0027;
         public static final int sort_order_clear=0x7f0a0028;
-        public static final int spOperation=0x7f0a0049;
-        public static final int spinnerDecimalSeparators=0x7f0a0068;
-        public static final int spinnerDecimals=0x7f0a0067;
-        public static final int spinnerFieldSeparator=0x7f0a006a;
-        public static final int spinnerGroupSeparators=0x7f0a0069;
+        public static final int spOperation=0x7f0a0048;
+        public static final int spinnerDecimalSeparators=0x7f0a0067;
+        public static final int spinnerDecimals=0x7f0a0066;
+        public static final int spinnerFieldSeparator=0x7f0a0069;
+        public static final int spinnerGroupSeparators=0x7f0a0068;
         public static final int start_date=0x7f0a002c;
         public static final int start_time=0x7f0a002d;
-        public static final int status=0x7f0a0072;
+        public static final int status=0x7f0a0071;
         public static final int status_clear=0x7f0a0033;
         public static final int switcher=0x7f0a008c;
-        public static final int symbol=0x7f0a006e;
-        public static final int time=0x7f0a0074;
+        public static final int symbol=0x7f0a006d;
+        public static final int time=0x7f0a0073;
         public static final int timepicker_input=0x7f0a00a1;
-        public static final int title=0x7f0a006c;
-        public static final int toggle=0x7f0a003a;
-        public static final int top=0x7f0a0044;
+        public static final int title=0x7f0a006b;
+        public static final int toggle=0x7f0a0038;
+        public static final int top=0x7f0a0043;
         public static final int value=0x7f0a00b2;
         public static final int view=0x7f0a0091;
     }
@@ -468,51 +476,52 @@ public final class R {
         public static final int heartbeat_edit_fragment=0x7f030011;
         public static final int heartbeat_list=0x7f030012;
         public static final int heartbeat_list_item=0x7f030013;
-        public static final int list_item_old=0x7f030014;
-        public static final int location=0x7f030015;
-        public static final int location_item=0x7f030016;
-        public static final int location_list=0x7f030017;
-        public static final int lock=0x7f030018;
-        public static final int main=0x7f030019;
-        public static final int mileage_edit=0x7f03001a;
-        public static final int mileage_info=0x7f03001b;
-        public static final int mileage_info_title=0x7f03001c;
-        public static final int mileage_input=0x7f03001d;
-        public static final int mileage_list=0x7f03001e;
-        public static final int mileage_list_item=0x7f03001f;
-        public static final int monthly_view=0x7f030020;
-        public static final int number_picker=0x7f030021;
-        public static final int ok_cancel_buttons=0x7f030022;
-        public static final int position_list_item=0x7f030023;
-        public static final int refuel_edit=0x7f030024;
-        public static final int refuel_list=0x7f030025;
-        public static final int refuel_list_item=0x7f030026;
-        public static final int report=0x7f030027;
-        public static final int report_2d=0x7f030028;
-        public static final int report_list_item=0x7f030029;
-        public static final int reports_list=0x7f03002a;
-        public static final int save_and_new_buttons=0x7f03002b;
-        public static final int select_entry=0x7f03002c;
-        public static final int select_entry_checkbox=0x7f03002d;
-        public static final int select_entry_edit=0x7f03002e;
-        public static final int select_entry_icon=0x7f03002f;
-        public static final int select_entry_minus=0x7f030030;
-        public static final int select_entry_numeric=0x7f030031;
-        public static final int select_entry_payee=0x7f030032;
-        public static final int select_entry_picture=0x7f030033;
-        public static final int select_entry_plus=0x7f030034;
-        public static final int select_entry_plus_no_label=0x7f030035;
-        public static final int select_entry_rate=0x7f030036;
-        public static final int select_entry_simple=0x7f030037;
-        public static final int select_entry_simple_icon=0x7f030038;
-        public static final int select_entry_simple_list=0x7f030039;
-        public static final int select_entry_simple_minus=0x7f03003a;
-        public static final int select_entry_simple_plus=0x7f03003b;
-        public static final int select_entry_single=0x7f03003c;
-        public static final int select_entry_title=0x7f03003d;
-        public static final int start_and_stop_buttons=0x7f03003e;
-        public static final int widget_2x1=0x7f03003f;
-        public static final int widget_2x1_no_data=0x7f030040;
+        public static final int labeled_layout=0x7f030014;
+        public static final int list_item_old=0x7f030015;
+        public static final int location=0x7f030016;
+        public static final int location_item=0x7f030017;
+        public static final int location_list=0x7f030018;
+        public static final int lock=0x7f030019;
+        public static final int main=0x7f03001a;
+        public static final int mileage_edit=0x7f03001b;
+        public static final int mileage_info=0x7f03001c;
+        public static final int mileage_info_title=0x7f03001d;
+        public static final int mileage_input=0x7f03001e;
+        public static final int mileage_list=0x7f03001f;
+        public static final int mileage_list_item=0x7f030020;
+        public static final int monthly_view=0x7f030021;
+        public static final int number_picker=0x7f030022;
+        public static final int ok_cancel_buttons=0x7f030023;
+        public static final int position_list_item=0x7f030024;
+        public static final int refuel_edit=0x7f030025;
+        public static final int refuel_list=0x7f030026;
+        public static final int refuel_list_item=0x7f030027;
+        public static final int report=0x7f030028;
+        public static final int report_2d=0x7f030029;
+        public static final int report_list_item=0x7f03002a;
+        public static final int reports_list=0x7f03002b;
+        public static final int save_and_new_buttons=0x7f03002c;
+        public static final int select_entry=0x7f03002d;
+        public static final int select_entry_checkbox=0x7f03002e;
+        public static final int select_entry_edit=0x7f03002f;
+        public static final int select_entry_icon=0x7f030030;
+        public static final int select_entry_minus=0x7f030031;
+        public static final int select_entry_numeric=0x7f030032;
+        public static final int select_entry_payee=0x7f030033;
+        public static final int select_entry_picture=0x7f030034;
+        public static final int select_entry_plus=0x7f030035;
+        public static final int select_entry_plus_no_label=0x7f030036;
+        public static final int select_entry_rate=0x7f030037;
+        public static final int select_entry_simple=0x7f030038;
+        public static final int select_entry_simple_icon=0x7f030039;
+        public static final int select_entry_simple_list=0x7f03003a;
+        public static final int select_entry_simple_minus=0x7f03003b;
+        public static final int select_entry_simple_plus=0x7f03003c;
+        public static final int select_entry_single=0x7f03003d;
+        public static final int select_entry_title=0x7f03003e;
+        public static final int start_and_stop_buttons=0x7f03003f;
+        public static final int widget_2x1=0x7f030040;
+        public static final int widget_2x1_no_data=0x7f030041;
     }
     public static final class menu {
         public static final int context_menu=0x7f0c0000;
@@ -887,6 +896,7 @@ public final class R {
         public static final int recurrence_period_starts_on_date=0x7f0601b7;
         public static final int recurrence_period_starts_on_time=0x7f0601b8;
         public static final int recurrence_weekly_days=0x7f06019d;
+        public static final int refuel_cost_input_label=0x7f060226;
         public static final int remember_last_account=0x7f060118;
         public static final int remember_last_account_summary=0x7f060119;
         public static final int remember_last_category=0x7f06011a;
@@ -1094,4 +1104,33 @@ public final class R {
         public static final int report_preferences=0x7f050000;
         public static final int widget_2x1=0x7f050001;
     }
+    public static final class styleable {
+        /** Attributes that can be used with a LabeledLayout.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #LabeledLayout_label com.wheelly:label}</code></td><td></td></tr>
+           </table>
+           @see #LabeledLayout_label
+         */
+        public static final int[] LabeledLayout = {
+            0x7f010000
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.wheelly.R.attr#label}
+          attribute's value can be found in the {@link #LabeledLayout} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:label
+        */
+        public static final int LabeledLayout_label = 0;
+    };
 }

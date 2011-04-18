@@ -8,34 +8,7 @@
   Contributors:
       Denis Solonenko - initial API and implementation
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id						="@+id/layout"
-	android:orientation				="vertical"
-	android:layout_width			="fill_parent"
-	android:layout_height			="wrap_content"
-	android:layout_marginLeft		="8dip"
-	android:layout_marginTop		="3dip"
-	android:layout_marginBottom		="3dip"
-	android:layout_weight			="1"
-	android:duplicateParentState	="true">
-	
-	<TextView android:id			="@+id/label"
-		android:layout_width		="fill_parent"
-		android:layout_height		="wrap_content"
-		android:singleLine			="true"
-		android:textAppearance		="?android:attr/textAppearanceMedium"
-		android:fadingEdge			="horizontal"
-		android:duplicateParentState="true"
-		android:text				="@string/mileage_input_label" />
-	
-	<LinearLayout
-		android:id					="@+id/layout"
-		android:layout_width		="fill_parent"
-		android:layout_height		="wrap_content"
-		android:layout_marginLeft	="8dip"
-		android:layout_marginTop	="3dip" 
-		android:duplicateParentState="true">
-		
+<merge xmlns:android			="http://schemas.android.com/apk/res/android">
 		<EditText
 			android:layout_height	="fill_parent"
 			android:textStyle		="bold"
@@ -61,5 +34,4 @@
 			android:layout_width	="wrap_content"
 			android:visibility		="gone"
 			style					="@style/CalcButton"/>
-	</LinearLayout>
-</LinearLayout>
+</merge>

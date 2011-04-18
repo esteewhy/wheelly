@@ -9,10 +9,16 @@
 		android:layout_width	="fill_parent"
 		style					="@style/ButtonBar"/>
 	
-	<com.wheelly.widget.MileageInput
-		android:id				="@+id/odometer"
+	<com.wheelly.widget.LabeledLayout
+		xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+		android:layout_width	="fill_parent"
 		android:layout_height	="wrap_content"
-		android:layout_width	="fill_parent" />
+		wheelly:label			="@string/mileage_input_label">
+		<com.wheelly.widget.MileageInput
+			android:id				="@+id/odometer"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent" />
+	</com.wheelly.widget.LabeledLayout>
 	
 	<include
 		layout	="@layout/edit_divider" />

@@ -613,7 +613,8 @@
     <string name="stop">Stop</string>
     <string name="item_add">Add</string>
     
-    <string name="fuel_input_label"><b>Amount</b>, litres</string>
-    <string name="mileage_input_label"><b>Mileage</b>, km</string>
+    <string name="fuel_input_label"><b>Amount</b>, <i>litres</i></string>
+    <string name="mileage_input_label"><b>Mileage</b>, <i>km</i></string>
+    <string name="refuel_cost_input_label"><b>Total cost</b>, <i>uah</i></string>
 
 </resources>
