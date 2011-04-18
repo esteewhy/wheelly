@@ -15,16 +15,16 @@ import java.math.BigDecimal;
 import com.wheelly.R;
 import ru.orangesoftware.financisto.utils.Utils;
 import ru.orangesoftware.financisto.widget.AmountPicker.OnChangedListener;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-public class QuickAmountInput extends Activity {
+public class QuickAmountInput extends FragmentActivity {
 	
 	private AmountPicker picker;	
 	

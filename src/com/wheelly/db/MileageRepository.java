@@ -33,6 +33,13 @@ public final class MileageRepository implements IRepository {
 		}
 	}
 	
+	public void delete(long id) {
+		this.database.delete("mileages",
+			BaseColumns._ID,
+			new String[] { Long.toString(id) }
+		);
+	}
+	
 	public ContentValues getDefaults() {
 		Cursor cursor = this.database.rawQuery(DatabaseSchema.Mileages.Defaults, null);
 		try {
@@ -60,6 +67,10 @@ public final class MileageRepository implements IRepository {
 			values,
 			BaseColumns._ID + " = ?",
 			new String[] { Long.toString(id) });
+	}
+	
+	public long exists(ContentValues values) {
+		return 0;
 	}
 
 	static ContentValues deserialize(Cursor cursor) {

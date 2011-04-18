@@ -20,10 +20,9 @@ import com.wheelly.db.HeartbeatRepository;
 import com.wheelly.db.IRepository;
 import com.wheelly.db.RefuelController;
 import com.wheelly.db.RefuelRepository;
-import com.wheelly.widget.MileageInput;
-
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.model.*;
+import ru.orangesoftware.financisto.widget.AmountInput;
 
 /**
  * Edit single trip properties and manipulate associated heartbeats.
@@ -41,16 +40,16 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
 		final SQLiteDatabase db = new DatabaseHelper(Refuel.this).getReadableDatabase();
 		
-		final RefuelRepository repository = new RefuelRepository(db);
-		final ContentValues values = id > 0 ? repository.load(id) : repository.getDefaults();
+		final IRepository repository = new RefuelRepository(db);
+		final ContentValues refuel = id > 0 ? repository.load(id) : repository.getDefaults();
 		final IRepository heartbeatRepository = new HeartbeatRepository(db);
-		final ContentValues heartbeat = heartbeatRepository.getDefaults();
+		final long heartbeatId = refuel.getAsLong("heartbeat_id");
+		final ContentValues heartbeat = heartbeatId > 0 ? heartbeatRepository.load(heartbeatId) : heartbeatRepository.getDefaults();
 		
 		final Controls c = new Controls(this);
 		
-		c.Name.setText(values.getAsString("name"));
-		c.Mileage.setAmount(values.getAsLong("calc_mileage"));
 		c.Heartbeat.setValues(heartbeat);
+		c.Cost.setAmount((long)Math.round(refuel.getAsFloat("cost") * 100));
 		
 		c.Save.setOnClickListener(
 			new OnClickListener() {
@@ -58,13 +57,12 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 				public void onClick(View v) {
 					
 					final ContentValues heartbeat = c.Heartbeat.getValues();
-					values.put("calc_mileage", c.Mileage.getAmount());
-					values.put("heartbeat_id", heartbeat.getAsLong(BaseColumns._ID));
-					values.put("name", c.Name.getText().toString());
+					refuel.put("heartbeat_id", heartbeat.getAsLong(BaseColumns._ID));
+					refuel.put("cost", (float)c.Cost.getAmount() / 100);
 					
 					intent.putExtra(BaseColumns._ID,
 						new RefuelController(Refuel.this)
-							.update(values, heartbeat)
+							.update(refuel, heartbeat)
 					);
 					
 					setResult(RESULT_OK, intent);
@@ -117,16 +115,14 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 	 * Encapsulates UI objects.
 	 */
 	static class Controls {
-		public final EditText Name;
-		public final MileageInput Mileage;
 		public final HeartbeatInput Heartbeat;
+		public final AmountInput Cost;
 		public final Button Save;
 		public final Button Cancel;
 		
 		public Controls(FragmentActivity view) {
-			Name		= (EditText)view.findViewById(R.id.payee);
-			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
 			Heartbeat	= (HeartbeatInput)view.getSupportFragmentManager().findFragmentById(R.id.heartbeat);
+			Cost		= (AmountInput)view.getSupportFragmentManager().findFragmentById(R.id.cost);
 			Save		= (Button)view.findViewById(R.id.bSave);
 			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
 		}

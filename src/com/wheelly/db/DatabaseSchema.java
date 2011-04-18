@@ -24,9 +24,14 @@ public final class DatabaseSchema {
 			
 			+ "mileage		NUMERIC,"
 			+ "amount		NUMERIC,"
-			
+			// Calculated fields.
 			+ "calc_cost	NUMERIC,"
-			+ "calc_amount	NUMERIC);";
+			+ "calc_amount	NUMERIC"
+			// Constraints.
+			// Arent's supported prior 2.2
+			//+ ",FOREIGN KEY start_heartbeat_id REFERENCES heartbeats(_id)"
+			//+ ",FOREIGN KEY stop_heartbeat_id REFERENCES heartbeats(_id)"
+			+ ");";
 		
 		public static final String Select =
 			"SELECT m." + BaseColumns._ID + ", name, h._created start_time, mileage, calc_cost, calc_amount"
@@ -79,7 +84,10 @@ public final class DatabaseSchema {
 			+ "is_full		INTEGER NOT NULL DEFAULT 1,"
 			+ "heartbeat_id	LONG,"
 			
-			+ "calc_mileage	NUMERIC)";
+			+ "calc_mileage	NUMERIC"
+			
+			//+ ",FOREIGN KEY(heartbeat_id) REFERENCES heartbeats(_id)"
+			+ ")";
 		
 		public static final String Select =
 			"SELECT f._id, f.name, f.calc_mileage, f.cost, f.amount"
@@ -87,8 +95,18 @@ public final class DatabaseSchema {
 			+" FROM refuels f"
 			+" LEFT OUTER JOIN heartbeats h ON f.heartbeat_id = h._id;";
 		
+		public static final String Single =
+			"SELECT _id, name, calc_mileage, cost, amount"
+			+", _created"
+			+", transaction_id"
+			+", heartbeat_id"
+			+" FROM refuels f"
+			+" WHERE _id = ?"
+			+" LIMIT 1";
+		
 		public static final String Defaults =
-			"SELECT 0 _id, 1 is_full, '' name, NULL calc_mileage"
+			"SELECT 0 _id, 1 is_full, '' name"
+			+", NULL calc_mileage"
 			+", (60 - h.fuel) amount"
 			+", CURRENT_TIMESTAMP _created"
 			+", NULL transaction_id"
@@ -122,5 +140,21 @@ public final class DatabaseSchema {
 		public static final String Single =
 			"SELECT * FROM heartbeats"
 			+ " WHERE " + BaseColumns._ID + " = ?";
+		
+		public static final String Exists =
+			"SELECT "
+			+ BaseColumns._ID
+			+ " FROM heartbeats"
+			+ " WHERE odometer = ? AND fuel = ?"
+			+ " LIMIT 1;";
+		
+		public static final String ReferenceCount =
+			"SELECT SUM(cnt) FROM ("
+			+ "SELECT COUNT(1) cnt FROM mileages WHERE start_heartbeat_id = ?"
+			+ " UNION "
+			+ "SELECT COUNT(1) cnt FROM mileages WHERE stop_heartbeat_id = ?"
+			+ " UNION "
+			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?"
+			+ ");";
 	}
 }

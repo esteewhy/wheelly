@@ -18,6 +18,7 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.wheelly.R;
 import ru.orangesoftware.financisto.utils.Utils;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.text.method.NumberKeyListener;
+import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -205,15 +207,17 @@ public class AmountInput extends Fragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-
-		if (requestCode == requestId) {
-			String amount = data.getStringExtra(EXTRA_AMOUNT);
-			if (amount != null) {
-				try {
-					BigDecimal d = new BigDecimal(amount).setScale(2,
-							BigDecimal.ROUND_HALF_UP);
-					setAmount(d.unscaledValue().longValue());
-				} catch (NumberFormatException ex) {
+		
+		if(resultCode == Activity.RESULT_OK) {
+			if (requestCode == requestId) {
+				String amount = data.getStringExtra(EXTRA_AMOUNT);
+				if (amount != null) {
+					try {
+						BigDecimal d = new BigDecimal(amount).setScale(2,
+								BigDecimal.ROUND_HALF_UP);
+						setAmount(d.unscaledValue().longValue());
+					} catch (NumberFormatException ex) {
+					}
 				}
 			}
 		}
@@ -249,6 +253,13 @@ public class AmountInput extends Fragment {
 	public void setColor(int color) {
 		c.primary.setTextColor(color);
 		c.secondary.setTextColor(color);
+	}
+
+	@Override
+	public void onInflate(AttributeSet attrs, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onInflate(attrs, savedInstanceState);
+		Object val = attrs.getAttributeValue("", "label");
 	}
 	
 	static class Controls {

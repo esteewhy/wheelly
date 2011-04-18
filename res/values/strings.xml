@@ -75,15 +75,9 @@
 	<string name="select_category">Please select category..</string>
 	<string name="select_project">Please select project..</string>	
 	<string name="warning">Warning</string>
-	<string name="no_accounts">You should start with creating an account. Tap the green \'+\' at the bottom..</string>
-	<string name="no_heartbeats">No heartbeats</string>
-	<string name="no_transactions">No transactions</string>
-	<string name="no_categories">No categories</string>
-	<string name="no_currencies">No currencies</string>
-	<string name="no_projects">No projects</string>
-	<string name="no_recur">No recur</string>
-	<string name="account_from">From Account</string>
-	<string name="account_to">To Account</string>
+	<string name="no_mileages">Mileage consists of a recorded start and stop time, odometer and fuel level. You want to create ont every time starting a trip. "Close" it when You\'ve arrived to the destination. Press "Menu" button then select "Add".</string>
+	<string name="no_heartbeats">Heartbeat is a special type of record, holding basic counters of Your car. Normaly it gets created simultaneously when entering other types of records like Refuel or Mileage. Also, You are welcome to create heartbeats as frequent as possible, this way You can greatly increase usage statistics accuracy. Press "Menu" button then select "Add".</string>
+	<string name="no_refuels">You want to enter a new Refuel record each time after visiting fuel pump. Press "Menu" button then select "Add".</string>
 	<string name="amount_from">Amount Out</string>
 	<string name="amount_to">Amount In</string>
 	<string name="rate">Rate</string>
@@ -211,11 +205,10 @@
 	<string name="group_separator">Group\nseparator</string>
 	<string name="field_separator">Field\nseparator</string>
 	<string name="include_header">Include\nheader</string>
-	<string name="delete_account_confirm">Delete account?</string>
-	<string name="delete_transaction_confirm">Delete transaction?</string>
-	<string name="delete_budget_confirm">Delete budget?</string>
+	<string name="delete_mileage_confirm">Delete mileage?</string>
+	<string name="delete_heartbeat_confirm">Delete heartbeat?</string>
+	<string name="delete_refuel_confirm">Delete refuel?</string>
 	<string name="delete_budget_recurring_select">You\'re about to delete a recurring budget. What to delete?</string>
-	<string name="delete_budget_recurring_confirm">Delete recurring budget?</string>
 	<string name="delete_budget_one_entry">This entry</string>	
 	<string name="delete_budget_all_entries">All entries</string>
 	<string name="edit_recurring_budget">You\'re editing recurring budget, it will affect all entries</string>	
@@ -473,7 +466,6 @@
 	<string name="transfer_template">Transfer (Template)</string>	
 	<string name="no_templates">No templates</string>	
 	<string name="template">Template</string>	
-	<string name="delete_template_confirm">Delete template?</string>	
 	<string name="save_as_template">Save as template</string>	
 	<string name="save_as_template_success">Transaction saved as template..</string>		
 	<string name="scheduled_transactions">Scheduled</string>	
@@ -619,5 +611,9 @@
     <string name="type">Type</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="item_add">Add</string>
+    
+    <string name="fuel_input_label"><b>Amount</b>, litres</string>
+    <string name="mileage_input_label"><b>Mileage</b>, km</string>
 
 </resources>

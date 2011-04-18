@@ -18,22 +18,35 @@ public class TripController {
 		this.context = context;
 	}
 	
-	public long updateTrip(ContentValues values) {
+	public long update(ContentValues mileage) {
 		SQLiteDatabase db = null;
-		long id = values.getAsLong(BaseColumns._ID);
+		long id = mileage.getAsLong(BaseColumns._ID);
 		
 		try {
-			
 			IRepository repository = new MileageRepository(
 				db = new DatabaseHelper(context).getWritableDatabase()
 			);
 		
 			if(id > 0) {
-				repository.update(values);
+				repository.update(mileage);
 				return id;
 			} else {
-				return repository.insert(values);
+				return repository.insert(mileage);
 			}
+		} finally {
+			if(null != db) {
+				db.close();
+			}
+		}
+	}
+
+	public void delete(long id) {
+		SQLiteDatabase db = null;
+		
+		try {
+			new MileageRepository(
+				db = new DatabaseHelper(context).getWritableDatabase()
+			).delete(id);
 		} finally {
 			if(null != db) {
 				db.close();

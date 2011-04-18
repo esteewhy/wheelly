@@ -87,9 +87,7 @@ public class MileageInput extends LinearLayout {
 
 	private void initialize(Context context, AttributeSet attrs) {
 		requestId = EDIT_AMOUNT_REQUEST.incrementAndGet();
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
-		LinearLayout view = (LinearLayout)layoutInflater.inflate(R.layout.number_input, this, true);
-		view.setOrientation(LinearLayout.VERTICAL);
+		LayoutInflater.from(context).inflate(R.layout.mileage_input, this, true);
 		
 		findViewById(R.id.amount_input).setOnClickListener(new OnClickListener() {
 			@Override
@@ -109,7 +107,7 @@ public class MileageInput extends LinearLayout {
 				
 				// picker
 				final MultiNumberPicker picker = new MultiNumberPicker(ctx);
-				layout.addView(picker, lpWrapWrap);		
+				layout.addView(picker, lpWrapWrap);
 				if (amount != 0) {
 					picker.setCurrent((int)amount);
 				}

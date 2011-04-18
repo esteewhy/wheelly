@@ -7,13 +7,28 @@ import android.database.Cursor;
  * Unified contract for persisting entities of a given type.
  */
 public interface IRepository {
-	public Cursor list();
+	Cursor list();
 	
-	public long insert(ContentValues values);
+	long insert(ContentValues values);
 	
-	public void update(ContentValues values);
+	void update(ContentValues values);
 	
-	public ContentValues load(long id);
+	ContentValues load(long id);
 	
-	public ContentValues getDefaults();
+	void delete(long id);
+	
+	/**
+	 * Calculate default entity values.
+	 * @return
+	 */
+	ContentValues getDefaults();
+	
+	/**
+	 * Attempts to match an existing record against provided values.
+	 * 
+	 * This is primarily used to reduce duplications and is specific to entity.
+	 * @param values
+	 * @return Matched record ID or 0.
+	 */
+	long exists(ContentValues values);
 }

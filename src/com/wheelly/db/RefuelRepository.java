@@ -1,6 +1,5 @@
 package com.wheelly.db;
 
-import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.content.ContentValues;
@@ -23,7 +22,7 @@ public final class RefuelRepository implements IRepository {
 	}
 	
 	public ContentValues load(long id) {
-		Cursor cursor = this.database.rawQuery(Mileages.Single, new String[] {
+		Cursor cursor = this.database.rawQuery(Refuels.Single, new String[] {
 			((Object)id).toString()
 		});
 		try {
@@ -32,6 +31,13 @@ public final class RefuelRepository implements IRepository {
 		} finally {
 			cursor.close();
 		}
+	}
+	
+	public void delete(long id) {
+		this.database.delete("refuels",
+			BaseColumns._ID,
+			new String[] { Long.toString(id) }
+		);
 	}
 	
 	public ContentValues getDefaults() {
@@ -52,7 +58,7 @@ public final class RefuelRepository implements IRepository {
 	public void update(ContentValues values) {
 		long id = values.getAsLong(BaseColumns._ID);
 		
-		for(String column : new String[] {BaseColumns._ID, "stop_place_id", "start_place_id"}) {
+		for(String column : new String[] {BaseColumns._ID}) {
 			values.remove(column);
 		}
 		
@@ -62,8 +68,12 @@ public final class RefuelRepository implements IRepository {
 			BaseColumns._ID + " = ?",
 			new String[] { Long.toString(id) });
 	}
-
-	static ContentValues deserialize(Cursor cursor) {
+	
+	public long exists(ContentValues values) {
+		return 0;
+	}
+	
+	public static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));

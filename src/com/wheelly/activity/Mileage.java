@@ -60,7 +60,7 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 					values.put("stop_heartbeat_id", heartbeats.StopId);
 					values.put("name", c.Name.getText().toString());
 					
-					intent.putExtra(BaseColumns._ID, new TripController(Mileage.this).updateTrip(values));
+					intent.putExtra(BaseColumns._ID, new TripController(Mileage.this).update(values));
 					
 					setResult(RESULT_OK, intent);
 					finish();

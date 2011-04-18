@@ -47,6 +47,13 @@ public final class HeartbeatRepository implements IRepository {
 		}
 	}
 	
+	public void delete(long id) {
+		this.database.delete("heartbeats",
+			BaseColumns._ID + " = ?",
+			new String[] { Long.toString(id) }
+		);
+	}
+	
 	public ContentValues getDefaults() {
 		Cursor cursor = this.database.rawQuery(DatabaseSchema.Heartbeats.Defaults, null);
 		try {
@@ -65,6 +72,28 @@ public final class HeartbeatRepository implements IRepository {
 		} finally {
 			cursor.close();
 		}
+	}
+	
+	public long exists(ContentValues values) {
+		Cursor cursor = this.database.rawQuery(DatabaseSchema.Heartbeats.Exists,
+			new String[] {
+				values.getAsLong("odometer").toString(),
+				values.getAsLong("fuel").toString()
+			});
+		
+		return
+			cursor.moveToFirst()
+				? cursor.getLong(0)
+				: 0;
+	}
+	
+	public int referenceCount(final long id) {
+		String _id = Long.toString(id);
+		Cursor cursor = this.database
+			.rawQuery(DatabaseSchema.Heartbeats.ReferenceCount,
+				new String[] { _id, _id, _id });
+		cursor.moveToFirst();
+		return cursor.getInt(0);
 	}
 	
 	static ContentValues deserialize(Cursor cursor) {

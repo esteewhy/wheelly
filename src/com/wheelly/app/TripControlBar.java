@@ -18,8 +18,6 @@ import android.widget.Button;
 /**
  * A user control consisting of 2 buttons each of which spawn start or stop
  * heartbeat editing or creation.
- * 
- * @author esteewhy
  */
 public class TripControlBar extends Fragment {
 	
@@ -92,7 +90,7 @@ public class TripControlBar extends Fragment {
 	}
 	
 	/**
-	 * Initialise both heartbeats to edit and updates UI.
+	 * Initialises both edited heartbeats and updates UI.
 	 */
 	public void setValue(TripControlBarValue value) {
 		c.StartButton.setTag(value.StartId);

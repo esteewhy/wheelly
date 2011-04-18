@@ -27,13 +27,12 @@ public final class FuelInput extends LinearLayout {
 	}
 
 	void initialize(Context context) {
-		LayoutInflater.from(context).inflate(R.layout.select_entry_amount, this, true);
+		LayoutInflater.from(context).inflate(R.layout.fuel_input, this, true);
 		
 		this.seekBar = ((SeekBar)findViewById(R.id.amount));
 		this.editText = ((EditText)findViewById(R.id.primary));
 		
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 			
@@ -50,7 +49,6 @@ public final class FuelInput extends LinearLayout {
 		});
 		
 		editText.addTextChangedListener(new TextWatcher() {
-			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
@@ -66,13 +64,11 @@ public final class FuelInput extends LinearLayout {
 			}
 		});
 	}
-
 	
 	public int getAmount() {
 		return this.seekBar.getProgress();
 	}
 	
-
 	public void setAmount(int amount) {
 		this.editText.setText(Integer.toString(amount));
 	}

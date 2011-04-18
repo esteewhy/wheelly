@@ -10,17 +10,44 @@
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="wrap_content" android:layout_width="fill_parent">
-    <TextView android:layout_width="wrap_content"
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id						="@+id/layout"
+	android:orientation				="vertical"
+	android:layout_width			="fill_parent"
+	android:layout_height			="wrap_content"
+	android:layout_marginLeft		="8dip"
+	android:layout_marginTop		="3dip"
+	android:layout_marginBottom		="3dip"
+	android:layout_weight			="1"
+	android:duplicateParentState	="true">
+	
+	<TextView android:id			="@+id/label"
+		android:layout_width		="fill_parent"
+		android:layout_height		="wrap_content"
+		android:singleLine			="true"
+		android:textAppearance		="?android:attr/textAppearanceMedium"
+		android:fadingEdge			="horizontal"
+		android:duplicateParentState="true"
+		android:text				="@string/mileage_input_label" />
+	
+	<LinearLayout
+		android:id					="@+id/layout"
+		android:layout_width		="fill_parent"
+		android:layout_height		="wrap_content"
+		android:layout_marginLeft	="8dip"
+		android:layout_marginTop	="3dip" 
+		android:duplicateParentState="true">
+	<TextView android:layout_width="wrap_content"
 		android:id="@+id/currency" android:text=""
 		android:layout_height="fill_parent" android:gravity="center_vertical"
 		android:textStyle="bold" android:textSize="20sp"/>
-    <ToggleButton android:layout_width="60dp"
-        android:id="@+id/toggle"
-        android:textOn="+"
-        android:textOff="-"
-        android:background="@drawable/btn_toggle_bg"
-        android:layout_height="fill_parent" />
-    <EditText android:layout_height="fill_parent"
+	<ToggleButton android:layout_width="60dp"
+		android:id="@+id/toggle"
+		android:textOn="+"
+		android:textOff="-"
+		android:background="@drawable/btn_toggle_bg"
+		android:layout_height="fill_parent" />
+	<EditText android:layout_height="fill_parent"
 		android:textStyle="bold" android:singleLine="true"
 		android:layout_width="wrap_content" android:layout_weight="1"
 		android:textSize="20sp" android:gravity="right|center_vertical"
@@ -35,14 +62,16 @@
 		android:textSize="20sp" android:gravity="left|center_vertical"
 		android:id="@+id/secondary"  android:numeric="integer" 
 		android:maxLength="2" android:phoneNumber="true"/>
-    <ImageButton
-        android:id="@+id/amount_input"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        style="@style/UpDownButton"/>
-    <ImageButton
-        android:id="@+id/calculator"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        style="@style/CalcButton"/>
+	<ImageButton
+		android:id="@+id/amount_input"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		style="@style/UpDownButton"/>
+	<ImageButton
+		android:id="@+id/calculator"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		style="@style/CalcButton"/>
+		</LinearLayout>
+	</LinearLayout>
 </merge>

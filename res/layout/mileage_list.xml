@@ -28,15 +28,5 @@
 		android:layout_height	="wrap_content"
 		android:layout_weight	="1"
 		android:gravity			="center"
-		android:text			="@string/no_accounts" />
-	
-	<LinearLayout
-		android:layout_height	="wrap_content"
-		android:layout_width	="fill_parent"
-		android:background		="#FFF"
-		android:paddingTop		="2dp">
-		<ImageButton android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:id="@+id/bAdd"
-			android:src="@drawable/ic_input_add"/>
-	</LinearLayout>
+		android:text			="@string/no_mileages" />
 </LinearLayout>

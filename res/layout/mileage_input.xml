@@ -8,22 +8,25 @@
   Contributors:
       Denis Solonenko - initial API and implementation
 -->
-<merge
-	xmlns:android				="http://schemas.android.com/apk/res/android"
-	android:layout_height		="wrap_content"
-	android:layout_width		="fill_parent"
-	android:orientation			="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id						="@+id/layout"
+	android:orientation				="vertical"
+	android:layout_width			="fill_parent"
+	android:layout_height			="wrap_content"
+	android:layout_marginLeft		="8dip"
+	android:layout_marginTop		="3dip"
+	android:layout_marginBottom		="3dip"
+	android:layout_weight			="1"
+	android:duplicateParentState	="true">
 	
-	<TextView
-			android:id				="@+id/label"
-			android:layout_width	="fill_parent"
-			android:layout_height	="wrap_content"
-			android:singleLine		="true"
-			android:textAppearance	="?android:attr/textAppearanceMedium"
-			android:ellipsize		="marquee"
-			android:fadingEdge		="vertical"
-			android:text			="Mileage"
-			android:duplicateParentState	="true" />
+	<TextView android:id			="@+id/label"
+		android:layout_width		="fill_parent"
+		android:layout_height		="wrap_content"
+		android:singleLine			="true"
+		android:textAppearance		="?android:attr/textAppearanceMedium"
+		android:fadingEdge			="horizontal"
+		android:duplicateParentState="true"
+		android:text				="@string/mileage_input_label" />
 	
 	<LinearLayout
 		android:id					="@+id/layout"
@@ -33,30 +36,12 @@
 		android:layout_marginTop	="3dip" 
 		android:duplicateParentState="true">
 		
-		<TextView
-			android:layout_width	="wrap_content"
-			android:id				="@+id/uom"
-			android:text			="km"
-			android:layout_height	="fill_parent"
-			android:gravity			="center_vertical"
-			android:textStyle		="bold"
-			android:textSize		="20sp"/>
-		
-		<ToggleButton
-			android:layout_width	="60dp"
-			android:id				="@+id/toggle"
-			android:textOn			="+"
-			android:textOff			="="
-			android:background		="@drawable/btn_toggle_bg"
-			android:visibility		="gone"
-			android:layout_height	="fill_parent" />
-		
 		<EditText
 			android:layout_height	="fill_parent"
 			android:textStyle		="bold"
 			android:singleLine		="true"
 			android:layout_width	="wrap_content"
-			android:layout_weight	="1"
+			android:layout_weight	="2"
 			android:textSize		="20sp"
 			android:gravity			="right|center_vertical"
 			android:id				="@+id/primary"
@@ -76,6 +61,5 @@
 			android:layout_width	="wrap_content"
 			android:visibility		="gone"
 			style					="@style/CalcButton"/>
-	
 	</LinearLayout>
-</merge>
+</LinearLayout>

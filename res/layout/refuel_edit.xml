@@ -38,23 +38,11 @@
 			<include
 				layout		="@layout/edit_divider" />
 				
-			<include
-				layout		="@layout/select_entry_payee"/>
-			
-			<include
-				layout		="@layout/edit_divider" />
-			
-			<com.wheelly.widget.MileageInput
-				android:id				="@+id/mileage"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
-			
-			<include
-				layout		="@layout/edit_divider" />
 			
 			<fragment
 				class		="ru.orangesoftware.financisto.widget.AmountInput"
 				android:id	="@+id/cost"
+				label="@string/mileage_input_label"
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" />
 			
