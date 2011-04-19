@@ -60,8 +60,8 @@
 			android:layout_alignParentTop	="true"
 			android:textAppearance	="?android:attr/textAppearanceLarge"
 			android:singleLine		="true"
-			android:text			="-25.4"
-			android:textColor		="@color/negative_amount"/>
+			android:text			="25.4"
+			android:textColor		="@color/neutral_amount"/>
 		
 		<TextView android:id		="@+id/fuelUOM"
 			android:gravity			="center_vertical"

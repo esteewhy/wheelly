@@ -35,16 +35,18 @@
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" /> 
 			
-			<include
-				layout		="@layout/select_entry_payee" />
-			
-			<include
-				layout		="@layout/edit_divider" />
-			
-			<com.wheelly.widget.MileageInput
-				android:id				="@+id/mileage"
+			<com.wheelly.widget.LabeledLayout
+				xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+				android:layout_width	="fill_parent"
 				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
+				wheelly:label			="@string/mileage_input_label">
+				
+				<com.wheelly.widget.MileageInput
+					android:id				="@+id/mileage"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+				
+			</com.wheelly.widget.LabeledLayout>
 			
 		</LinearLayout>
 	</ScrollView>

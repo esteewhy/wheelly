@@ -611,6 +611,7 @@
     <string name="type">Type</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="heartbeat_button_caption">%1$05d / %2$02d</string> 
     <string name="item_add">Add</string>
     
     <string name="fuel_input_label"><b>Amount</b>, <i>litres</i></string>

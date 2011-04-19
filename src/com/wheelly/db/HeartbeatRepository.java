@@ -91,7 +91,7 @@ public final class HeartbeatRepository implements IRepository {
 		String _id = Long.toString(id);
 		Cursor cursor = this.database
 			.rawQuery(DatabaseSchema.Heartbeats.ReferenceCount,
-				new String[] { _id, _id, _id });
+				new String[] { _id });
 		cursor.moveToFirst();
 		return cursor.getInt(0);
 	}

@@ -37,7 +37,7 @@ public class RefuelList extends ListActivity {
 		super.setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.refuel_list_item, cursor,
 				new String[] {
-					"name", "calc_mileage", "cost", "_created", "amount"
+					"name", "mileage", "cost", "_created", "amount"
 				},
 				new int[] {
 					R.id.name, R.id.mileage, R.id.cost, R.id.date, R.id.consumption

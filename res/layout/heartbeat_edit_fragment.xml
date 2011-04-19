@@ -23,8 +23,14 @@
 	<include
 		layout	="@layout/edit_divider" />
 	
-	<com.wheelly.widget.FuelInput
-		android:id				="@+id/fuel"
+	<com.wheelly.widget.LabeledLayout
+		xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+		android:layout_width	="fill_parent"
 		android:layout_height	="wrap_content"
-		android:layout_width	="fill_parent"/>
+		wheelly:label			="@string/fuel_input_label">
+		<com.wheelly.widget.FuelInput
+			android:id				="@+id/fuel"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent"/>
+	</com.wheelly.widget.LabeledLayout>
 </LinearLayout>

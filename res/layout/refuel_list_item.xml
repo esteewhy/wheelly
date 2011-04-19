@@ -34,16 +34,17 @@
 	<TextView
 		android:id					="@+id/consumption"
 		android:gravity				="center_vertical"
-		android:layout_alignBaseline="@id/name"
 		android:layout_marginLeft	="5dip"
+		android:layout_marginRight	="3dip"
+		android:layout_alignBaseline="@id/name"
 		android:layout_width		="wrap_content"
 		android:layout_height		="wrap_content"
 		android:layout_alignParentTop="true"
-		android:layout_toLeftOf	="@id/consumptionUom"
-		android:textAppearance	="?android:attr/textAppearanceLarge"
-		android:singleLine		="true"
-		android:text			="+25.4"
-		android:textColor		="@color/positive_amount"/>
+		android:layout_toLeftOf		="@id/consumptionUom"
+		android:textAppearance		="?android:attr/textAppearanceLarge"
+		android:singleLine			="true"
+		android:text				="+25.4"
+		android:textColor			="@color/positive_amount"/>
 	<TextView
 		android:id				="@+id/name"
 		android:layout_height	="wrap_content"
@@ -72,14 +73,14 @@
 		android:textAppearance="?android:attr/textAppearanceSmall"/>
 	
 	<TextView
-		android:id="@+id/mileage"
-		android:layout_marginLeft="5dip"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:layout_toRightOf="@id/date"
+		android:id					="@+id/mileage"
+		android:layout_marginLeft	="5dip"
+		android:layout_height		="wrap_content"
+		android:layout_width		="wrap_content"
+		android:layout_toRightOf	="@id/date"
 		android:layout_alignParentBottom="true"
 		android:layout_alignWithParentIfMissing="true"
-		android:singleLine="true"
+		android:singleLine			="true"
 		android:text="283.5"
 		android:textAppearance="?android:attr/textAppearanceSmall"/>
 	

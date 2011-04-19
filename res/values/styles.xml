@@ -24,6 +24,9 @@
 	<style name="TextAppearance.NegativeAmount">
 		<item name="android:textColor">#f26522</item>
 	</style>
+	<style name="TextAppearance.NeutralAmount">
+		<item name="android:textColor">#FFFF00</item>
+	</style>
 	<style name="MinusButton">
 		<item name="android:background">@drawable/btn_circle</item>
 		<item name="android:src">@drawable/ic_btn_round_minus</item>

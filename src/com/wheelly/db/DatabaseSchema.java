@@ -34,38 +34,50 @@ public final class DatabaseSchema {
 			+ ");";
 		
 		public static final String Select =
-			"SELECT m." + BaseColumns._ID + ", name, h._created start_time, mileage, calc_cost, calc_amount"
+			"SELECT m." + BaseColumns._ID
+			+ ", name"
+			+ ", COALESCE(stop._created, start._created, m._created) stop_time"
+			+ ", mileage"
+			+ ", calc_cost		cost"
+			+ ", COALESCE(stop.fuel - start.fuel, calc_amount) fuel"
 			+ " FROM mileages m"
-			+ " LEFT OUTER JOIN heartbeats h"
-			+ " ON m.start_heartbeat_id = h." + BaseColumns._ID
-			+ " ORDER BY m._created";
+			+ " LEFT OUTER JOIN heartbeats start"
+			+ " 	ON m.start_heartbeat_id = start." + BaseColumns._ID
+			+ " LEFT OUTER JOIN heartbeats stop"
+			+ " 	ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+			+ " ORDER BY COALESCE(stop._created, start._created, m._created) DESC";
 		
 		public static final String Single =
 			"SELECT "
-			+ "m." + BaseColumns._ID + ","
-			+ "m._created, name,"
-			+ "track_id,"
-			+ "start_time,"
-			+ "start_heartbeat_id,"
-			+ "stop_time,"
-			+ "stop_heartbeat_id,"
-			+ "mileage,"
-			+ "amount,"
-			+ "calc_cost,"
-			+ "calc_amount"
+			+ "m." + BaseColumns._ID
+			+ ", m._created"
+			+ ", name"
+			+ ", track_id"
+			+ ", start_time"
+			+ ", start_heartbeat_id"
+			+ ", stop_time"
+			+ ", stop_heartbeat_id"
+			+ ", mileage"
+			+ ", amount"
+			+ ", calc_cost"
+			+ ", calc_amount"
 			+ " FROM mileages m"
 			+ " WHERE m." + BaseColumns._ID + " = ?";
 		
 		public static final String Defaults =
 			"SELECT -1 " + BaseColumns._ID
-			+ ", (select max(h.odometer) from heartbeats h) mileage"
-			+ ", CURRENT_TIMESTAMP start_time"
-			+ ", NULL stop_time"
-			+ ", CURRENT_TIMESTAMP _created"
-			+ ", MAX(m.amount) amount, NULL track_id"
-			+ ", NULL start_heartbeat_id, NULL stop_heartbeat_id"
-			+ ", 0 calc_cost, 0 calc_amount"
-			+ ", CURRENT_TIMESTAMP name FROM mileages m;";
+			+ ", 0					mileage"
+			+ ", CURRENT_TIMESTAMP	start_time"
+			+ ", NULL				stop_time"
+			+ ", CURRENT_TIMESTAMP	_created"
+			+ ", MAX(m.amount)		amount"
+			+ ", NULL				track_id"
+			+ ", NULL				start_heartbeat_id"
+			+ ", NULL				stop_heartbeat_id"
+			+ ", 0					calc_cost"
+			+ ", 0					calc_amount"
+			+ ", CURRENT_TIMESTAMP	name"
+			+ " FROM mileages m;";
 	}
 	
 	public static final class Refuels {
@@ -90,10 +102,15 @@ public final class DatabaseSchema {
 			+ ")";
 		
 		public static final String Select =
-			"SELECT f._id, f.name, f.calc_mileage, f.cost, f.amount"
-			+", IFNULL(f._created, h._created) _created"
-			+" FROM refuels f"
-			+" LEFT OUTER JOIN heartbeats h ON f.heartbeat_id = h._id;";
+			"SELECT f." + BaseColumns._ID
+			+ ", f.name"
+			+ ", f.calc_mileage mileage"
+			+ ", f.cost"
+			+ ", f.amount"
+			+ ", IFNULL(h._created, f._created) _created"
+			+ " FROM refuels f"
+			+ " LEFT OUTER JOIN heartbeats h"
+			+ "		ON f.heartbeat_id = h." + BaseColumns._ID;
 		
 		public static final String Single =
 			"SELECT _id, name, calc_mileage, cost, amount"
@@ -105,12 +122,14 @@ public final class DatabaseSchema {
 			+" LIMIT 1";
 		
 		public static final String Defaults =
-			"SELECT 0 _id, 1 is_full, '' name"
-			+", NULL calc_mileage"
-			+", (60 - h.fuel) amount"
-			+", CURRENT_TIMESTAMP _created"
-			+", NULL transaction_id"
-			+", NULL heartbeat_id"
+			"SELECT 0				_id"
+			+", 1					is_full"
+			+", ''					name"
+			+", NULL				calc_mileage"
+			+", (60 - h.fuel)		amount"
+			+", CURRENT_TIMESTAMP	_created"
+			+", NULL				transaction_id"
+			+", NULL				heartbeat_id"
 			+", (SELECT f.cost * (60 - h.fuel) / f.amount FROM refuels f"
 			+" 		LEFT OUTER JOIN heartbeats hh"
 			+"		ON hh._id = f.heartbeat_id"
@@ -150,11 +169,11 @@ public final class DatabaseSchema {
 		
 		public static final String ReferenceCount =
 			"SELECT SUM(cnt) FROM ("
-			+ "SELECT COUNT(1) cnt FROM mileages WHERE start_heartbeat_id = ?"
+			+ "SELECT COUNT(1) cnt FROM mileages WHERE start_heartbeat_id = ?1"
 			+ " UNION "
-			+ "SELECT COUNT(1) cnt FROM mileages WHERE stop_heartbeat_id = ?"
+			+ "SELECT COUNT(1) cnt FROM mileages WHERE stop_heartbeat_id = ?1"
 			+ " UNION "
-			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?"
+			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?1"
 			+ ");";
 	}
 }

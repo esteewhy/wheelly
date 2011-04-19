@@ -42,7 +42,6 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		
 		final Controls c = new Controls(this);
 		
-		c.Name.setText(values.getAsString("name"));
 		c.Mileage.setAmount(values.getAsLong("mileage"));
 		final TripControlBarValue heartbeats = new TripControlBarValue();
 		heartbeats.StartId = values.getAsLong("start_heartbeat_id");
@@ -58,7 +57,6 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 					final TripControlBarValue heartbeats = c.Heartbeats.getValue();
 					values.put("start_heartbeat_id", heartbeats.StartId);
 					values.put("stop_heartbeat_id", heartbeats.StopId);
-					values.put("name", c.Name.getText().toString());
 					
 					intent.putExtra(BaseColumns._ID, new MileageBroker(Mileage.this).update(values));
 					
@@ -112,14 +110,12 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 	 * Encapsulates UI objects.
 	 */
 	static class Controls {
-		public final EditText Name;
 		public final MileageInput Mileage;
 		public final TripControlBar Heartbeats; 
 		public final Button Save;
 		public final Button Cancel;
 		
 		public Controls(FragmentActivity view) {
-			Name		= (EditText)view.findViewById(R.id.payee);
 			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
 			Heartbeats	= (TripControlBar)view.getSupportFragmentManager().findFragmentById(R.id.heartbeats);
 			Save		= (Button)view.findViewById(R.id.bSave);
