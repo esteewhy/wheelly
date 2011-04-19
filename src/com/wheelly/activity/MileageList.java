@@ -19,7 +19,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
-import com.wheelly.db.TripController;
+import com.wheelly.db.MileageBroker;
 
 public class MileageList extends ListActivity {
 
@@ -104,7 +104,7 @@ public class MileageList extends ListActivity {
 					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
-							new TripController(MileageList.this).delete(mi.id);
+							new MileageBroker(MileageList.this).delete(mi.id);
 							onActivityResult(0, RESULT_OK, null);
 						}
 					})

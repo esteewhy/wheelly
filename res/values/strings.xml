@@ -616,5 +616,9 @@
     <string name="fuel_input_label"><b>Amount</b>, <i>litres</i></string>
     <string name="mileage_input_label"><b>Mileage</b>, <i>km</i></string>
     <string name="refuel_cost_input_label"><b>Total cost</b>, <i>uah</i></string>
+    
+    <string name="mileages">Mileages</string>
+    <string name="refuels">Refuels</string>
+    <string name="heartbeats">Heartbeats</string>
 
 </resources>

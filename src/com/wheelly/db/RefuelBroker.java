@@ -11,16 +11,16 @@ import android.widget.Toast;
  * Higher level abstraction over refuel persistence to accommodate
  * database connection management.
  */
-public class RefuelController {
+public class RefuelBroker {
 	
 	final Context context;
 	
-	public RefuelController(Context context)
+	public RefuelBroker(Context context)
 	{
 		this.context = context;
 	}
 	
-	public long update(ContentValues refuel, ContentValues heartbeat) {
+	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
 		SQLiteDatabase db = null;
 		long id = refuel.getAsLong(BaseColumns._ID);
 		

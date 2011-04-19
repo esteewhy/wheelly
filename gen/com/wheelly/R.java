@@ -694,6 +694,7 @@ containing a value of this type.
         public static final int header_credits=0x7f0601ff;
         public static final int header_expenses=0x7f060200;
         public static final int header_payments=0x7f0601fe;
+        public static final int heartbeats=0x7f060229;
         public static final int home_screen=0x7f06014c;
         public static final int include_credit=0x7f0601e0;
         public static final int include_credit_summary=0x7f0601e1;
@@ -726,6 +727,7 @@ containing a value of this type.
         public static final int mean_result_label=0x7f060097;
         public static final int menu=0x7f06005a;
         public static final int mileage_input_label=0x7f060225;
+        public static final int mileages=0x7f060227;
         public static final int min_result_label=0x7f060096;
         public static final int monday=0x7f0601af;
         public static final int month_apr=0x7f060177;
@@ -897,6 +899,7 @@ containing a value of this type.
         public static final int recurrence_period_starts_on_time=0x7f0601b8;
         public static final int recurrence_weekly_days=0x7f06019d;
         public static final int refuel_cost_input_label=0x7f060226;
+        public static final int refuels=0x7f060228;
         public static final int remember_last_account=0x7f060118;
         public static final int remember_last_account_summary=0x7f060119;
         public static final int remember_last_category=0x7f06011a;

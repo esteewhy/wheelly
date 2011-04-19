@@ -17,7 +17,7 @@ import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
-import com.wheelly.db.TripController;
+import com.wheelly.db.MileageBroker;
 import com.wheelly.widget.MileageInput;
 
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
@@ -60,7 +60,7 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 					values.put("stop_heartbeat_id", heartbeats.StopId);
 					values.put("name", c.Name.getText().toString());
 					
-					intent.putExtra(BaseColumns._ID, new TripController(Mileage.this).update(values));
+					intent.putExtra(BaseColumns._ID, new MileageBroker(Mileage.this).update(values));
 					
 					setResult(RESULT_OK, intent);
 					finish();

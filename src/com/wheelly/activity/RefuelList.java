@@ -18,7 +18,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.RefuelController;
+import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
 
 public class RefuelList extends ListActivity {
@@ -104,7 +104,7 @@ public class RefuelList extends ListActivity {
 					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
-							new RefuelController(RefuelList.this).delete(mi.id);
+							new RefuelBroker(RefuelList.this).delete(mi.id);
 							onActivityResult(0, RESULT_OK, null);
 						}
 					})

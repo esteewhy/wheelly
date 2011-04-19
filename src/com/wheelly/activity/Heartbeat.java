@@ -11,13 +11,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.HeartbeatRepository;
+import com.wheelly.content.Marshaller;
+import com.wheelly.db.HeartbeatBroker;
 
 /**
  * Complete heartbeat editing UI.
- * 
- * @author esteewhy
  */
 public final class Heartbeat extends FragmentActivity {
 	
@@ -28,34 +26,26 @@ public final class Heartbeat extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		super.setContentView(R.layout.heartbeat_edit);
+		setContentView(R.layout.heartbeat_edit);
 		
-		//components
-		final Intent intent = this.getIntent();
-		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final HeartbeatRepository repository = new HeartbeatRepository(new DatabaseHelper(Heartbeat.this).getReadableDatabase());
-		final ContentValues values = id > 0 ? repository.load(id) : repository.getDefaults();
+		final Intent intent = getIntent();
+		
+		final ContentValues heartbeat =
+			intent.hasExtra("heartbeat")
+				? Marshaller.Convert(intent.getBundleExtra("heartbeat"))
+				: new HeartbeatBroker(this)
+					.loadOrCreate(intent.getLongExtra(BaseColumns._ID, 0));
 		
 		final Controls c = new Controls(this);
-		
-		c.Heartbeat.setValues(values);
-		
+		c.Heartbeat.setValues(heartbeat);
 		c.SaveButton.setOnClickListener(
 			new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					
 					final ContentValues values = c.Heartbeat.getValues();
-					
-					final HeartbeatRepository repository = new HeartbeatRepository(
-						new DatabaseHelper(Heartbeat.this).getWritableDatabase()
-					);
-					
-					if(id > 0) {
-						repository.update(values);
-					} else {
-						intent.putExtra(BaseColumns._ID, repository.insert(values));
-					}
+					intent.putExtra(BaseColumns._ID,
+						new HeartbeatBroker(Heartbeat.this).updateOrInsert(values));
 					
 					setResult(RESULT_OK, intent);
 					finish();

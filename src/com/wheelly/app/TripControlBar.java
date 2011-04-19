@@ -22,7 +22,7 @@ import android.widget.Button;
 public class TripControlBar extends Fragment {
 	
 	Controls c;
-	static final AtomicInteger TRIP_CONTROL_REQUEST = new AtomicInteger(3000);
+	static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
 	
 	int editStartHeartbeatRequestId;
 	int editStopHeartbeatRequestId;
@@ -34,8 +34,8 @@ public class TripControlBar extends Fragment {
 		
 		View view = inflater.inflate(R.layout.start_and_stop_buttons, container, true);
 		c = new Controls(view);
-		this.editStartHeartbeatRequestId = TRIP_CONTROL_REQUEST.incrementAndGet();
-		this.editStopHeartbeatRequestId = TRIP_CONTROL_REQUEST.incrementAndGet();
+		this.editStartHeartbeatRequestId = MILEAGE_CONTROL_REQUEST.incrementAndGet();
+		this.editStopHeartbeatRequestId = MILEAGE_CONTROL_REQUEST.incrementAndGet();
 		
 		c.StartButton.setOnClickListener(new View.OnClickListener() {
 			@Override

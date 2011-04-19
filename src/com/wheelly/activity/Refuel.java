@@ -18,7 +18,7 @@ import com.wheelly.app.HeartbeatInput;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.HeartbeatRepository;
 import com.wheelly.db.IRepository;
-import com.wheelly.db.RefuelController;
+import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.model.*;
@@ -61,8 +61,8 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 					refuel.put("cost", (float)c.Cost.getAmount() / 100);
 					
 					intent.putExtra(BaseColumns._ID,
-						new RefuelController(Refuel.this)
-							.update(refuel, heartbeat)
+						new RefuelBroker(Refuel.this)
+							.updateOrInsert(refuel, heartbeat)
 					);
 					
 					setResult(RESULT_OK, intent);

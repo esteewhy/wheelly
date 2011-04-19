@@ -9,11 +9,11 @@ import android.provider.BaseColumns;
  * Higher level abstraction over trip persistence to accommodate
  * database connection management.
  */
-public class TripController {
+public class MileageBroker {
 	
 	final Context context;
 	
-	public TripController(Context context)
+	public MileageBroker(Context context)
 	{
 		this.context = context;
 	}
