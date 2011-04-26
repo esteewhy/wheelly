@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.wheelly;
+package com.google.android.apps.mytracks.lib;
 
 public final class R {
     public static final class anim {

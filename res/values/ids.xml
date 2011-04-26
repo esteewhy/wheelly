@@ -69,4 +69,6 @@
 	<item type="id" name="tag_request_code"/>
 	<item type="id" name="tag_id"/>
 	<item type="id" name="tag_values"/>
+	<item type="id" name="tag_transaction_id"/>
+	<item type="id" name="tag_track_id"/>
 </resources>

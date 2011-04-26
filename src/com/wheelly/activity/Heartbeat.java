@@ -11,13 +11,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
-import com.wheelly.content.Marshaller;
 import com.wheelly.db.HeartbeatBroker;
 
 /**
  * Complete heartbeat editing UI.
  */
-public final class Heartbeat extends FragmentActivity {
+public class Heartbeat extends FragmentActivity {
 	
 	/**
 	 * Construct UI and wire up events.
@@ -32,7 +31,7 @@ public final class Heartbeat extends FragmentActivity {
 		
 		final ContentValues heartbeat =
 			intent.hasExtra("heartbeat")
-				? Marshaller.Convert(intent.getBundleExtra("heartbeat"))
+				? (ContentValues)intent.getParcelableExtra("heartbeat")
 				: new HeartbeatBroker(this)
 					.loadOrCreate(intent.getLongExtra(BaseColumns._ID, 0));
 		
@@ -46,6 +45,7 @@ public final class Heartbeat extends FragmentActivity {
 					final ContentValues values = c.Heartbeat.getValues();
 					intent.putExtra(BaseColumns._ID,
 						new HeartbeatBroker(Heartbeat.this).updateOrInsert(values));
+					intent.putExtra("heartbeat", values);
 					
 					setResult(RESULT_OK, intent);
 					finish();

@@ -2,16 +2,21 @@ package com.wheelly.app;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.android.apps.mytracks.services.ITrackRecordingService;
 import com.wheelly.R;
-import com.wheelly.activity.Heartbeat;
-import com.wheelly.content.Marshaller;
+import com.wheelly.activity.HeartbeatDialog;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,8 +32,40 @@ public class TripControlBar extends Fragment {
 	Controls c;
 	static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
 	
+	ITrackRecordingService mytracksService;
+	
 	int editStartHeartbeatRequestId;
 	int editStopHeartbeatRequestId;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName(
+			getString(R.string.mytracks_service_package),
+			getString(R.string.mytracks_service_class))
+		);
+		
+		if (!getActivity().bindService(intent, new ServiceConnection() {
+			
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				synchronized (TripControlBar.this) {
+					mytracksService = ITrackRecordingService.Stub.asInterface(service);
+				}
+			}
+		}, Activity.BIND_AUTO_CREATE)) {
+			Log.e("W", "Couldn't bind to service.");
+		}
+	}
 	
 	/**
 	 * Constructs UI and wire up event handlers.
@@ -46,11 +83,11 @@ public class TripControlBar extends Fragment {
 			new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(getActivity(), Heartbeat.class);
+					Intent intent = new Intent(getActivity(), HeartbeatDialog.class);
 					intent.putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
 					ContentValues values = (ContentValues)v.getTag(R.id.tag_values);
 					if(null != values) {
-						intent.putExtra("heartbeat", Marshaller.Convert(values));
+						intent.putExtra("heartbeat", values);
 					}
 					startActivityForResult(intent, (Integer)v.getTag(R.id.tag_request_code));
 				}
@@ -70,13 +107,36 @@ public class TripControlBar extends Fragment {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if(resultCode == Activity.RESULT_OK) {
-			long id = data.getLongExtra(BaseColumns._ID, 0); 
+			long id = data.getLongExtra(BaseColumns._ID, 0);
+			ContentValues heartbeat = data.getParcelableExtra("heartbeat");
 			TripControlBarValue value = this.getValue();
 			
 			if(requestCode == editStartHeartbeatRequestId) {
 				value.StartId = id;
+				value.StartHeartbeat = heartbeat;
+				
+				if(null != mytracksService && value.TrackId <= 0) {
+					try {
+						value.TrackId = mytracksService.startNewTrack();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			} else if (requestCode == editStopHeartbeatRequestId) {
 				value.StopId = id;
+				value.StopHeartbeat = heartbeat;
+				
+				if(null != mytracksService && value.TrackId > 0) {
+					try {
+						if(mytracksService.getRecordingTrackId() == value.TrackId) {
+							mytracksService.endCurrentTrack();
+						}
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 			
 			this.setValue(value);
@@ -88,15 +148,16 @@ public class TripControlBar extends Fragment {
 	 */
 	public TripControlBarValue getValue() {
 		TripControlBarValue result = new TripControlBarValue();
-		result.StartId = (Long)c.StartButton.getTag(R.id.tag_id);
-		result.StopId = (Long)c.StopButton.getTag(R.id.tag_id);
-		result.StartHeartbeat = (ContentValues)c.StartButton.getTag(R.id.tag_values);
-		result.StopHeartbeat = (ContentValues)c.StopButton.getTag(R.id.tag_values);
+		result.StartId			= (Long)c.StartButton.getTag(R.id.tag_id);
+		result.StopId			= (Long)c.StopButton.getTag(R.id.tag_id);
+		result.StartHeartbeat	= (ContentValues)c.StartButton.getTag(R.id.tag_values);
+		result.StopHeartbeat	= (ContentValues)c.StopButton.getTag(R.id.tag_values);
+		result.TrackId			= (Long)c.StartButton.getTag(R.id.tag_track_id);
 		return result;
 	}
 	
-	void initButton(Button button, ContentValues values, int defaultTextResource) {
-		if(null != values) {
+	void initButton(Button button, long id, ContentValues values, int defaultTextResource) {
+		if(id > 0 && null != values) {
 			button.setTag(R.id.tag_values, values);
 			button.setText(
 				String.format(
@@ -112,12 +173,14 @@ public class TripControlBar extends Fragment {
 	 * Initialises both edited heartbeats and updates UI.
 	 */
 	public void setValue(TripControlBarValue value) {
+		c.StartButton.setTag(R.id.tag_track_id, value.TrackId);
+		
 		c.StartButton.setTag(R.id.tag_id, value.StartId);
 		c.StopButton.setTag(R.id.tag_id, value.StopId);
 		
 		// Store temp values into controls.
-		initButton(c.StartButton, value.StartHeartbeat, R.string.start);
-		initButton(c.StopButton, value.StopHeartbeat, R.string.stop);
+		initButton(c.StartButton, value.StartId,  value.StartHeartbeat, R.string.start);
+		initButton(c.StopButton, value.StopId, value.StopHeartbeat, R.string.stop);
 		
 		// Update icons.
 		c.StopButton.setEnabled(value.StartId > 0);

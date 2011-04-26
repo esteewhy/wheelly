@@ -12,6 +12,7 @@
 -->
 <LinearLayout
 	xmlns:android			="http://schemas.android.com/apk/res/android"
+	xmlns:wheelly			="http://schemas.android.com/apk/res/com.wheelly"
 	android:layout_width	="fill_parent"
 	android:layout_height	="fill_parent"
 	android:orientation		="vertical">
@@ -37,9 +38,50 @@
 			
 			<include
 				layout		="@layout/edit_divider" />
+			
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="Sync transaction">
+				<fragment
+					class		="com.wheelly.widget.FinancistoSync"
+					android:id	="@+id/financisto"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout		="@layout/edit_divider" />
+			
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="@string/refuel_amount_input_label">
+				<fragment
+					class		="ru.orangesoftware.financisto.widget.AmountInput"
+					android:id	="@+id/amount"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout		="@layout/edit_divider" />
 				
 			<com.wheelly.widget.LabeledLayout
-				xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="@string/refuel_price_input_label">
+				<fragment
+					class		="ru.orangesoftware.financisto.widget.AmountInput"
+					android:id	="@+id/price"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout		="@layout/edit_divider" />
+				
+			<com.wheelly.widget.LabeledLayout
 				android:layout_width	="fill_parent"
 				android:layout_height	="wrap_content"
 				wheelly:label			="@string/refuel_cost_input_label">

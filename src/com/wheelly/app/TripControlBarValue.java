@@ -7,4 +7,6 @@ public class TripControlBarValue {
 	public long StopId;
 	public ContentValues StartHeartbeat;
 	public ContentValues StopHeartbeat;
+	
+	public long TrackId;
 }

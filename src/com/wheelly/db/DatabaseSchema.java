@@ -114,6 +114,7 @@ public final class DatabaseSchema {
 		
 		public static final String Single =
 			"SELECT _id, name, calc_mileage, cost, amount"
+			+", unit_price"
 			+", _created"
 			+", transaction_id"
 			+", heartbeat_id"
@@ -127,6 +128,7 @@ public final class DatabaseSchema {
 			+", ''					name"
 			+", NULL				calc_mileage"
 			+", (60 - h.fuel)		amount"
+			+", NULL				unit_price"
 			+", CURRENT_TIMESTAMP	_created"
 			+", NULL				transaction_id"
 			+", NULL				heartbeat_id"

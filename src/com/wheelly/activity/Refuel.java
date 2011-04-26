@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -20,12 +21,14 @@ import com.wheelly.db.HeartbeatRepository;
 import com.wheelly.db.IRepository;
 import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
+import com.wheelly.widget.FinancistoSync;
+
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.model.*;
 import ru.orangesoftware.financisto.widget.AmountInput;
 
 /**
- * Edit single trip properties and manipulate associated heartbeats.
+ * Edit refuel properties and manipulate associated heartbeats.
  */
 public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 	
@@ -49,7 +52,10 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 		final Controls c = new Controls(this);
 		
 		c.Heartbeat.setValues(heartbeat);
+		c.Amount.setAmount((long)Math.round(refuel.getAsFloat("amount") * 100));
+		c.Price.setAmount((long)Math.round(refuel.getAsFloat("unit_price") * 100));
 		c.Cost.setAmount((long)Math.round(refuel.getAsFloat("cost") * 100));
+		c.Financisto.setValue((long)refuel.getAsLong("transaction_id"));
 		
 		c.Save.setOnClickListener(
 			new OnClickListener() {
@@ -58,7 +64,10 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 					
 					final ContentValues heartbeat = c.Heartbeat.getValues();
 					refuel.put("heartbeat_id", heartbeat.getAsLong(BaseColumns._ID));
+					refuel.put("amount", (float)c.Amount.getAmount() / 100);
+					refuel.put("unit_price", (float)c.Price.getAmount() / 100);
 					refuel.put("cost", (float)c.Cost.getAmount() / 100);
+					refuel.put("transaction_id", c.Financisto.getValue());
 					
 					intent.putExtra(BaseColumns._ID,
 						new RefuelBroker(Refuel.this)
@@ -116,15 +125,23 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 	 */
 	static class Controls {
 		public final HeartbeatInput Heartbeat;
+		public final AmountInput Amount;
+		public final AmountInput Price;
 		public final AmountInput Cost;
 		public final Button Save;
 		public final Button Cancel;
+		public final FinancistoSync Financisto;
 		
 		public Controls(FragmentActivity view) {
-			Heartbeat	= (HeartbeatInput)view.getSupportFragmentManager().findFragmentById(R.id.heartbeat);
-			Cost		= (AmountInput)view.getSupportFragmentManager().findFragmentById(R.id.cost);
+			final FragmentManager fm = view.getSupportFragmentManager();
+			
+			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
+			Amount		= (AmountInput)fm.findFragmentById(R.id.amount);
+			Price		= (AmountInput)fm.findFragmentById(R.id.price);
+			Cost		= (AmountInput)fm.findFragmentById(R.id.cost);
 			Save		= (Button)view.findViewById(R.id.bSave);
 			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
+			Financisto	= (FinancistoSync)fm.findFragmentById(R.id.financisto);
 		}
 	}
 }

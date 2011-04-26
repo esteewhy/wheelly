@@ -78,11 +78,12 @@ public final class RefuelRepository implements IRepository {
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));
 		values.put("_created",		cursor.getString(cursor.getColumnIndexOrThrow("_created")));
-		values.put("transaction_id",cursor.getInt(cursor.getColumnIndexOrThrow("transaction_id")));
+		values.put("transaction_id",cursor.getLong(cursor.getColumnIndexOrThrow("transaction_id")));
 		values.put("heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("heartbeat_id")));
 		values.put("calc_mileage",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_mileage")));
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
 		values.put("cost",			cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
+		values.put("unit_price",	cursor.getFloat(cursor.getColumnIndexOrThrow("unit_price")));
 		return values;
 	}
 }

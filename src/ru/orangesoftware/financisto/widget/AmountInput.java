@@ -28,7 +28,6 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.text.method.NumberKeyListener;
-import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -253,13 +252,6 @@ public class AmountInput extends Fragment {
 	public void setColor(int color) {
 		c.primary.setTextColor(color);
 		c.secondary.setTextColor(color);
-	}
-
-	@Override
-	public void onInflate(AttributeSet attrs, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onInflate(attrs, savedInstanceState);
-		Object val = attrs.getAttributeValue("", "label");
 	}
 	
 	static class Controls {

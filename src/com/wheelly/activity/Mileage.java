@@ -16,6 +16,7 @@ import com.wheelly.R;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
+import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.widget.MileageInput;
@@ -46,6 +47,9 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		final TripControlBarValue heartbeats = new TripControlBarValue();
 		heartbeats.StartId = values.getAsLong("start_heartbeat_id");
 		heartbeats.StopId = values.getAsLong("stop_heartbeat_id");
+		HeartbeatBroker broker = new HeartbeatBroker(this);
+		heartbeats.StartHeartbeat = broker.loadOrCreate(heartbeats.StartId);
+		heartbeats.StopHeartbeat = broker.loadOrCreate(heartbeats.StopId);
 		c.Heartbeats.setValue(heartbeats);
 		
 		c.Save.setOnClickListener(

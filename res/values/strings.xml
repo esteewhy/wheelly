@@ -614,9 +614,16 @@
     <string name="heartbeat_button_caption">%1$05d / %2$02d</string> 
     <string name="item_add">Add</string>
     
-    <string name="fuel_input_label"><b>Amount</b>, <i>litres</i></string>
+    <string name="fuel_input_label"><b>Fuel</b>, <i>litres</i></string>
+    <string name="amount_input_label"><b>Amount</b>, <i>litres</i></string>
+    <string name="odometer_input_label"><b>Odometer</b>, <i>km</i></string>
     <string name="mileage_input_label"><b>Mileage</b>, <i>km</i></string>
+    <string name="refuel_amount_input_label"><b>Amount</b>, <i>litres</i></string>
+    <string name="refuel_price_input_label"><b>Unit price</b>, <i>uah</i></string>
     <string name="refuel_cost_input_label"><b>Total cost</b>, <i>uah</i></string>
+    
+    <string name="transaction_create">New transaction...</string>
+    <string name="transaction_edit">Transaction: <b>%1$d</b></string>
     
     <string name="mileages">Mileages</string>
     <string name="refuels">Refuels</string>
