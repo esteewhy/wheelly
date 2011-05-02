@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
@@ -37,12 +38,23 @@ public class RefuelList extends ListActivity {
 		super.setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.refuel_list_item, cursor,
 				new String[] {
-					"name", "mileage", "cost", "_created", "amount"
+					"name", "mileage", "cost", "_created", "amount", "place"
 				},
 				new int[] {
-					R.id.name, R.id.mileage, R.id.cost, R.id.date, R.id.consumption
+					R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.place
 				}
-			)
+			) {
+				@Override
+				public void setViewText(TextView v, String text) {
+					switch(v.getId()) {
+					case R.id.mileage:
+					case R.id.fuel:
+						v.setText(text == "" ? text : String.format("%+.2f", Float.parseFloat(text)));
+						break;
+					default: super.setViewText(v, text);
+					}
+				}
+			}
 		);
 		registerForContextMenu(getListView());
 	}

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.wheelly"
-		android:versionCode="1"
-		android:versionName="1.0">
+		android:versionCode="2"
+		android:versionName="20110501">
 	<application
 			android:icon="@drawable/icon"
 			android:label="@string/app_name">
-
+		
+		<uses-library android:name="com.google.android.maps" android:required="false" />
+		
 		<activity
 				android:label="@string/app_name"
 				android:configChanges="orientation|keyboardHidden"
@@ -34,6 +36,9 @@
 		
 		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
 			android:label="@string/calculator" android:theme="@android:style/Theme.Dialog"/>
+			
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity" android:label="@string/location"/>
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity" android:label="@string/locations"/>
 	</application>
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>

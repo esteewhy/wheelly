@@ -101,25 +101,38 @@ public final class DatabaseSchema {
 			//+ ",FOREIGN KEY(heartbeat_id) REFERENCES heartbeats(_id)"
 			+ ")";
 		
+		private static final String SelectPreviousHeartbeat =
+			"SELECT h.odometer - hh.odometer"
+			+ " FROM heartbeats hh"
+			+ " INNER JOIN refuels ff ON ff.heartbeat_id = hh." + BaseColumns._ID
+			+ " WHERE hh._created < h._created"
+			+ " ORDER BY hh._created DESC"
+			+ " LIMIT 1";
+		
 		public static final String Select =
 			"SELECT f." + BaseColumns._ID
 			+ ", f.name"
-			+ ", f.calc_mileage mileage"
+			//+ ", f.calc_mileage mileage"
+			+ ", (" + SelectPreviousHeartbeat + ") mileage"
 			+ ", f.cost"
 			+ ", f.amount"
 			+ ", IFNULL(h._created, f._created) _created"
+			+ ", l.name place"
 			+ " FROM refuels f"
 			+ " LEFT OUTER JOIN heartbeats h"
-			+ "		ON f.heartbeat_id = h." + BaseColumns._ID;
+			+ "		ON f.heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT OUTER JOIN locations l"
+			+ "		ON h.place_id = l." + BaseColumns._ID
+			+ " ORDER BY h._created DESC";
 		
 		public static final String Single =
-			"SELECT _id, name, calc_mileage, cost, amount"
+			"SELECT " + BaseColumns._ID + ", name, calc_mileage, cost, amount"
 			+", unit_price"
 			+", _created"
 			+", transaction_id"
 			+", heartbeat_id"
-			+" FROM refuels f"
-			+" WHERE _id = ?"
+			+" FROM refuels"
+			+" WHERE " + BaseColumns._ID + " = ?"
 			+" LIMIT 1";
 		
 		public static final String Defaults =
@@ -148,12 +161,18 @@ public final class DatabaseSchema {
 			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			+ "odometer		NUMERIC NOT NULL,"
 			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG,"
-			+ "latitude		DOUBLE,"
-			+ "longitude	DOUBLE);";
+			+ "place_id		LONG);";
 		
 		public static final String Select =
-			"SELECT * FROM heartbeats ORDER BY _created DESC";
+			"SELECT h." + BaseColumns._ID
+			+ ", h._created"
+			+ ", h.odometer"
+			+ ", h.fuel"
+			+ ", l.name place"
+			+ " FROM heartbeats h"
+			+ " LEFT JOIN locations l"
+			+ " ON l." + BaseColumns._ID + " = h.place_id"
+			+ " ORDER BY h._created DESC";
 		
 		public static final String Defaults =
 			"SELECT * FROM heartbeats ORDER BY _created DESC LIMIT 1";
@@ -177,5 +196,26 @@ public final class DatabaseSchema {
 			+ " UNION "
 			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?1"
 			+ ");";
+	}
+
+	public static final class Locations {
+		public static String Create =
+			"create table if not exists locations ("
+			+"		_id integer primary key autoincrement," 
+			+"		name text not null,	"
+			+"		datetime long not null,"
+			+"		provider text,"
+			+"		accuracy float,"
+			+"		latitude double,"
+			+"		longitude double,"
+			+"		is_payee integer not null default 0,"
+			+"		resolved_address text"
+			+"	);";
+		
+		public static String Select =
+			"SELECT * FROM locations;";
+		
+		public static String Single =
+			"SELECT * FROM locations WHERE _id = ? LIMIT 1;";
 	}
 }

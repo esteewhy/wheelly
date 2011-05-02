@@ -64,6 +64,7 @@ public final class HeartbeatRepository implements IRepository {
 				values = new ContentValues();
 				values.put("odometer", 0);
 				values.put("fuel", 0);
+				values.put("place_id", -1);
 				
 			}
 			values.put(BaseColumns._ID, -1);
@@ -104,6 +105,7 @@ public final class HeartbeatRepository implements IRepository {
 		values.put("_created", cursor.getString(cursor.getColumnIndexOrThrow("_created")));
 		values.put("odometer", cursor.getLong(cursor.getColumnIndexOrThrow("odometer")));
 		values.put("fuel", cursor.getLong(cursor.getColumnIndexOrThrow("fuel")));
+		values.put("place_id", cursor.getLong(cursor.getColumnIndexOrThrow("place_id")));
 		
 		return values;
 	}

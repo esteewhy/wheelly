@@ -3,6 +3,7 @@ package com.wheelly.app;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,8 @@ import com.wheelly.widget.MileageInput;
  */
 public final class HeartbeatInput extends Fragment {
 	
-	Controls c;
-	ContentValues values;
+	private Controls c;
+	private ContentValues values;
 	
 	/**
 	 * Initialize UI.
@@ -44,6 +45,7 @@ public final class HeartbeatInput extends Fragment {
 		values.put("odometer", c.OdometerEditText.getAmount());
 		values.put("fuel", c.FuelAmountEditor.getAmount());
 		values.put("_created", c.CreatedDateTimeBar.getDateTime());
+		values.put("place_id", c.Place.getValue());
 		
 		return values;
 	}
@@ -56,6 +58,7 @@ public final class HeartbeatInput extends Fragment {
 		c.OdometerEditText.setAmount(values.getAsLong("odometer"));
 		c.FuelAmountEditor.setAmount(values.getAsInteger("fuel"));
 		c.CreatedDateTimeBar.setDateTime(values.getAsString("_created"));
+		c.Place.setValue(values.getAsLong("place_id"));
 	}
 	
 	/**
@@ -65,11 +68,13 @@ public final class HeartbeatInput extends Fragment {
 		final MileageInput OdometerEditText;
 		final FuelInput FuelAmountEditor;
 		final DateTimeBar CreatedDateTimeBar;
+		final LocationInput Place;
 		
 		public Controls(View view) {
 			OdometerEditText	= (MileageInput)view.findViewById(R.id.odometer);
 			FuelAmountEditor	= (FuelInput)view.findViewById(R.id.fuel);
 			CreatedDateTimeBar	= (DateTimeBar)view.findViewById(R.id.datetimebar);
+			Place				= (LocationInput)((FragmentActivity)view.getContext()).getSupportFragmentManager().findFragmentById(R.id.place);
 		}
 	}
 }

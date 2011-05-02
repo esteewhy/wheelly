@@ -1,6 +1,7 @@
 package com.wheelly.db;
 
 import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Refuels;
 
@@ -11,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 1);
+		super(context, "wheelly.db", null, 2);
 		
 	}
 
@@ -20,11 +21,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(Mileages.Create);
 		db.execSQL(Refuels.Create);
 		db.execSQL(Heartbeats.Create);
+		db.execSQL(Locations.Create);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
-		
+		switch(oldVersion) {
+		case 1:
+			db.execSQL(Locations.Create);
+		}
 	}
 }

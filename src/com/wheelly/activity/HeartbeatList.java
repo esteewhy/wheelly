@@ -36,11 +36,10 @@ public class HeartbeatList extends ListActivity {
 		
 		final SimpleCursorAdapter adapter =
 			new SimpleCursorAdapter(this, R.layout.heartbeat_list_item, cursor,
-				new String[] { "odometer", "_created", "fuel", "fuel" },
-				new int[] { R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge }
+				new String[] { "odometer", "_created", "fuel", "fuel", "place" },
+				new int[] { R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place }
 			); 
 		
-		// Some customisation is necessary to bind int to ProgressBar...
 		final String[] columnNames = cursor.getColumnNames();
 		
 		adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder(){
