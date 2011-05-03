@@ -7,12 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
 import com.wheelly.R;
+import com.wheelly.app.LocationInput;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
@@ -44,9 +46,13 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		final Controls c = new Controls(this);
 		
 		c.Mileage.setAmount(values.getAsLong("mileage"));
-		final TripControlBarValue heartbeats = new TripControlBarValue();
-		heartbeats.StartId = values.getAsLong("start_heartbeat_id");
-		heartbeats.StopId = values.getAsLong("stop_heartbeat_id");
+		c.Destination.setValue(values.getAsLong("location_id"));
+		
+		final TripControlBarValue heartbeats = new TripControlBarValue() {{
+			StartId = values.getAsLong("start_heartbeat_id");
+			StopId = values.getAsLong("stop_heartbeat_id");
+		}};
+		
 		HeartbeatBroker broker = new HeartbeatBroker(this);
 		heartbeats.StartHeartbeat = broker.loadOrCreate(heartbeats.StartId);
 		heartbeats.StopHeartbeat = broker.loadOrCreate(heartbeats.StopId);
@@ -58,6 +64,7 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 				public void onClick(View v) {
 					
 					values.put("mileage", c.Mileage.getAmount());
+					values.put("location_id", c.Destination.getValue());
 					final TripControlBarValue heartbeats = c.Heartbeats.getValue();
 					values.put("start_heartbeat_id", heartbeats.StartId);
 					values.put("stop_heartbeat_id", heartbeats.StopId);
@@ -115,13 +122,17 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 	 */
 	private static class Controls {
 		final MileageInput Mileage;
+		final LocationInput Destination;
 		final TripControlBar Heartbeats; 
 		final Button Save;
 		final Button Cancel;
 		
 		public Controls(FragmentActivity view) {
+			final FragmentManager fm = view.getSupportFragmentManager();
+			
 			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
-			Heartbeats	= (TripControlBar)view.getSupportFragmentManager().findFragmentById(R.id.heartbeats);
+			Destination	= (LocationInput)fm.findFragmentById(R.id.place);
+			Heartbeats	= (TripControlBar)fm.findFragmentById(R.id.heartbeats);
 			Save		= (Button)view.findViewById(R.id.bSave);
 			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
 		}

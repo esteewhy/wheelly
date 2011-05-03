@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 2);
+		super(context, "wheelly.db", null, 3);
 		
 	}
 
@@ -29,6 +29,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		switch(oldVersion) {
 		case 1:
 			db.execSQL(Locations.Create);
+			break;
+		case 2:
+			db.execSQL("ALTER TABLE mileages ADD location_id LONG;");
+			break;
 		}
 	}
 }

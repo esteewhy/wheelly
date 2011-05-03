@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.text.Html;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,17 +39,21 @@ public class MileageList extends ListActivity {
 		super.setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.mileage_list_item, cursor,
 				new String[] {
-					"name", "mileage", "cost", "stop_time", "fuel"
+					"start_place", "stop_place", "mileage", "cost", "stop_time", "fuel", "destination"
 				},
 				new int[] {
-					R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel
+					R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
 				}
 			) {
 				@Override
 				public void setViewText(TextView v, String text) {
 					switch(v.getId()) {
 					case R.id.mileage:
-						v.setText(String.format("%+d", Integer.parseInt(text)));
+						int val = Integer.parseInt(text);
+						v.setText(Html.fromHtml(String.format("%c<b>%03d</b>", val >= 0 ? '+' : '-', val)));
+						break;
+					case R.id.fuel:
+						v.setText(String.format("%\u002003d", Integer.parseInt(text)));
 						break;
 					default: super.setViewText(v, text);
 					}

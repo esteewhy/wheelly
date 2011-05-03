@@ -48,6 +48,15 @@
 				
 			</com.wheelly.widget.LabeledLayout>
 			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<fragment
+				class					="com.wheelly.app.LocationInput"
+				android:id				="@+id/place"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
+			
 		</LinearLayout>
 	</ScrollView>
 	

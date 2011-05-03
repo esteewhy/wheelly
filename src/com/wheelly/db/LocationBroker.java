@@ -33,7 +33,8 @@ public class LocationBroker {
 	
 	public long updateOrInsert(ContentValues values){
 		SQLiteDatabase db = null;
-		final long id = values.getAsLong(BaseColumns._ID);
+		final long id = values.containsKey(BaseColumns._ID)
+			? values.getAsLong(BaseColumns._ID) : -1;
 		
 		try {
 			final IRepository repository = new LocationRepository(

@@ -83,9 +83,11 @@ public class TripControlBar extends Fragment {
 		final OnClickListener listener =
 			new OnClickListener() {
 				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(getActivity(), HeartbeatDialog.class);
-					intent.putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
+				public void onClick(final View v) {
+					Intent intent = new Intent(getActivity(), HeartbeatDialog.class) {{
+						putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
+					}};
+					
 					ContentValues values = (ContentValues)v.getTag(R.id.tag_values);
 					if(null != values) {
 						intent.putExtra("heartbeat", values);

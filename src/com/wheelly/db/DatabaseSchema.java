@@ -19,8 +19,7 @@ public final class DatabaseSchema {
 			+ "start_heartbeat_id	LONG,"
 			+ "stop_heartbeat_id	LONG,"
 			
-			+ "start_time	TIMESTAMP,"
-			+ "stop_time	TIMESTAMP,"
+			+ "location_id	LONG,"
 			
 			+ "mileage		NUMERIC,"
 			+ "amount		NUMERIC,"
@@ -35,16 +34,24 @@ public final class DatabaseSchema {
 		
 		public static final String Select =
 			"SELECT m." + BaseColumns._ID
-			+ ", name"
 			+ ", COALESCE(stop._created, start._created, m._created) stop_time"
 			+ ", mileage"
 			+ ", calc_cost		cost"
 			+ ", COALESCE(stop.fuel - start.fuel, calc_amount) fuel"
+			+ ", start_place.name start_place"
+			+ ", stop_place.name stop_place"
+			+ ", dest.name destination"
 			+ " FROM mileages m"
 			+ " LEFT OUTER JOIN heartbeats start"
 			+ " 	ON m.start_heartbeat_id = start." + BaseColumns._ID
+			+ " LEFT OUTER JOIN locations start_place"
+			+ "		ON start.place_id = start_place." + BaseColumns._ID
 			+ " LEFT OUTER JOIN heartbeats stop"
 			+ " 	ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+			+ " LEFT OUTER JOIN locations stop_place"
+			+ "		ON stop.place_id = stop_place." + BaseColumns._ID
+			+ " LEFT OUTER JOIN locations dest"
+			+ "		ON m.location_id = dest." + BaseColumns._ID
 			+ " ORDER BY COALESCE(stop._created, start._created, m._created) DESC";
 		
 		public static final String Single =
@@ -53,12 +60,11 @@ public final class DatabaseSchema {
 			+ ", m._created"
 			+ ", name"
 			+ ", track_id"
-			+ ", start_time"
 			+ ", start_heartbeat_id"
-			+ ", stop_time"
 			+ ", stop_heartbeat_id"
 			+ ", mileage"
 			+ ", amount"
+			+ ", location_id"
 			+ ", calc_cost"
 			+ ", calc_amount"
 			+ " FROM mileages m"
@@ -67,10 +73,9 @@ public final class DatabaseSchema {
 		public static final String Defaults =
 			"SELECT -1 " + BaseColumns._ID
 			+ ", 0					mileage"
-			+ ", CURRENT_TIMESTAMP	start_time"
-			+ ", NULL				stop_time"
 			+ ", CURRENT_TIMESTAMP	_created"
 			+ ", MAX(m.amount)		amount"
+			+ ", 0					location_id"
 			+ ", NULL				track_id"
 			+ ", NULL				start_heartbeat_id"
 			+ ", NULL				stop_heartbeat_id"
@@ -91,7 +96,6 @@ public final class DatabaseSchema {
 			+ "unit_price	NUMERIC,"
 			+ "cost			NUMERIC,"
 			+ "fuel_type	TEXT,"
-			+ "place_id		INTEGER,"
 			+ "transaction_id INTEGER,"
 			+ "is_full		INTEGER NOT NULL DEFAULT 1,"
 			+ "heartbeat_id	LONG,"

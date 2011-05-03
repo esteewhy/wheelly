@@ -85,6 +85,7 @@ public final class MileageRepository implements IRepository {
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
 		values.put("calc_cost",		cursor.getFloat(cursor.getColumnIndexOrThrow("calc_cost")));
 		values.put("calc_amount",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_amount")));
+		values.put("location_id",	cursor.getLong(cursor.getColumnIndexOrThrow("location_id")));
 		return values;
 	}
 }
