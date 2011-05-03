@@ -37,15 +37,9 @@
 	<include
 		layout	="@layout/edit_divider" />
 	
-	<com.wheelly.widget.LabeledLayout
-		xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
-		android:layout_width	="fill_parent"
+	<fragment
+		class					="com.wheelly.app.LocationInput"
+		android:id				="@+id/place"
 		android:layout_height	="wrap_content"
-		wheelly:label			="@string/location_input_label">
-		<fragment
-			class					="com.wheelly.app.LocationInput"
-			android:id				="@+id/place"
-			android:layout_height	="wrap_content"
-			android:layout_width	="fill_parent" />
-	</com.wheelly.widget.LabeledLayout>
+		android:layout_width	="fill_parent" />
 </LinearLayout>

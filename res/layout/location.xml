@@ -15,9 +15,9 @@
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:clickable="true"
-		android:apiKey="0XB_zWHtLDQEIKFROoJYZFGCHklz4KiwWOsah5A" />
-		<!-- 0XB_zWHtLDQEIKFROoJYZFGCHklz4KiwWOsah5A release -->
-		<!--0XB_zWHtLDQHVkiL48eCDJDblk3PmKtiQ5ZLAtw debug -->
+		android:apiKey="0cJI0WVHtbB377mbYkFK01EfKK7xCVvvha0TJgQ" />
+		<!-- 0cJI0WVHtbB06UAV_9fbdOidrKW1i57wQ6ghK6Q release -->
+		<!--0cJI0WVHtbB377mbYkFK01EfKK7xCVvvha0TJgQ debug -->
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:paddingLeft="3dp"
 		android:paddingRight="3dp" android:paddingTop="3dp">

@@ -42,11 +42,12 @@ public class TripControlBar extends Fragment {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
-		Intent intent = new Intent();
-		intent.setComponent(new ComponentName(
-			getString(R.string.mytracks_service_package),
-			getString(R.string.mytracks_service_class))
-		);
+		Intent intent = new Intent() {{
+			setComponent(new ComponentName(
+				getString(R.string.mytracks_service_package),
+				getString(R.string.mytracks_service_class))
+			);
+		}};
 		
 		if (!getActivity().bindService(intent, new ServiceConnection() {
 			

@@ -31,6 +31,9 @@ import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+/**
+ * Location selection control.
+ */
 public final class LocationInput extends Fragment {
 	
 	private static final int NEW_LOCATION_REQUEST = 4002;
@@ -57,6 +60,7 @@ public final class LocationInput extends Fragment {
 			);
 		
 		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		((TextView)v.findViewById(R.id.label)).setText(R.string.location_input_label);
 		v.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -97,7 +101,7 @@ public final class LocationInput extends Fragment {
 				case NEW_LOCATION_REQUEST:
 					locationCursor.requery();
 					long locationId = data.getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
-					if (locationId != -1) {
+					if (locationId > 0) {
 						setValue(locationId);
 					}
 					break;
@@ -114,10 +118,12 @@ public final class LocationInput extends Fragment {
 		if (locationId <= 0) {
 			selectCurrentLocation(false);
 		} else {
-			ContentValues location = new LocationRepository(new DatabaseHelper(this.getActivity()).getReadableDatabase()).load(locationId);
-			c.locationText.setText(location.toString());
-			selectedLocationId = locationId;
-			setCurrentLocation = false;
+			if (Utils.moveCursor(locationCursor, "_id", locationId) != -1) {
+				ContentValues location = LocationRepository.deserialize(locationCursor);
+				c.locationText.setText(LocationUtils.locationToText(location));
+				selectedLocationId = locationId;
+				setCurrentLocation = false;
+			}
 		}
 	}
 	
@@ -180,7 +186,7 @@ public final class LocationInput extends Fragment {
 		if (lastFix.getProvider() == null) {
 			c.locationText.setText(R.string.no_fix);
 		} else {
-			c.locationText.setText(LocationRepository.locationToText(
+			c.locationText.setText(LocationUtils.locationToText(
 				lastFix.getProvider(), 
 				lastFix.getLatitude(),
 				lastFix.getLongitude(), 

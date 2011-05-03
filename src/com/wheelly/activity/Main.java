@@ -43,7 +43,7 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		MenuItem mi = menu.add(Menu.NONE, 1, Menu.NONE, R.string.location);
+		MenuItem mi = menu.add(Menu.NONE, 1, Menu.NONE, R.string.locations);
 		mi.setIcon(R.drawable.menu_entities_locations);
 		mi.setIntent(new Intent(this, LocationsListActivity.class));
 		return true;

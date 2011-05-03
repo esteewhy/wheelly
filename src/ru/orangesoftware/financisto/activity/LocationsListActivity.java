@@ -13,7 +13,9 @@ package ru.orangesoftware.financisto.activity;
 import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.wheelly.R;
+import com.wheelly.app.LocationUtils;
 import com.wheelly.db.DatabaseHelper;
+import com.wheelly.db.LocationBroker;
 import com.wheelly.db.LocationRepository;
 
 import android.app.ListActivity;
@@ -67,7 +69,7 @@ public class LocationsListActivity extends ListActivity {
 					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 						switch(view.getId()) {
 						case R.id.label:
-							((TextView)view).setText(LocationRepository.locationToText(cursor));
+							((TextView)view).setText(LocationUtils.locationToText(cursor));
 							return true;
 						}
 						return false;
@@ -180,7 +182,7 @@ public class LocationsListActivity extends ListActivity {
 			if (found != null) {
 				Toast.makeText(LocationsListActivity.this, found, Toast.LENGTH_LONG).show();
 				location.put("resolved_address", found);
-				new LocationRepository(new DatabaseHelper(LocationsListActivity.this).getWritableDatabase()).update(location);
+				new LocationBroker(LocationsListActivity.this).updateOrInsert(location);
 				cursor.requery();
 				//locationText.setText(found.name);
 			} else if (geocoder.lastException != null) {

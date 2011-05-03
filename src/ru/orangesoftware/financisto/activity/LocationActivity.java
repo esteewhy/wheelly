@@ -11,9 +11,7 @@
 package ru.orangesoftware.financisto.activity;
 
 import com.wheelly.R;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.LocationRepository;
-
+import com.wheelly.db.LocationBroker;
 import ru.orangesoftware.financisto.utils.AddressGeocoder;
 import ru.orangesoftware.financisto.utils.Utils;
 import android.app.Activity;
@@ -51,11 +49,11 @@ public class LocationActivity extends MapActivity {
 	static final int MENU_MOVE_MARKER_TO_MAP_CENTER = Menu.FIRST + 3;
 	static final int MENU_GO_TO_MARKER = Menu.FIRST + 4;
 
-	MapView mapView;
-	LocationOvelay locationOverlay;
-	MyLocationOverlay myLocationOverlay;
-	TextView location;
-	Vibrator vibrator;
+	private MapView mapView;
+	private LocationOvelay locationOverlay;
+	private MyLocationOverlay myLocationOverlay;
+	private TextView location;
+	private Vibrator vibrator;
 	
 	ContentValues myLocation = new ContentValues();
 	
@@ -73,7 +71,7 @@ public class LocationActivity extends MapActivity {
 		if (intent != null) {
 			long locationId = intent.getLongExtra(LOCATION_ID_EXTRA, -1);
 			if (locationId != -1) {
-				myLocation = new LocationRepository(new DatabaseHelper(this).getReadableDatabase()).load(locationId);
+				myLocation = new LocationBroker(this).loadOrCreate(locationId);
 				EditText name = (EditText)findViewById(R.id.name);
 				name.setText(myLocation.getAsString("name"));
 				String resolvedAddress = myLocation.getAsString("resolvedAddress"); 
@@ -170,10 +168,14 @@ public class LocationActivity extends MapActivity {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			long id = new LocationRepository(new DatabaseHelper(LocationActivity.this).getWritableDatabase()).insert(myLocation);
-			Intent data = new Intent();
-			data.putExtra(LOCATION_ID_EXTRA, id);
-			setResult(RESULT_OK, data);
+			setResult(RESULT_OK,
+				new Intent() {{
+					putExtra(LOCATION_ID_EXTRA,
+						new LocationBroker(LocationActivity.this)
+							.updateOrInsert(myLocation)
+					);
+				}}
+			);
 			finish();
 		}
 
