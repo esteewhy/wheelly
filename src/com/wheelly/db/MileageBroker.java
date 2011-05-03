@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
  */
 public class MileageBroker {
 	
-	final Context context;
+	private final Context context;
 	
 	public MileageBroker(Context context)
 	{

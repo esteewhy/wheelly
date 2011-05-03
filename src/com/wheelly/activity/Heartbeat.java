@@ -65,7 +65,7 @@ public class Heartbeat extends FragmentActivity {
 	/**
 	 * Holds UI controls references.
 	 */
-	static class Controls {
+	private static class Controls {
 		final HeartbeatInput Heartbeat;
 		final Button SaveButton;
 		final Button CancelButton;

@@ -29,13 +29,13 @@ import android.widget.Button;
  */
 public class TripControlBar extends Fragment {
 	
-	Controls c;
-	static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
+	private Controls c;
+	private static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
 	
-	ITrackRecordingService mytracksService;
+	private ITrackRecordingService mytracksService;
 	
-	int editStartHeartbeatRequestId;
-	int editStopHeartbeatRequestId;
+	private int editStartHeartbeatRequestId;
+	private int editStopHeartbeatRequestId;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -156,7 +156,7 @@ public class TripControlBar extends Fragment {
 		return result;
 	}
 	
-	void initButton(Button button, long id, ContentValues values, int defaultTextResource) {
+	private void initButton(Button button, long id, ContentValues values, int defaultTextResource) {
 		if(id > 0 && null != values) {
 			button.setTag(R.id.tag_values, values);
 			button.setText(
@@ -197,7 +197,7 @@ public class TripControlBar extends Fragment {
 	/**
 	 * Encapsulates UI objects.
 	 */
-	static class Controls {
+	private static class Controls {
 		final Button StartButton;
 		final Button StopButton;
 		

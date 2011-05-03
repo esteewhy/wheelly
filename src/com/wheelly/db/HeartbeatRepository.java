@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public final class HeartbeatRepository implements IRepository {
-	final SQLiteDatabase database;
+	private final SQLiteDatabase database;
 	
 	public HeartbeatRepository(SQLiteDatabase database) {
 		this.database = database;
@@ -97,7 +97,7 @@ public final class HeartbeatRepository implements IRepository {
 		return cursor.getInt(0);
 	}
 	
-	static ContentValues deserialize(Cursor cursor) {
+	private static ContentValues deserialize(Cursor cursor) {
 		
 		ContentValues values = new ContentValues();
 		

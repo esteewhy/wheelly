@@ -169,9 +169,15 @@ public final class DatabaseSchema {
 			+ ", h.odometer"
 			+ ", h.fuel"
 			+ ", l.name place"
+			
+			// reverse links detection
+			+ ", EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
+			+ "		| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
+			+ "		| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id) icons"
+			
 			+ " FROM heartbeats h"
 			+ " LEFT JOIN locations l"
-			+ " ON l." + BaseColumns._ID + " = h.place_id"
+			+ "		ON l." + BaseColumns._ID + " = h.place_id"
 			+ " ORDER BY h._created DESC";
 		
 		public static final String Defaults =

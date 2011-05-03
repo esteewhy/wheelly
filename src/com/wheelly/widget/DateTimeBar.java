@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 public final class DateTimeBar extends LinearLayout {
 	
 	//controls
-	DateButton dateButton;
-	TimeButton timeButton;
+	private DateButton dateButton;
+	private TimeButton timeButton;
 	
 	public DateTimeBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -28,7 +28,7 @@ public final class DateTimeBar extends LinearLayout {
 		initialize(context);
 	}
 
-	void initialize(Context context) {
+	private void initialize(Context context) {
 		LayoutInflater.from(context).inflate(R.layout.datetimebar, this, true);
 		
 		dateButton = (DateButton)findViewById(R.id.date);

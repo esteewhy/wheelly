@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 public final class LabeledLayout extends LinearLayout {
 	
-	final CharSequence label; 
+	private final CharSequence label; 
 	
 	public LabeledLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);

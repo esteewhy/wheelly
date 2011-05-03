@@ -15,8 +15,8 @@ import android.widget.DatePicker;
 
 public final class DateButton extends Button implements OnClickListener {
 
-	Calendar dateTime = Calendar.getInstance();
-	DateFormat df;
+	private Calendar dateTime = Calendar.getInstance();
+	private DateFormat df;
 	
 	public DateButton(Context context) {
 		super(context);
@@ -33,7 +33,7 @@ public final class DateButton extends Button implements OnClickListener {
 		initialize();
 	}
 	
-	void initialize() {
+	private void initialize() {
 		setOnClickListener(this);
 		this.df = android.text.format.DateFormat.getLongDateFormat(this.getContext());
 		setDate(dateTime.getTimeInMillis());

@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
  */
 public class HeartbeatBroker {
 	
-	final Context context;
+	private final Context context;
 	
 	public HeartbeatBroker(Context context)
 	{

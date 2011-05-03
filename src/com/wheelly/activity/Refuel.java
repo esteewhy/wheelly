@@ -123,14 +123,14 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 	/**
 	 * Encapsulates UI objects.
 	 */
-	static class Controls {
-		public final HeartbeatInput Heartbeat;
-		public final AmountInput Amount;
-		public final AmountInput Price;
-		public final AmountInput Cost;
-		public final Button Save;
-		public final Button Cancel;
-		public final FinancistoSync Financisto;
+	private static class Controls {
+		final HeartbeatInput Heartbeat;
+		final AmountInput Amount;
+		final AmountInput Price;
+		final AmountInput Cost;
+		final Button Save;
+		final Button Cancel;
+		final FinancistoSync Financisto;
 		
 		public Controls(FragmentActivity view) {
 			final FragmentManager fm = view.getSupportFragmentManager();

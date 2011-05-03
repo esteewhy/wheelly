@@ -64,7 +64,7 @@ public final class HeartbeatInput extends Fragment {
 	/**
 	 * Holds control references.
 	 */
-	static class Controls {
+	private static class Controls {
 		final MileageInput OdometerEditText;
 		final FuelInput FuelAmountEditor;
 		final DateTimeBar CreatedDateTimeBar;

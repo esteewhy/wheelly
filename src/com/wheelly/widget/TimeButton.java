@@ -16,8 +16,8 @@ import android.widget.TimePicker;
 
 public final class TimeButton extends Button implements OnClickListener {
 
-	Calendar dateTime = Calendar.getInstance();
-	DateFormat tf;
+	private Calendar dateTime = Calendar.getInstance();
+	private DateFormat tf;
 	
 	public TimeButton(Context context) {
 		super(context);
@@ -34,7 +34,7 @@ public final class TimeButton extends Button implements OnClickListener {
 		initialize();
 	}
 	
-	void initialize() {
+	private void initialize() {
 		setOnClickListener(this);
 		this.tf = android.text.format.DateFormat.getTimeFormat(this.getContext());
 		setTime(dateTime.getTimeInMillis());

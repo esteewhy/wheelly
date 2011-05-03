@@ -10,25 +10,42 @@
  ******************************************************************************/
 package ru.orangesoftware.financisto.activity;
 
+import ru.orangesoftware.financisto.utils.AddressGeocoder;
+
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 
 import android.app.ListActivity;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LocationsListActivity extends ListActivity {
 	
-	static final int MENU_RESOLVE = Menu.FIRST + 5;
+	private static final int MENU_EDIT = Menu.FIRST+2;
+	private static final int MENU_DELETE = Menu.FIRST+3;
+	private static final int MENU_RESOLVE = Menu.FIRST + 5;
+	
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
+	
+	private Cursor cursor;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -37,57 +54,48 @@ public class LocationsListActivity extends ListActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.location_list);
 		
-		final Cursor cursor = new LocationRepository(new DatabaseHelper(this).getReadableDatabase()).list();
+		this.cursor = new LocationRepository(new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
 		
-		final SimpleCursorAdapter adapter =
+		setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.location_item, cursor,
-				new String[] { "name", "resolvedAddress" },
+				new String[] { "name", "resolved_address" },
 				new int[] { R.id.line1, R.id.label }
-			);
+			) {{
+				setViewBinder(new ViewBinder() {
+					@Override
+					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+						switch(view.getId()) {
+						case R.id.label:
+							((TextView)view).setText(LocationRepository.locationToText(cursor));
+							return true;
+						}
+						return false;
+					}
+				});
+			}}
+		);
 		
-		final String[] columnNames = cursor.getColumnNames();
-		
-		adapter.setViewBinder(new ViewBinder() {
-			
+		findViewById(R.id.bAdd).setOnClickListener(new OnClickListener(){
 			@Override
-			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-				if("resolvedAddress".equals(columnNames[columnIndex])) {
-					((TextView)view.findViewById(R.id.label)).setText(
-						LocationRepository.locationToText(cursor)
-					);
-					return true;
-				}
-				return false;
+			public void onClick(View arg0) {
+				startActivityForResult(
+					new Intent(LocationsListActivity.this, LocationActivity.class),
+					NEW_LOCATION_REQUEST
+				);
 			}
 		});
 		
-		setListAdapter(adapter);
-		//registerForContextMenu(getListView());
+		registerForContextMenu(getListView());
 	}
-	/*
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)menuInfo;
-		String headerTitle = getContextMenuHeaderTitle(mi.position);
-		if (headerTitle != null) {
-			menu.setHeaderTitle(headerTitle);
-		}
-		List<MenuItemInfo> menus = createContextMenus(mi.id);
-		int i = 0;
-		for (MenuItemInfo m : menus) {
-			if (m.enabled) {
-				menu.add(0, m.menuId, i++, m.titleId);				
-			}
-		}
-	}
-	
-	//@Override
-	protected List<MenuItemInfo> createContextMenus(long id) {
-		List<MenuItemInfo> menus = super.createContextMenus(id);
-		menus.add(0, new MenuItemInfo(MENU_RESOLVE, R.string.resolve_address));
-		return menus;
+		menu.setHeaderTitle(R.string.locations);
+		menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address);
+		menu.add(1, MENU_EDIT, 1, R.string.edit);
+		menu.add(1, MENU_DELETE, 2, R.string.delete);
 	}
 	
 	@Override
@@ -95,105 +103,91 @@ public class LocationsListActivity extends ListActivity {
 		if (super.onContextItemSelected(item)) {
 			return true;
 		}
-		if (item.getItemId() == MENU_RESOLVE) {
-			AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-			resolveAddress(mi.position, mi.id);
-		}
+		
+		final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
+		
+		switch(item.getItemId()) {
+		case MENU_RESOLVE:
+			cursor.moveToPosition(mi.position);
+			startGeocode(LocationRepository.deserialize(cursor));
+			return true;
+		case MENU_EDIT:
+			onListItemClick(getListView(), null, mi.position, mi.id);
+			return true;
+		case MENU_DELETE:
+			new LocationRepository(new DatabaseHelper(this).getWritableDatabase()).delete(mi.id);
+			cursor.requery();
+			return true;
+		};
 		return false;
 	}
-
-	private void resolveAddress(int position, long id) {
-		cursor.moveToPosition(position);
-		MyLocation location = EntityManager.loadFromCursor(cursor, MyLocation.class);
-		startGeocode(location);
-	}*/
-/*
+	
 	@Override
-	protected void addItem() {
-		Intent intent = new Intent(this, LocationActivity.class);
-		startActivityForResult(intent, NEW_LOCATION_REQUEST);
+	protected void onListItemClick(ListView l, View v, int position, final long id) {
+		startActivityForResult(
+			new Intent(this, LocationActivity.class) {{
+				putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
+			}},
+			EDIT_LOCATION_REQUEST
+		);
 	}
-
+	
 	@Override
-	protected void deleteItem(int position, long id) {
-		em.deleteLocation(id);
-		cursor.requery();
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			cursor.requery();
+		}
 	}
-
-	@Override
-	public void editItem(int position, long id) {
-		Intent intent = new Intent(this, LocationActivity.class);
-		intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
-		startActivityForResult(intent, EDIT_LOCATION_REQUEST);
+	
+	private void startGeocode(ContentValues location) {
+		new GeocoderTask(location)
+			.execute(
+				location.getAsDouble("latitude"),
+				location.getAsDouble("longitude")
+			);
 	}
-
-	@Override
-	protected String getContextMenuHeaderTitle(int position) {
-		return getString(R.string.location);
+	
+	private class GeocoderTask extends AsyncTask<Double, Void, String> {
+		private final AddressGeocoder geocoder;
+		private final ContentValues location;
+		
+		private GeocoderTask(ContentValues location) {
+			this.geocoder = new AddressGeocoder(LocationsListActivity.this);
+			this.location = location;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			Log.d("Geocoder", "About to enter from onPreExecute");
+			// Show progress spinner and disable buttons
+			setProgressBarIndeterminateVisibility(true);
+			//setActionEnabled(false);
+			Log.d("Geocoder", "About to exit from onPreExecute");
+		}
+		
+		@Override
+		protected String doInBackground(Double... args) {
+			Log.d("Geocoder", "About to enter from doInBackground");
+			// Reverse geocode using location
+			return geocoder.resolveAddressFromLocation(args[0], args[1]);
+		}
+		
+		@Override
+		protected void onPostExecute(String found) {
+			Log.d("Geocoder", "About to enter from onPostExecute");
+			setProgressBarIndeterminateVisibility(false);
+			// Update GUI with resolved string
+			if (found != null) {
+				Toast.makeText(LocationsListActivity.this, found, Toast.LENGTH_LONG).show();
+				location.put("resolved_address", found);
+				new LocationRepository(new DatabaseHelper(LocationsListActivity.this).getWritableDatabase()).update(location);
+				cursor.requery();
+				//locationText.setText(found.name);
+			} else if (geocoder.lastException != null) {
+				Toast.makeText(LocationsListActivity.this, R.string.service_is_not_available, Toast.LENGTH_LONG).show();
+			}
+			//setActionEnabled(true);
+			Log.d("Geocoder", "About to exit from onPostExecute");
+		}
 	}
-
-	@Override
-	protected void viewItem(int position, long id) {
-		editItem(position, id);
-//		try { 
-//			cursor.moveToPosition(position);
-//			MyLocation location = EntityManager.loadFromCursor(cursor, MyLocation.class);
-//			Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("geo:"
-//					+Location.convert(location.latitude, Location.FORMAT_DEGREES)+","
-//					+Location.convert(location.longitude, Location.FORMAT_DEGREES))); 
-//		    startActivity(myIntent); 
-//		} catch (Exception e) { }
-	}	
-
-    private void startGeocode(MyLocation location) {
-        new GeocoderTask(location).execute(location.latitude, location.longitude);
-    }
-
-    private class GeocoderTask extends AsyncTask<Double, Void, String> {
-        
-    	private final AddressGeocoder geocoder;
-        private final MyLocation location;
-
-        private GeocoderTask(MyLocation location) {
-        	this.geocoder = new AddressGeocoder(LocationsListActivity.this);
-            this.location = location;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        	Log.d("Geocoder", "About to enter from onPreExecute");
-            // Show progress spinner and disable buttons
-            setProgressBarIndeterminateVisibility(true);
-            //setActionEnabled(false);
-            Log.d("Geocoder", "About to exit from onPreExecute");
-        }
-
-        @Override
-        protected String doInBackground(Double... args) {
-        	Log.d("Geocoder", "About to enter from doInBackground");
-            // Reverse geocode using location
-            return geocoder.resolveAddressFromLocation(args[0], args[1]);
-        }
-
-        @Override
-        protected void onPostExecute(String found) {
-        	Log.d("Geocoder", "About to enter from onPostExecute");
-            setProgressBarIndeterminateVisibility(false);
-            // Update GUI with resolved string
-            if (found != null) {
-				Toast t = Toast.makeText(LocationsListActivity.this, found, Toast.LENGTH_LONG);
-				t.show();
-				location.resolvedAddress = found;
-				em.saveLocation(location);
-				requeryCursor();
-        		//locationText.setText(found.name);            		
-            } else if (geocoder.lastException != null) {
-				Toast t = Toast.makeText(LocationsListActivity.this, R.string.service_is_not_available, Toast.LENGTH_LONG);
-				t.show();            	
-            }
-            //setActionEnabled(true);
-            Log.d("Geocoder", "About to exit from onPostExecute");
-        }
-    }
-*/
 }

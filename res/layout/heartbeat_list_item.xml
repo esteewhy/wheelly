@@ -24,7 +24,27 @@
 		android:text			="2011-03-21 09:01"
 		android:textSize		="10dp"
 		android:paddingTop		="2dp" />
-
+	
+	<LinearLayout
+		android:layout_width		="wrap_content"
+		android:layout_height		="wrap_content"
+		android:layout_marginTop	="2dp"
+		android:id					="@+id/icons"
+		android:layout_alignParentRight="true">
+	
+		<ImageView style="@style/HeartbeatTypeIcon"
+			android:id	="@+id/icon_start"
+			android:src	="@drawable/hb_start"/>
+		
+		<ImageView style="@style/HeartbeatTypeIcon"
+			android:id	="@+id/icon_stop"
+			android:src	="@drawable/hb_stop"/>
+		
+		<ImageView style="@style/HeartbeatTypeIcon"
+			android:id	="@+id/icon_refuel"
+			android:src	="@drawable/hb_refuel"/>
+	</LinearLayout>
+	
 	<LinearLayout
 		android:layout_height	="wrap_content"
 		android:id				="@+id/layout"

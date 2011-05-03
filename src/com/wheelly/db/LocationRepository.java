@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public final class LocationRepository implements IRepository {
-	final SQLiteDatabase database;
+	private final SQLiteDatabase database;
 	
 	public LocationRepository(SQLiteDatabase database) {
 		this.database = database;
@@ -55,12 +55,10 @@ public final class LocationRepository implements IRepository {
 		return new ContentValues();
 	}
 	
-	static ContentValues deserialize(Cursor cursor) {
-		
+	public static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
-		
 		values.put("name", cursor.getString(cursor.getColumnIndexOrThrow("name"))); 	
 		values.put("datetime", cursor.getLong(cursor.getColumnIndexOrThrow("datetime")));
 		values.put("provider", cursor.getString(cursor.getColumnIndexOrThrow("provider")));
@@ -93,7 +91,7 @@ public final class LocationRepository implements IRepository {
 				cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")),
 				cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")),
 				cursor.getFloat(cursor.getColumnIndexOrThrow("accuracy")),
-				cursor.getString(cursor.getColumnIndexOrThrow("resolvedAddress"))
+				cursor.getString(cursor.getColumnIndexOrThrow("resolved_address"))
 			);
 	}
 

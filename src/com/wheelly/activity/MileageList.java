@@ -24,8 +24,8 @@ import com.wheelly.db.MileageBroker;
 
 public class MileageList extends ListActivity {
 
-	static final int NEW_REQUEST = 1;
-	static final int EDIT_REQUEST = 2;
+	private static final int NEW_REQUEST = 1;
+	private static final int EDIT_REQUEST = 2;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -72,6 +72,7 @@ public class MileageList extends ListActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.mileages_menu, menu);
 		return true;
 	}

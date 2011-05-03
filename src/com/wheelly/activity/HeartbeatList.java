@@ -22,9 +22,8 @@ import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.HeartbeatRepository;
 
 public class HeartbeatList extends ListActivity {
-
-	static final int NEW_REQUEST = 1;
-	static final int EDIT_REQUEST = 2;
+	private static final int NEW_REQUEST = 1;
+	private static final int EDIT_REQUEST = 2;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -34,29 +33,35 @@ public class HeartbeatList extends ListActivity {
 		final Cursor cursor = new HeartbeatRepository(new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
 		
-		final SimpleCursorAdapter adapter =
+		setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.heartbeat_list_item, cursor,
-				new String[] { "odometer", "_created", "fuel", "fuel", "place" },
-				new int[] { R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place }
-			); 
-		
-		final String[] columnNames = cursor.getColumnNames();
-		
-		adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder(){
-			@Override
-			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-				if("fuel".equals(columnNames[columnIndex])) {
-					ProgressBar pb = ((ProgressBar)view.findViewById(R.id.fuelGauge));
-					if(null != pb) {
-						pb.setProgress(cursor.getInt(columnIndex));
-						return true;
-					}
+				new String[] {
+					"odometer", "_created", "fuel", "fuel", "place", "icons"
+				},
+				new int[] {
+					R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icons
 				}
-				return false;
-			}
-		});
+			) {{
+				setViewBinder(new SimpleCursorAdapter.ViewBinder(){
+					@Override
+					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+						switch(view.getId()) {
+						case R.id.fuelGauge:
+							((ProgressBar)view).setProgress(cursor.getInt(columnIndex));
+							return true;
+						case R.id.icons:
+							int mask = cursor.getInt(columnIndex);
+							view.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
+							view.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
+							view.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
+							return true;
+						}
+						return false;
+					}
+				});
+			}}
+		);
 		
-		setListAdapter(adapter);
 		registerForContextMenu(getListView());
 	}
 	
@@ -76,6 +81,7 @@ public class HeartbeatList extends ListActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.heartbeats_menu, menu);
 		return true;
 	}

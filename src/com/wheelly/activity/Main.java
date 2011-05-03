@@ -1,11 +1,15 @@
 package com.wheelly.activity;
 
+import ru.orangesoftware.financisto.activity.LocationsListActivity;
+
 import com.wheelly.R;
 
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TabHost;
 
@@ -35,7 +39,16 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 		
 		tabHost.setOnTabChangedListener(this);
 	}
-
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuItem mi = menu.add(Menu.NONE, 1, Menu.NONE, R.string.location);
+		mi.setIcon(R.drawable.menu_entities_locations);
+		mi.setIntent(new Intent(this, LocationsListActivity.class));
+		return true;
+	}
+	
 	@Override
 	public void onTabChanged(String arg0) {
 		// TODO Auto-generated method stub

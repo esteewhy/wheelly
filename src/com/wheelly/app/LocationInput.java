@@ -7,6 +7,7 @@ import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -39,17 +40,18 @@ public final class LocationInput extends Fragment {
 	private LocationManager locationManager;
 	private Location lastFix;
 	private Controls c;
+	private Cursor locationCursor;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		final Cursor cursor = new LocationRepository(new DatabaseHelper(getActivity()).getReadableDatabase()).list();
-		getActivity().startManagingCursor(cursor);
+		locationCursor = new LocationRepository(new DatabaseHelper(getActivity()).getReadableDatabase()).list();
+		getActivity().startManagingCursor(locationCursor);
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(getActivity(),
 					android.R.layout.simple_spinner_dropdown_item,
-					cursor, 
+					locationCursor, 
 					new String[] {"name"},
 					new int[] { android.R.id.text1 }
 			);
@@ -60,13 +62,13 @@ public final class LocationInput extends Fragment {
 			public void onClick(View v) {
 				new AlertDialog.Builder(getActivity())
 					.setSingleChoiceItems(adapter,
-						Utils.moveCursor(cursor, BaseColumns._ID, selectedLocationId),
+						Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
 						new DialogInterface.OnClickListener(){
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.cancel();
-								cursor.moveToPosition(which);	
-								long selectedId = cursor.getLong(cursor.getColumnIndexOrThrow("_id")); 
+								locationCursor.moveToPosition(which);	
+								long selectedId = locationCursor.getLong(locationCursor.getColumnIndexOrThrow("_id")); 
 								selectedLocationId = selectedId;
 							}
 						}
@@ -85,6 +87,23 @@ public final class LocationInput extends Fragment {
 		});
 		
 		return v;
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case NEW_LOCATION_REQUEST:
+					locationCursor.requery();
+					long locationId = data.getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
+					if (locationId != -1) {
+						setValue(locationId);
+					}
+					break;
+			}
+		} else {
+		}
 	}
 	
 	public long getValue() {
@@ -108,19 +127,19 @@ public final class LocationInput extends Fragment {
 		
 		// Start listener to find current location
 		locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(new Criteria(), true);
-        
-        if (provider != null) {
-        	lastFix = locationManager.getLastKnownLocation(provider);        	
-        }  
-
-        if (lastFix != null) {
-        	setLocation(lastFix);
-        	connectGps(forceUseGps);
-        } else {
-        	// No enabled providers found, so disable option
-       		c.locationText.setText(R.string.no_fix);
-        }
+		String provider = locationManager.getBestProvider(new Criteria(), true);
+		
+		if (provider != null) {
+			lastFix = locationManager.getLastKnownLocation(provider);
+		}
+		
+		if (lastFix != null) {
+			setLocation(lastFix);
+			connectGps(forceUseGps);
+		} else {
+			// No enabled providers found, so disable option
+			c.locationText.setText(R.string.no_fix);
+		}
 	}
 	
 	private class DefaultLocationListener implements LocationListener {
@@ -145,17 +164,14 @@ public final class LocationInput extends Fragment {
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
-		
 	}
 
 	private final LocationListener networkLocationListener = new DefaultLocationListener() {
-
 		@Override
 		public void onLocationChanged(Location location) {
 			super.onLocationChanged(location);
 			locationManager.removeUpdates(networkLocationListener);
 		}
-
 	};
 	
 	private final LocationListener gpsLocationListener = new DefaultLocationListener();
@@ -177,12 +193,20 @@ public final class LocationInput extends Fragment {
 	private void connectGps(boolean forceUseGps) {
 		if (locationManager != null) {
 			boolean useGps = forceUseGps;
-        	if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {	    	        
-    	        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkLocationListener);	        	    	        
-        	}
-        	if (useGps && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-        		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, gpsLocationListener);
-        	}
+			
+			if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+				locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 0, 0,
+					networkLocationListener
+				);
+			}
+			
+			if (useGps && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				locationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER, 1000, 0,
+					gpsLocationListener
+				);
+			}
 		}
 	}
 
@@ -194,12 +218,18 @@ public final class LocationInput extends Fragment {
 	}
 	
 	@Override
-	public void onDestroyView() {
+	public void onDestroy() {
 		disconnectGPS();
-		super.onDestroyView();
+		super.onDestroy();
 	}
 	
-	static class Controls {
+	@Override
+	public void onPause() {
+		disconnectGPS();
+		super.onPause();
+	}
+	
+	private static class Controls {
 		final TextView locationText;
 		final ImageView locationAdd;
 		

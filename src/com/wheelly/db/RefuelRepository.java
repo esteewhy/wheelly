@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
  * Basic persistence operations over fuel refill entity.
  */
 public final class RefuelRepository implements IRepository {
-	final SQLiteDatabase database;
+	private final SQLiteDatabase database;
 	
 	public RefuelRepository(SQLiteDatabase database) {
 		this.database = database;
@@ -73,7 +73,7 @@ public final class RefuelRepository implements IRepository {
 		return 0;
 	}
 	
-	public static ContentValues deserialize(Cursor cursor) {
+	private static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));

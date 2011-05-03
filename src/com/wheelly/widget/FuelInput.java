@@ -13,8 +13,8 @@ import android.widget.SeekBar;
 
 public final class FuelInput extends LinearLayout {
 	
-	SeekBar seekBar;
-	EditText editText;
+	private SeekBar seekBar;
+	private EditText editText;
 	
 	public FuelInput(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -26,7 +26,7 @@ public final class FuelInput extends LinearLayout {
 		initialize(context);
 	}
 
-	void initialize(Context context) {
+	private void initialize(Context context) {
 		LayoutInflater.from(context).inflate(R.layout.fuel_input, this, true);
 		
 		this.seekBar = ((SeekBar)findViewById(R.id.amount));

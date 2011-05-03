@@ -78,4 +78,10 @@
         <item name="android:minHeight">12dip</item>
         <item name="android:maxHeight">12dip</item>
     </style>
+	
+	<style name="HeartbeatTypeIcon">
+		<item name="android:layout_width">11dp</item>
+		<item name="android:layout_height">11dp</item>
+		<item name="android:layout_marginRight">3dp</item>
+	</style>
 </resources>

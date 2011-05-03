@@ -13,7 +13,7 @@ import android.widget.Toast;
  */
 public class RefuelBroker {
 	
-	final Context context;
+	private final Context context;
 	
 	public RefuelBroker(Context context)
 	{

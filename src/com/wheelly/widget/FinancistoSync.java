@@ -17,7 +17,7 @@ public final class FinancistoSync extends Fragment {
 	public static final String TRAN_ID_EXTRA = "tranId";
 	private static final int NEW_TRANSACTION_REQUEST = 1;
 
-	Button SyncButton;
+	private Button SyncButton;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

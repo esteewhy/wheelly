@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
  * Basic persistance operations over trip entity.
  */
 public final class MileageRepository implements IRepository {
-	final SQLiteDatabase database;
+	private final SQLiteDatabase database;
 	
 	public MileageRepository(SQLiteDatabase database) {
 		this.database = database;
@@ -73,7 +73,7 @@ public final class MileageRepository implements IRepository {
 		return 0;
 	}
 
-	static ContentValues deserialize(Cursor cursor) {
+	private static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));

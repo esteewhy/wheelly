@@ -113,11 +113,11 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 	/**
 	 * Encapsulates UI objects.
 	 */
-	static class Controls {
-		public final MileageInput Mileage;
-		public final TripControlBar Heartbeats; 
-		public final Button Save;
-		public final Button Cancel;
+	private static class Controls {
+		final MileageInput Mileage;
+		final TripControlBar Heartbeats; 
+		final Button Save;
+		final Button Cancel;
 		
 		public Controls(FragmentActivity view) {
 			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
