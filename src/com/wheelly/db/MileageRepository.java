@@ -35,7 +35,7 @@ public final class MileageRepository implements IRepository {
 	
 	public void delete(long id) {
 		this.database.delete("mileages",
-			BaseColumns._ID,
+			BaseColumns._ID + " = ?",
 			new String[] { Long.toString(id) }
 		);
 	}

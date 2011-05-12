@@ -35,7 +35,7 @@ public final class RefuelRepository implements IRepository {
 	
 	public void delete(long id) {
 		this.database.delete("refuels",
-			BaseColumns._ID,
+			BaseColumns._ID + " = ?",
 			new String[] { Long.toString(id) }
 		);
 	}

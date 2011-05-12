@@ -99,5 +99,4 @@
 			android:textColor		="#ccc"
 			android:text			="L"/>
 	</LinearLayout>
-	
 </RelativeLayout>

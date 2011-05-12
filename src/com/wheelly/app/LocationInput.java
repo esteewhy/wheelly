@@ -48,11 +48,11 @@ public final class LocationInput extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		locationCursor = new LocationRepository(new DatabaseHelper(getActivity()).getReadableDatabase()).list();
-		getActivity().startManagingCursor(locationCursor);
+		final Activity ctx = getActivity();  
+		locationCursor = new LocationRepository(new DatabaseHelper(ctx).getReadableDatabase()).list();
+		ctx.startManagingCursor(locationCursor);
 		final ListAdapter adapter =
-			new SimpleCursorAdapter(getActivity(),
+			new SimpleCursorAdapter(ctx,
 					android.R.layout.simple_spinner_dropdown_item,
 					locationCursor, 
 					new String[] {"name"},
@@ -60,11 +60,10 @@ public final class LocationInput extends Fragment {
 			);
 		
 		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
-		((TextView)v.findViewById(R.id.label)).setText(R.string.location_input_label);
 		v.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(getActivity())
+				new AlertDialog.Builder(ctx)
 					.setSingleChoiceItems(adapter,
 						Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
 						new DialogInterface.OnClickListener(){
@@ -81,11 +80,13 @@ public final class LocationInput extends Fragment {
 					.show();
 			}
 		});
+		
 		c = new Controls(v);
+		c.labelView.setText(R.string.location_input_label);
 		c.locationAdd.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getActivity(), LocationActivity.class);
+				Intent intent = new Intent(ctx, LocationActivity.class);
 				startActivityForResult(intent, NEW_LOCATION_REQUEST);
 			}
 		});
@@ -237,11 +238,13 @@ public final class LocationInput extends Fragment {
 	
 	private static class Controls {
 		final TextView locationText;
+		final TextView labelView;
 		final ImageView locationAdd;
 		
 		public Controls(View v) {
-			this.locationText = (TextView)v.findViewById(R.id.data);
-			this.locationAdd = (ImageView)v.findViewById(R.id.plus_minus);
+			this.locationText	= (TextView)v.findViewById(R.id.data);
+			this.labelView 		= (TextView)v.findViewById(R.id.label);
+			this.locationAdd	= (ImageView)v.findViewById(R.id.plus_minus);
 		}
 	}
 }

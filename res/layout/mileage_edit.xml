@@ -57,6 +57,15 @@
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" />
 			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<fragment
+				class					="com.wheelly.app.TrackInput"
+				android:id				="@+id/track"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
+			
 		</LinearLayout>
 	</ScrollView>
 	
