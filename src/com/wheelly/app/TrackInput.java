@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
@@ -45,7 +46,15 @@ public final class TrackInput extends Fragment {
 					new int[] { android.R.id.text1 }
 			);
 		
-		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		final View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		
+		// prepend MyTracks icon
+		((ViewGroup)v).addView(new ImageView(ctx) {{
+			setImageResource(R.drawable.arrow_icon);
+		}}, 0, new LayoutParams(
+				LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT));
+		
 		v.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -81,8 +90,10 @@ public final class TrackInput extends Fragment {
 		if (trackId <= 0) {
 			selectedTrackId = trackId;
 		} else {
-			c.locationText.setText(Long.toString(trackId));
-			selectedTrackId = trackId;
+			if (Utils.moveCursor(tracksCursor, "_id", trackId) != -1) {
+				c.locationText.setText(tracksCursor.getString(tracksCursor.getColumnIndexOrThrow("name")));
+				selectedTrackId = trackId;
+			}
 		}
 	}
 	

@@ -387,7 +387,7 @@ containing a value of this type.
         public static final int location_clear=0x7f0a001a;
         public static final int mainlayout=0x7f0a0092;
         public static final int mapview=0x7f0a0093;
-        public static final int mileage=0x7f0a009d;
+        public static final int mileage=0x7f0a009e;
         public static final int monthly_result=0x7f0a00ab;
         public static final int monthly_result_label=0x7f0a00aa;
         public static final int monthly_view_title=0x7f0a00a8;
@@ -473,7 +473,7 @@ containing a value of this type.
         public static final int title=0x7f0a0070;
         public static final int toggle=0x7f0a003d;
         public static final int top=0x7f0a0048;
-        public static final int track=0x7f0a009e;
+        public static final int track=0x7f0a009d;
         public static final int value=0x7f0a00c0;
         public static final int view=0x7f0a009b;
     }
