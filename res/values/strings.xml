@@ -92,6 +92,7 @@
 	<string name="track">Track</string>
 	<string name="locations">Locations</string>
 	<string name="tracks">Tracks</string>
+	<string name="no_track"><i>Select existing track</i></string>
 	<string name="no_locations">No locations</string>
 	<string name="use_gps">Use GPS</string>
 	<string name="use_gps_summary">Use GPS to get current location for transaction</string>

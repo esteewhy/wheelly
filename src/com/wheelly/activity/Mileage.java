@@ -1,7 +1,5 @@
 package com.wheelly.activity;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +14,7 @@ import android.widget.*;
 import com.wheelly.R;
 import com.wheelly.app.LocationInput;
 import com.wheelly.app.TrackInput;
+import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.DatabaseHelper;
@@ -23,20 +22,18 @@ import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.widget.MileageInput;
-
-import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
-import ru.orangesoftware.financisto.model.*;
+import com.wheelly.content.TrackRepository;
 
 /**
  * Edit single trip properties and manipulate associated heartbeats.
  */
-public class Mileage extends FragmentActivity implements ActivityLayoutListener {
+public class Mileage extends FragmentActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		super.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		super.setContentView(R.layout.mileage_edit);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setContentView(R.layout.mileage_edit);
 		
 		//components
 		final Intent intent = this.getIntent();
@@ -48,6 +45,15 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		
 		c.Mileage.setAmount(values.getAsLong("mileage"));
 		c.Destination.setValue(values.getAsLong("location_id"));
+		c.Track.setOnTrackChangedListener(new OnTrackChangedListener() {
+			@Override
+			public void onTrackChanged(long trackId) {
+				// @todo Compare to default
+				if(c.Mileage.getAmount() == 0) {
+					c.Mileage.setAmount(trackId > 0 ? new TrackRepository(Mileage.this).getDistance(trackId) : 0);
+				}
+			}
+		});
 		c.Track.setValue(values.getAsLong("track_id"));
 		
 		final TripControlBarValue heartbeats = new TripControlBarValue() {{
@@ -59,6 +65,31 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 		HeartbeatBroker broker = new HeartbeatBroker(this);
 		heartbeats.StartHeartbeat = broker.loadOrCreate(heartbeats.StartId);
 		heartbeats.StopHeartbeat = broker.loadOrCreate(heartbeats.StopId);
+		c.Heartbeats.setOnValueChangedListener(new TripControlBar.OnValueChangedListener() {
+			@Override
+			public void onValueChanged(TripControlBarValue value) {
+				if(c.Mileage.getAmount() == 0
+						&& value.StartHeartbeat != null
+						&& value.StartHeartbeat.containsKey("odometer")
+						&& value.StopHeartbeat != null
+						&& value.StopHeartbeat.containsKey("odometer")) {
+					c.Mileage.setAmount(
+						value.StopHeartbeat.getAsLong("odometer")
+						- value.StartHeartbeat.getAsLong("odometer"));
+				}
+				
+				if(c.Track.getValue() == 0
+						&& value.TrackId > 0) {
+					c.Track.setValue(value.TrackId);
+				}
+				
+				if(c.Destination.getValue() == 0
+						&& value.StopHeartbeat != null
+						&& value.StopHeartbeat.containsKey("place_id")) {
+					c.Destination.setValue(value.StopHeartbeat.getAsLong("place_id"));
+				}
+			}
+		});
 		c.Heartbeats.setValue(heartbeats);
 		
 		c.Save.setOnClickListener(
@@ -95,35 +126,14 @@ public class Mileage extends FragmentActivity implements ActivityLayoutListener 
 	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		/*if (hasFocus) {
-			accountText.requestFocusFromTouch();
-		}*/
+		if (hasFocus) {
+			getSupportFragmentManager()
+				.findFragmentById(R.id.track)
+				.getView()
+				.requestFocusFromTouch();
+		}
 	}
 
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelectedPos(int id, int selectedPos) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelectedId(int id, long selectedId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelected(int id, ArrayList<? extends MultiChoiceItem> items) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	/**
 	 * Encapsulates UI objects.
 	 */

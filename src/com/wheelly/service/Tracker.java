@@ -15,13 +15,14 @@ public class Tracker {
 	final Intent serviceIntent;
 	final Context context;
 	
-	private OnStartTrackListener listener;
+	private TrackListener listener;
 
-	public static interface OnStartTrackListener {
+	public static interface TrackListener {
 		void onStartTrack(long trackId);
+		void onTrackStopped();
 	}
 	
-	public Tracker setStartTrackListener(OnStartTrackListener listener) {
+	public Tracker setStartTrackListener(TrackListener listener) {
 		this.listener = listener;
 		return this;
 	}
@@ -70,16 +71,19 @@ public class Tracker {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				synchronized (Tracker.this) {
-					try {
-						final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
-						if(svc.getRecordingTrackId() == trackId) {
-							svc.endCurrentTrack();
+					if(listener != null) {
+						try {
+							final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
+							if(svc.getRecordingTrackId() == trackId) {
+								svc.endCurrentTrack();
+								listener.onTrackStopped();
+							}
+							context.unbindService(this);
+							context.stopService(serviceIntent);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						context.unbindService(this);
-						context.stopService(serviceIntent);
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				}
 			}

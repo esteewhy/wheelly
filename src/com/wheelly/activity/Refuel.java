@@ -1,7 +1,5 @@
 package com.wheelly.activity;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,14 +21,12 @@ import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
 import com.wheelly.widget.FinancistoSync;
 
-import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
-import ru.orangesoftware.financisto.model.*;
 import ru.orangesoftware.financisto.widget.AmountInput;
 
 /**
  * Edit refuel properties and manipulate associated heartbeats.
  */
-public class Refuel extends FragmentActivity implements ActivityLayoutListener {
+public class Refuel extends FragmentActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,30 +92,6 @@ public class Refuel extends FragmentActivity implements ActivityLayoutListener {
 		}*/
 	}
 
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelectedPos(int id, int selectedPos) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelectedId(int id, long selectedId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onSelected(int id, ArrayList<? extends MultiChoiceItem> items) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	/**
 	 * Encapsulates UI objects.
 	 */

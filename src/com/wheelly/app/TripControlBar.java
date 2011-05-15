@@ -4,8 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wheelly.R;
 import com.wheelly.activity.HeartbeatDialog;
+import com.wheelly.content.TrackRepository;
 import com.wheelly.service.Tracker;
-import com.wheelly.service.Tracker.OnStartTrackListener;
+import com.wheelly.service.Tracker.TrackListener;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -32,6 +33,23 @@ public class TripControlBar extends Fragment {
 	private int editStartHeartbeatAndStartTrackingRequestId;
 	private int editStopHeartbeatRequestId;
 	private boolean canStartTracking = true;
+	
+	public static interface OnValueChangedListener {
+		void onValueChanged(TripControlBarValue value);
+	}
+	
+	private OnValueChangedListener onValueChangedListener;
+	
+	public void setOnValueChangedListener(OnValueChangedListener listener) {
+		this.onValueChangedListener = listener;
+	}
+	
+	protected void onValueChanged(TripControlBarValue value) {
+		if(null != onValueChangedListener) {
+			onValueChangedListener.onValueChanged(value);
+		}
+		setValue(value);
+	}
 	
 	/**
 	 * Constructs UI and wire up event handlers.
@@ -63,26 +81,44 @@ public class TripControlBar extends Fragment {
 					
 					// Stop tracking (if active) *before* entering final heartbeat.
 					if(requestId == editStopHeartbeatRequestId) {
-						TripControlBarValue val = getValue();
+						final TripControlBarValue val = getValue();
 						if(val.TrackId < 0) {
 							val.TrackId = val.TrackId * -1;
-							new Tracker(getActivity()).Stop(val.TrackId);
-							setValue(val);
+							new Tracker(getActivity())
+								.setStartTrackListener(new TrackListener() {
+									
+									@Override
+									public void onTrackStopped() {
+										long distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
+										if(val.StartHeartbeat != null &&
+												val.StopHeartbeat != null) {
+											val.StopHeartbeat.put("odometer", val.StartHeartbeat.getAsLong("odometer" + distance));
+										}
+										setValue(val);
+									}
+									
+									@Override
+									public void onStartTrack(long trackId) {}
+								})
+								.Stop(val.TrackId);
 						}
 					} else if(requestId == editStartHeartbeatAndStartTrackingRequestId) {
 						final TripControlBarValue val = getValue();
 						
 						new Tracker(getActivity())
-							.setStartTrackListener(new OnStartTrackListener() {
-							@Override
-							public void onStartTrack(long trackId) {
-								// negative means "tracking in progress".
-								val.TrackId = trackId * -1;
-								setValue(val);
-								v.setEnabled(true);
-							}
-						})
-						.Start();
+							.setStartTrackListener(new TrackListener() {
+								@Override
+								public void onStartTrack(long trackId) {
+									// negative means "tracking in progress".
+									val.TrackId = trackId * -1;
+									onValueChanged(val);
+									v.setEnabled(true);
+								}
+								
+								@Override
+								public void onTrackStopped() {}
+							})
+							.Start();
 						
 						v.setEnabled(false);
 						return;
@@ -117,7 +153,7 @@ public class TripControlBar extends Fragment {
 				value.StopHeartbeat = heartbeat;
 			}
 			
-			this.setValue(value);
+			onValueChanged(value);
 		}
 	}
 	

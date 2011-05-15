@@ -2,8 +2,9 @@ package com.wheelly.app;
 
 import ru.orangesoftware.financisto.utils.Utils;
 
-import com.google.android.apps.mytracks.content.TracksColumns;
 import com.wheelly.R;
+import com.wheelly.content.TrackRepository;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,18 +27,35 @@ import android.widget.TextView;
  */
 public final class TrackInput extends Fragment {
 	
-	private long selectedTrackId = 0;
+	private long selectedTrackId = 1;
 	private Controls c;
 	private Cursor tracksCursor;
+	
+	public static interface OnTrackChangedListener {
+		void onTrackChanged(long trackId); 
+	}
+	
+	private OnTrackChangedListener onTrackChangedListener;
+	
+	public void setOnTrackChangedListener(OnTrackChangedListener listener) {
+		onTrackChangedListener = listener;
+	}
+	
+	protected void onTrackChanged(long trackId) {
+		if(trackId != selectedTrackId) {
+			if(null != onTrackChangedListener) {
+				onTrackChangedListener.onTrackChanged(trackId);
+			}
+			setValue(trackId);
+		}
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
 		
-		tracksCursor = ctx.getContentResolver().query(
-				TracksColumns.CONTENT_URI, null, null, null, "_id DESC");
-		
-		ctx.startManagingCursor(tracksCursor);
+		ctx.startManagingCursor(tracksCursor = new TrackRepository(ctx).list());
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(ctx,
 					android.R.layout.simple_spinner_dropdown_item,
@@ -66,8 +84,8 @@ public final class TrackInput extends Fragment {
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.cancel();
 								tracksCursor.moveToPosition(which);	
-								long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id")); 
-								selectedTrackId = selectedId;
+								long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id"));
+								onTrackChanged(selectedId);
 							}
 						}
 					)
@@ -79,6 +97,7 @@ public final class TrackInput extends Fragment {
 		c = new Controls(v);
 		c.labelView.setText(R.string.track);
 		c.locationAdd.setVisibility(View.GONE);
+		setValue(0);//force default label
 		return v;
 	}
 	
@@ -87,13 +106,13 @@ public final class TrackInput extends Fragment {
 	}
 	
 	public void setValue(long trackId) {
-		if (trackId <= 0) {
-			selectedTrackId = trackId;
-		} else {
-			if (Utils.moveCursor(tracksCursor, "_id", trackId) != -1) {
+		if(selectedTrackId != trackId) {
+			if(trackId != 0 && Utils.moveCursor(tracksCursor, "_id", trackId) != -1) {
 				c.locationText.setText(tracksCursor.getString(tracksCursor.getColumnIndexOrThrow("name")));
-				selectedTrackId = trackId;
+			} else {
+				c.locationText.setText(R.string.no_track);
 			}
+			selectedTrackId = trackId;
 		}
 	}
 	

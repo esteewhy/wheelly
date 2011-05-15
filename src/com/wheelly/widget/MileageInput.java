@@ -55,7 +55,6 @@ public class MileageInput extends LinearLayout {
 		void onAmountChanged(long oldAmount, long newAmount);
 	}
 
-
 	public void setOnAmountChangedListener(
 			OnAmountChangedListener onAmountChangedListener) {
 		this.onAmountChangedListener = onAmountChangedListener;
@@ -92,12 +91,12 @@ public class MileageInput extends LinearLayout {
 		findViewById(R.id.amount_input).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Context ctx = getContext();
+				final Context ctx = getContext();
 				long amount = getAmount(); 
 				
 				LinearLayout layout = new LinearLayout(ctx);
 				layout.setOrientation(LinearLayout.VERTICAL);
-				LinearLayout.LayoutParams lpWrapWrap = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				final LinearLayout.LayoutParams lpWrapWrap = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				lpWrapWrap.weight = 1;
 				
 				final Dialog d = new AlertDialog.Builder(ctx)
@@ -118,38 +117,37 @@ public class MileageInput extends LinearLayout {
 					}
 				});
 				
-				// buttons
-				LinearLayout layout2 = new LinearLayout(ctx);
-				layout2.setOrientation(LinearLayout.HORIZONTAL);
-				Button bOK = new Button(ctx);
-				bOK.setText(R.string.ok);
-				bOK.setOnClickListener(new OnClickListener(){
-					@Override
-					public void onClick(View arg0) {
-						setAmount(picker.getCurrent());
-						d.dismiss();
-					}
-				});
-				layout2.addView(bOK, lpWrapWrap);
-				Button bClear = new Button(ctx);
-				bClear.setText(R.string.clear);
-				bClear.setOnClickListener(new OnClickListener(){
-					@Override
-					public void onClick(View arg0) {
-						picker.setCurrent(0);
-					}
-				});
-				layout2.addView(bClear, lpWrapWrap);
-				Button bCancel = new Button(ctx);
-				bCancel.setText(R.string.cancel);
-				bCancel.setOnClickListener(new OnClickListener(){
-					@Override
-					public void onClick(View arg0) {
-						d.dismiss();
-					}
-				});
-				layout2.addView(bCancel, lpWrapWrap);
-				layout.addView(layout2, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				layout.addView(new LinearLayout(ctx) {{
+					setOrientation(LinearLayout.HORIZONTAL);
+					addView(new Button(ctx) {{
+						setText(R.string.ok);
+						setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View arg0) {
+								setAmount(picker.getCurrent());
+								d.dismiss();
+							}
+						});
+					}}, lpWrapWrap);
+					addView(new Button(ctx) {{
+						setText(R.string.clear);
+						setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View arg0) {
+								picker.setCurrent(0);
+							}
+						});
+					}}, lpWrapWrap);
+					addView(new Button(ctx) {{
+						setText(R.string.cancel);
+						setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View arg0) {
+								d.dismiss();
+							}
+						});
+					}}, lpWrapWrap);
+				}}, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 				
 				d.setCanceledOnTouchOutside(true);
 				d.show();
@@ -174,7 +172,6 @@ public class MileageInput extends LinearLayout {
 	private static final char[] acceptedChars = new char[]{'0','1','2','3','4','5','6','7','8','9'};
 	
 	private final NumberKeyListener keyListener = new NumberKeyListener() {
-		
 		@Override
 		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 			return super.filter(source, start, end, dest, dstart, dend);
