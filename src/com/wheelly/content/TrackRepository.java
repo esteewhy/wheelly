@@ -1,10 +1,12 @@
 package com.wheelly.content;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
 import com.google.android.apps.mytracks.content.TracksColumns;
+import com.wheelly.db.LocationBroker;
 
 public class TrackRepository {
 	
@@ -32,5 +34,24 @@ public class TrackRepository {
 		} finally {
 			cursor.close();
 		}
+	}
+	
+	/*
+	 * Renames newly recorded track using start and stop location names.
+	 */
+	public void renameTrack(long trackId, long start_place_id, long stop_place_id) {
+		final LocationBroker broker = new LocationBroker(context);
+		final String name =
+			broker.loadOrCreate(start_place_id).getAsString("name")
+			+ " - "
+			+ broker.loadOrCreate(stop_place_id).getAsString("name");
+		ContentValues values = new ContentValues();
+		values.put("name", name);
+		context.getContentResolver().update(
+			TracksColumns.CONTENT_URI,
+			values,
+			BaseColumns._ID + " = ?",
+			new String[] { Long.toString(trackId)}
+		);
 	}
 }

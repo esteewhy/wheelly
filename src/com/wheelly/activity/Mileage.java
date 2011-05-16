@@ -128,7 +128,7 @@ public class Mileage extends FragmentActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		if (hasFocus) {
 			getSupportFragmentManager()
-				.findFragmentById(R.id.track)
+				.findFragmentById(R.id.heartbeats)
 				.getView()
 				.requestFocusFromTouch();
 		}

@@ -24,7 +24,10 @@
 		<activity android:name=".activity.Heartbeat" />
 		<activity android:name=".activity.HeartbeatDialog" android:theme="@android:style/Theme.Dialog" />
 		<activity android:name=".activity.MileageList"></activity>
-		<activity android:name=".activity.Mileage"></activity>
+		<activity android:name=".activity.Mileage"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Mileage"></activity>
 		<activity android:name=".activity.RefuelList"></activity>
 		<activity android:name=".activity.Refuel"></activity>
 		<activity android:name=".widget.QuickMultiNumberInput"

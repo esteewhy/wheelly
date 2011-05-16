@@ -151,6 +151,21 @@ public class TripControlBar extends Fragment {
 			} else if (requestCode == editStopHeartbeatRequestId) {
 				value.StopId = id;
 				value.StopHeartbeat = heartbeat;
+				
+				if(value.TrackId > 0
+					&& value.StopHeartbeat.containsKey("place_id")
+					&& value.StartHeartbeat.containsKey("place_id")) {
+					
+					long start_place_id = value.StartHeartbeat.getAsLong("place_id");
+					long stop_place_id = value.StopHeartbeat.getAsLong("place_id");
+					
+					if(start_place_id > 0 && stop_place_id > 0) {
+						new TrackRepository(getActivity()).renameTrack(
+							value.TrackId,
+							start_place_id,
+							stop_place_id);
+					}
+				}
 			}
 			
 			onValueChanged(value);
