@@ -27,4 +27,6 @@
 		android:layout_weight	="1"
 		android:gravity			="center"
 		android:text			="@string/no_refuels" />
+	
+	<include layout="@layout/status_bar"/>
 </LinearLayout>

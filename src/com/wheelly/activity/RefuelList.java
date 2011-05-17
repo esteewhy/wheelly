@@ -12,12 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
+import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
@@ -57,6 +59,20 @@ public class RefuelList extends ListActivity {
 			}
 		);
 		registerForContextMenu(getListView());
+		
+		// Set up status bar (if present).
+		final StatusBarControls c = new StatusBarControls(this);
+		c.AddButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(RefuelList.this, Refuel.class);
+				startActivityForResult(intent, NEW_REQUEST);
+			}
+		});
+		c.TransferButton.setVisibility(View.GONE);
+		c.TemplateButton.setVisibility(View.GONE);
+		c.FilterButton.setVisibility(View.GONE);
+		c.TotalLayout.setVisibility(View.GONE);
 	}
 	
 	@Override

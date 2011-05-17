@@ -13,12 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
+import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
@@ -31,12 +33,12 @@ public class MileageList extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		super.setContentView(R.layout.mileage_list);
+		setContentView(R.layout.mileage_list);
 		
 		final Cursor cursor = new MileageRepository(new DatabaseHelper(this).getReadableDatabase()).list();
-		super.startManagingCursor(cursor);
+		startManagingCursor(cursor);
 		
-		super.setListAdapter(
+		setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.mileage_list_item, cursor,
 				new String[] {
 					"start_place", "stop_place", "mileage", "cost", "stop_time", "fuel", "destination"
@@ -61,6 +63,20 @@ public class MileageList extends ListActivity {
 			}
 		);
 		registerForContextMenu(getListView());
+		
+		// Set up status bar (if present).
+		final StatusBarControls c = new StatusBarControls(this);
+		c.AddButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MileageList.this, Mileage.class);
+				startActivityForResult(intent, NEW_REQUEST);
+			}
+		});
+		c.TransferButton.setVisibility(View.GONE);
+		c.TemplateButton.setVisibility(View.GONE);
+		c.FilterButton.setVisibility(View.GONE);
+		c.TotalLayout.setVisibility(View.GONE);
 	}
 	
 	@Override
