@@ -1,5 +1,7 @@
 package com.wheelly.db;
 
+import com.wheelly.db.DatabaseSchema.Locations;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +15,11 @@ public final class LocationRepository implements IRepository {
 	}
 	
 	public Cursor list() {
-		return this.database.rawQuery(DatabaseSchema.Locations.Select, null);
+		return this.database.rawQuery(Locations.Select, null);
+	}
+	
+	public Cursor list(String recordType) {
+		return this.database.rawQuery(Locations.SelectByMileages, null);
 	}
 	
 	public long insert(ContentValues values) {

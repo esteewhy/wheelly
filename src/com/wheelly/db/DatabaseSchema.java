@@ -51,8 +51,14 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations stop_place"
 			+ "		ON stop.place_id = stop_place." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations dest"
-			+ "		ON m.location_id = dest." + BaseColumns._ID
-			+ " ORDER BY COALESCE(stop._created, start._created, m._created) DESC";
+			+ "		ON m.location_id = dest." + BaseColumns._ID;
+		
+		public static final String SelectWhereLocation =
+			"stop.place_id = ?1 OR start.place_id = ?1 OR m.location_id = ?1";
+		
+		static final String SelectOrder = " ORDER BY COALESCE(stop._created, start._created, m._created)"; 
+		public static final String SelectOrderAsc = SelectOrder + " ASC";
+		public static final String SelectOrderDesc = SelectOrder + " DESC";
 		
 		public static final String Single =
 			"SELECT "
@@ -227,5 +233,18 @@ public final class DatabaseSchema {
 		
 		public static String Single =
 			"SELECT * FROM locations WHERE _id = ? LIMIT 1;";
+		
+		public static String SelectByMileages =
+			"SELECT l.* FROM locations l"
+			+ " INNER JOIN ("
+			+ "  SELECT location_id, COUNT(" + BaseColumns._ID + ") cnt FROM ("
+			+ "   SELECT " + BaseColumns._ID + ", location_id FROM mileages"
+			+ "   UNION"
+			+ "   SELECT m." + BaseColumns._ID + ", h.place_id FROM mileages m INNER JOIN heartbeats h ON m.start_heartbeat_id = h." + BaseColumns._ID
+			+ "   UNION"
+			+ "   SELECT m." + BaseColumns._ID + ", h.place_id FROM mileages m INNER JOIN heartbeats h ON m.stop_heartbeat_id = h." + BaseColumns._ID
+			+ "  ) GROUP BY location_id"
+			+ " ) ml ON ml.location_id = l." + BaseColumns._ID
+			+ " ORDER BY ml.cnt DESC";
 	}
 }

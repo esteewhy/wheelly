@@ -1,11 +1,14 @@
 package com.wheelly.db;
 
+import java.util.ArrayList;
+
 import com.wheelly.db.DatabaseSchema.Mileages;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 
 /**
  * Basic persistance operations over trip entity.
@@ -18,7 +21,29 @@ public final class MileageRepository implements IRepository {
 	}
 	
 	public Cursor list() {
-		return this.database.rawQuery(Mileages.Select, null);
+		return this.database.rawQuery(Mileages.Select + Mileages.SelectOrderDesc, null);
+	}
+	
+	public Cursor list(ContentValues filter) {
+		StringBuilder sql = new StringBuilder(Mileages.Select);
+		ArrayList<String> conditions = new ArrayList<String>();
+		ArrayList<String> values = new ArrayList<String>();
+		if(filter.containsKey("location_id")) {
+			conditions.add(Mileages.SelectWhereLocation);
+			values.add(Long.toString(filter.getAsLong("location_id")));
+		} else {
+			values.add("");
+		}
+		
+		if(conditions.size() > 0) {
+			sql.append(" WHERE (");
+			sql.append(TextUtils.join(") AND (", conditions.toArray()));
+			sql.append(") ");
+		}
+		
+		sql.append(filter.containsKey("sort_order") && filter.getAsInteger("sort_order") != 0 ? Mileages.SelectOrderAsc : Mileages.SelectOrderDesc);
+		
+		return this.database.rawQuery(sql.toString(), values.toArray(new String[0]));
 	}
 	
 	public ContentValues load(long id) {

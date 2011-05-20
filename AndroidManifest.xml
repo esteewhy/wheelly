@@ -24,30 +24,64 @@
 		<activity android:name=".activity.Heartbeat"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Refuel" />
-		<activity android:name=".activity.HeartbeatDialog" android:theme="@android:style/Theme.Dialog" />
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
+		<activity android:name=".activity.HeartbeatDialog"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
 		<activity android:name=".activity.MileageList"></activity>
 		<activity android:name=".activity.Mileage"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Mileage"/>
+			android:taskAffinity=".activity.Mileage"
+			android:launchMode="singleTop" />
 		<activity android:name=".activity.RefuelList"></activity>
 		<activity android:name=".activity.Refuel"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Refuel" />
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
 		<activity android:name=".widget.QuickMultiNumberInput"
 			android:label="@string/amount"
-			android:theme="@android:style/Theme.Dialog"/>
-			
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	="ru.orangesoftwar.financisto.activity.DateFilterActivity"
+			android:label	="@string/filter"
+			android:theme	="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	=".activity.filter.MileageListFilterActivity"
+			android:label	="@string/filter"
+			android:theme	="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
 		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
-			android:label="@string/amount" android:theme="@android:style/Theme.Dialog"/>
+			android:label="@string/amount"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
 		
 		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
-			android:label="@string/calculator" android:theme="@android:style/Theme.Dialog"/>
-			
-		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity" android:label="@string/location"/>
-		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity" android:label="@string/locations"/>
+			android:label="@string/calculator"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.DateFilterActivity"
+			android:label="@string/filter"
+			android:theme="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity"
+			android:label="@string/location"
+			android:launchMode="singleTop" />
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
+			android:label="@string/locations"
+			android:launchMode="singleTop" />
 	</application>
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>

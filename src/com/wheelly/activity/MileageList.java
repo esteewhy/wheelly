@@ -2,6 +2,7 @@ package com.wheelly.activity;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
+import com.wheelly.activity.filter.MileageListFilterActivity;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
@@ -29,6 +31,10 @@ public class MileageList extends ListActivity {
 
 	private static final int NEW_REQUEST = 1;
 	private static final int EDIT_REQUEST = 2;
+	private static final int FILTER_REQUEST = 6;
+	
+	final private ContentValues filter = new ContentValues();
+	StatusBarControls c;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -65,17 +71,26 @@ public class MileageList extends ListActivity {
 		registerForContextMenu(getListView());
 		
 		// Set up status bar (if present).
-		final StatusBarControls c = new StatusBarControls(this);
+		c = new StatusBarControls(this);
 		c.AddButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				c.AddButton.setEnabled(false);
 				Intent intent = new Intent(MileageList.this, Mileage.class);
 				startActivityForResult(intent, NEW_REQUEST);
 			}
 		});
 		c.TransferButton.setVisibility(View.GONE);
 		c.TemplateButton.setVisibility(View.GONE);
-		c.FilterButton.setVisibility(View.GONE);
+		c.FilterButton.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				c.FilterButton.setEnabled(false);
+				Intent intent = new Intent(MileageList.this, MileageListFilterActivity.class);
+				MileageListFilterActivity.filterToIntent(filter, intent);
+				startActivityForResult(intent, FILTER_REQUEST);
+			}
+		});
 		c.TotalLayout.setVisibility(View.GONE);
 	}
 	
@@ -88,6 +103,25 @@ public class MileageList extends ListActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(requestCode) {
+		case FILTER_REQUEST:
+			if (resultCode == RESULT_FIRST_USER) {
+				filter.clear();
+			} else if (resultCode == RESULT_OK) {
+				MileageListFilterActivity.intentToFilter(data, filter);
+			}	
+			c.FilterButton.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
+			stopManagingCursor(((SimpleCursorAdapter)this.getListAdapter()).getCursor());
+			MileageRepository repo = new MileageRepository(new DatabaseHelper(this).getReadableDatabase());
+			Cursor cursor = filter.size() == 0 ? repo.list() : repo.list(filter);
+			startManagingCursor(cursor);
+			((SimpleCursorAdapter)this.getListAdapter()).changeCursor(cursor);
+			c.FilterButton.setEnabled(true);
+			break;
+		case NEW_REQUEST:
+			c.AddButton.setEnabled(true);
+			break;
+		}
 		((SimpleCursorAdapter)this.getListAdapter()).getCursor().requery();
 	}
 	

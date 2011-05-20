@@ -121,7 +121,8 @@ public final class LocationInput extends Fragment {
 		} else {
 			if (Utils.moveCursor(locationCursor, "_id", locationId) != -1) {
 				ContentValues location = LocationRepository.deserialize(locationCursor);
-				c.locationText.setText(LocationUtils.locationToText(location));
+				//c.locationText.setText(LocationUtils.locationToText(location));
+				c.locationText.setText(location.getAsString("name"));
 				selectedLocationId = locationId;
 				setCurrentLocation = false;
 			}

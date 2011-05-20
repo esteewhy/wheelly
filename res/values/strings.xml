@@ -633,5 +633,6 @@
     <string name="mileages">Mileages</string>
     <string name="refuels">Refuels</string>
     <string name="heartbeats">Heartbeats</string>
-
+	
+	<string name="filter_value_not_found">Not found...</string>
 </resources>
