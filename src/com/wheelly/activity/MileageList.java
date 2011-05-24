@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.Html;
@@ -19,10 +20,11 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Toast;
 
 import com.wheelly.R;
-import com.wheelly.activity.filter.MileageListFilterActivity;
 import com.wheelly.app.StatusBarControls;
+import com.wheelly.content.TrackRepository;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
@@ -34,12 +36,25 @@ public class MileageList extends ListActivity {
 	private static final int FILTER_REQUEST = 6;
 	
 	final private ContentValues filter = new ContentValues();
-	StatusBarControls c;
+	private StatusBarControls c;
+	private boolean suggestInstall = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mileage_list);
+		
+		//Advise user installing MyTracks app.
+		suggestInstall =
+			null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
+				? savedInstanceState.getBoolean("suggestInstall")
+				: !new TrackRepository(this).checkAvailability();
+		
+		if(!suggestInstall) {
+			Toast.makeText(this, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
+		}
+				
+		filter.put(Filter.F.LOCATION_FILTER, "mileages");
 		
 		final Cursor cursor = new MileageRepository(new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
@@ -61,7 +76,7 @@ public class MileageList extends ListActivity {
 						v.setText(Html.fromHtml(String.format("%c<b>%03d</b>", val >= 0 ? '+' : '-', val)));
 						break;
 					case R.id.fuel:
-						v.setText(String.format("%\u002003d", Integer.parseInt(text)));
+						v.setText(String.format("%\u002003.2f", Float.parseFloat(text)));
 						break;
 					default: super.setViewText(v, text);
 					}
@@ -86,12 +101,18 @@ public class MileageList extends ListActivity {
 			@Override
 			public void onClick(View v) {
 				c.FilterButton.setEnabled(false);
-				Intent intent = new Intent(MileageList.this, MileageListFilterActivity.class);
-				MileageListFilterActivity.filterToIntent(filter, intent);
+				Intent intent = new Intent(MileageList.this, Filter.class);
+				Filter.filterToIntent(filter, intent);
 				startActivityForResult(intent, FILTER_REQUEST);
 			}
 		});
 		c.TotalLayout.setVisibility(View.GONE);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean("suggestInstall", suggestInstall);
 	}
 	
 	@Override
@@ -108,14 +129,16 @@ public class MileageList extends ListActivity {
 			if (resultCode == RESULT_FIRST_USER) {
 				filter.clear();
 			} else if (resultCode == RESULT_OK) {
-				MileageListFilterActivity.intentToFilter(data, filter);
+				Filter.intentToFilter(data, filter);
 			}	
 			c.FilterButton.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 			stopManagingCursor(((SimpleCursorAdapter)this.getListAdapter()).getCursor());
+			
 			MileageRepository repo = new MileageRepository(new DatabaseHelper(this).getReadableDatabase());
 			Cursor cursor = filter.size() == 0 ? repo.list() : repo.list(filter);
 			startManagingCursor(cursor);
 			((SimpleCursorAdapter)this.getListAdapter()).changeCursor(cursor);
+			
 			c.FilterButton.setEnabled(true);
 			break;
 		case NEW_REQUEST:
@@ -129,6 +152,7 @@ public class MileageList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.mileages_menu, menu);
+		menu.findItem(R.id.opt_menu_install_mytracks).setVisible(suggestInstall);
 		return true;
 	}
 	
@@ -138,6 +162,11 @@ public class MileageList extends ListActivity {
 			case R.id.opt_menu_add:
 				Intent intent = new Intent(this, Mileage.class);
 				startActivityForResult(intent, NEW_REQUEST);
+				return true;
+			case R.id.opt_menu_install_mytracks:
+				Intent marketIntent = new Intent(Intent.ACTION_VIEW)
+					.setData(Uri.parse("market://details?id=com.google.android.maps.mytracks"));
+				startActivity(marketIntent);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

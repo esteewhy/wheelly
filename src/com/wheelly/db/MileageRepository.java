@@ -1,6 +1,8 @@
 package com.wheelly.db;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.wheelly.db.DatabaseSchema.Mileages;
 
@@ -28,22 +30,40 @@ public final class MileageRepository implements IRepository {
 		StringBuilder sql = new StringBuilder(Mileages.Select);
 		ArrayList<String> conditions = new ArrayList<String>();
 		ArrayList<String> values = new ArrayList<String>();
+		
 		if(filter.containsKey("location_id")) {
-			conditions.add(Mileages.SelectWhereLocation);
 			values.add(Long.toString(filter.getAsLong("location_id")));
-		} else {
-			values.add("");
+			conditions.add(Mileages.SelectWhereLocation
+				.replace("@location_id", "?" + values.size()));
+		}
+		
+		if(filter.containsKey("period")) {
+			String[] parts = filter.getAsString("period").split(",");
+			SimpleDateFormat date = new SimpleDateFormat(DatabaseSchema.DateTimeFormat); 
+			conditions.add(Mileages.SelectWherePeriod
+				.replace("@from",
+					values.add(date.format(new Date(Long.valueOf(parts[1]))))
+					? "?" + values.size() : "clever?")
+				.replace("@to",
+					values.add(date.format(new Date(Long.valueOf(parts[2]))))
+					? "?" + values.size() : "hell yeah!")
+			);
 		}
 		
 		if(conditions.size() > 0) {
-			sql.append(" WHERE (");
-			sql.append(TextUtils.join(") AND (", conditions.toArray()));
-			sql.append(") ");
+			sql.append(" WHERE ("
+				.concat(TextUtils.join(") AND (", conditions.toArray()))
+				.concat(") "));
 		}
 		
-		sql.append(filter.containsKey("sort_order") && filter.getAsInteger("sort_order") != 0 ? Mileages.SelectOrderAsc : Mileages.SelectOrderDesc);
+		sql.append(filter.containsKey("sort_order") && filter.getAsInteger("sort_order") != 0
+			? Mileages.SelectOrderAsc
+			: Mileages.SelectOrderDesc);
 		
-		return this.database.rawQuery(sql.toString(), values.toArray(new String[0]));
+		return this.database.rawQuery(sql.toString(),
+			conditions.size() > 0
+				? values.toArray(new String[0])
+				: null);
 	}
 	
 	public ContentValues load(long id) {

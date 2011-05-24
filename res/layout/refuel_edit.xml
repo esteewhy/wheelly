@@ -44,7 +44,7 @@
 				android:layout_height	="wrap_content"
 				wheelly:label			="Sync transaction">
 				<fragment
-					class		="com.wheelly.widget.FinancistoSync"
+					class		="com.wheelly.widget.FinancistoButton"
 					android:id	="@+id/financisto"
 					android:layout_height	="wrap_content"
 					android:layout_width	="fill_parent" />

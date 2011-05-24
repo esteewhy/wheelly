@@ -124,16 +124,6 @@
     </string-array>
 	<string name="widget_2x1">Financisto 2x1</string>
     <string name="currency_symbol_hint">$ £ ¥ π</string>
-   	<string name="card_issuer_visa">Visa</string>
-	<string name="card_issuer_electron">Visa Electron</string>
-	<string name="card_issuer_mastercard">Mastercard</string>
-	<string name="card_issuer_maestro">Maestro</string>
-	<string name="card_issuer_amex">AMEX</string>
-	<string name="card_issuer_jcb">JCB</string>	
-	<string name="card_issuer_diners">Diners Club</string>	
-	<string name="card_issuer_discover">Discover</string>	
-	<string name="card_issuer_nets">NETS</string>	
-	<string name="recur_rrule">RFC-2445 RRULE</string>
     <dimen name="category_padding">10dp</dimen>
 
 </resources>

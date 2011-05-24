@@ -16,6 +16,14 @@ public class TrackRepository {
 		this.context = context;
 	}
 	
+	/**
+	 * Checks if My Tracks content provider is available.
+	 */
+	public boolean checkAvailability() {
+		return null != context.getContentResolver()
+			.getType(TracksColumns.CONTENT_URI);
+	}
+	
 	public Cursor list() {
 		return context.getContentResolver().query(
 			TracksColumns.CONTENT_URI, null, null, null, "_id DESC");

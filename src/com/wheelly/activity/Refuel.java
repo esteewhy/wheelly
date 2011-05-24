@@ -19,7 +19,7 @@ import com.wheelly.db.HeartbeatRepository;
 import com.wheelly.db.IRepository;
 import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
-import com.wheelly.widget.FinancistoSync;
+import com.wheelly.widget.FinancistoButton;
 
 import ru.orangesoftware.financisto.widget.AmountInput;
 
@@ -102,7 +102,7 @@ public class Refuel extends FragmentActivity {
 		final AmountInput Cost;
 		final Button Save;
 		final Button Cancel;
-		final FinancistoSync Financisto;
+		final FinancistoButton Financisto;
 		
 		public Controls(FragmentActivity view) {
 			final FragmentManager fm = view.getSupportFragmentManager();
@@ -113,7 +113,7 @@ public class Refuel extends FragmentActivity {
 			Cost		= (AmountInput)fm.findFragmentById(R.id.cost);
 			Save		= (Button)view.findViewById(R.id.bSave);
 			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
-			Financisto	= (FinancistoSync)fm.findFragmentById(R.id.financisto);
+			Financisto	= (FinancistoButton)fm.findFragmentById(R.id.financisto);
 		}
 	}
 }

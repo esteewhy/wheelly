@@ -23,21 +23,30 @@ public final class DatabaseSchema {
 			
 			+ "mileage		NUMERIC,"
 			+ "amount		NUMERIC,"
-			// Calculated fields.
+			//TODO Calculated fields.
 			+ "calc_cost	NUMERIC,"
 			+ "calc_amount	NUMERIC"
-			// Constraints.
-			// Arent's supported prior 2.2
+			/// Constraints arent's supported prior 2.2
 			//+ ",FOREIGN KEY start_heartbeat_id REFERENCES heartbeats(_id)"
 			//+ ",FOREIGN KEY stop_heartbeat_id REFERENCES heartbeats(_id)"
 			+ ");";
 		
+		//Calculates amount of refuels occurred in progress of a given trip.
+		private static final String EnRouteRefuelAmount =
+			"SELECT Sum(r.amount)"
+			+ " FROM refuels r"
+			+ " INNER JOIN heartbeats rh"
+			+ "  ON r.heartbeat_id = rh." + BaseColumns._ID
+			+ " WHERE rh._created BETWEEN start._created AND stop._created";
+		
+		//TODO Convert to VIEW.
 		public static final String Select =
 			"SELECT m." + BaseColumns._ID
 			+ ", COALESCE(stop._created, start._created, m._created) stop_time"
 			+ ", mileage"
 			+ ", calc_cost		cost"
-			+ ", COALESCE(stop.fuel - start.fuel, calc_amount) fuel"
+			//TODO Calculate in a scheduled async. job
+			+ ", COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel"
 			+ ", start_place.name start_place"
 			+ ", stop_place.name stop_place"
 			+ ", dest.name destination"
@@ -54,7 +63,11 @@ public final class DatabaseSchema {
 			+ "		ON m.location_id = dest." + BaseColumns._ID;
 		
 		public static final String SelectWhereLocation =
-			"stop.place_id = ?1 OR start.place_id = ?1 OR m.location_id = ?1";
+			"stop.place_id = ?1 OR start.place_id = @location_id OR m.location_id = @location_id";
+		
+		public static final String SelectWherePeriod =
+			"stop._created BETWEEN @from AND @to"
+			+ " AND start._created BETWEEN @from AND @to";
 		
 		static final String SelectOrder = " ORDER BY COALESCE(stop._created, start._created, m._created)"; 
 		public static final String SelectOrderAsc = SelectOrder + " ASC";

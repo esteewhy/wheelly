@@ -105,7 +105,7 @@ public class TripControlBar extends Fragment {
 					} else if(requestId == editStartHeartbeatAndStartTrackingRequestId) {
 						final TripControlBarValue val = getValue();
 						
-						new Tracker(getActivity())
+						if(new Tracker(getActivity())
 							.setStartTrackListener(new TrackListener() {
 								@Override
 								public void onStartTrack(long trackId) {
@@ -118,9 +118,9 @@ public class TripControlBar extends Fragment {
 								@Override
 								public void onTrackStopped() {}
 							})
-							.Start();
-						
-						v.setEnabled(false);
+							.Start()) {
+							v.setEnabled(false);
+						}
 						return;
 					}
 					
@@ -216,7 +216,10 @@ public class TripControlBar extends Fragment {
 		c.StartButton.setTag(R.id.tag_id, value.StartId);
 		c.StopButton.setTag(R.id.tag_id, value.StopId);
 		
-		this.canStartTracking = value.StartId > 0 && value.TrackId == 0 && value.StopId == 0;
+		this.canStartTracking = value.StartId > 0
+			&& value.TrackId == 0
+			&& value.StopId == 0
+			&& new Tracker(getActivity()).checkAvailability();
 		
 		// Store temp values into controls.
 		initButton(c.StartButton, value.StartId,  value.StartHeartbeat,

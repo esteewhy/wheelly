@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
@@ -38,28 +39,42 @@ public class Tracker {
 		}};
 	}
 	
-	public void Start() {
-		context.startService(serviceIntent);
+	/**
+	 * Checks if My Tracks service is available.
+	 */
+	public boolean checkAvailability() {
+		return context.getPackageManager()
+			.queryIntentServices(
+				this.serviceIntent,
+				PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
+	}
+	
+	public boolean Start() {
+		ComponentName name = context.startService(serviceIntent);
 		
-		context.bindService(serviceIntent, new ServiceConnection() {
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-			}
-			
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				synchronized (Tracker.this) {
-					if(null != listener) {
-						try {
-							listener.onStartTrack(ITrackRecordingService.Stub.asInterface(service).startNewTrack());
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+		if(null != name) {
+			return context.bindService(serviceIntent, new ServiceConnection() {
+				@Override
+				public void onServiceDisconnected(ComponentName name) {
+				}
+				
+				@Override
+				public void onServiceConnected(ComponentName name, IBinder service) {
+					synchronized (Tracker.this) {
+						if(null != listener) {
+							try {
+								listener.onStartTrack(ITrackRecordingService.Stub.asInterface(service).startNewTrack());
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 				}
-			}
-		}, Activity.BIND_AUTO_CREATE);
+			}, Activity.BIND_AUTO_CREATE);
+		}
+		
+		return false;
 	}
 	
 	public void Stop(final long trackId) {

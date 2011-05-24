@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.view.ContextMenu;
@@ -17,9 +18,11 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Toast;
 
 import com.wheelly.R;
 import com.wheelly.app.StatusBarControls;
+import com.wheelly.content.TransactionRepository;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.RefuelBroker;
 import com.wheelly.db.RefuelRepository;
@@ -91,6 +94,12 @@ public class RefuelList extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.refuels_menu, menu);
+		
+		if(!new TransactionRepository(this).checkAvailability()) {
+			menu.findItem(R.id.opt_menu_install_financisto).setVisible(true);
+			Toast.makeText(this, R.string.advertise_financisto, Toast.LENGTH_LONG).show();
+		}
+		
 		return true;
 	}
 	
@@ -100,6 +109,11 @@ public class RefuelList extends ListActivity {
 			case R.id.opt_menu_add:
 				Intent intent = new Intent(this, Refuel.class);
 				startActivityForResult(intent, NEW_REQUEST);
+				return true;
+			case R.id.opt_menu_install_financisto:
+				Intent marketIntent = new Intent(Intent.ACTION_VIEW)
+					.setData(Uri.parse("market://details?id=ru.orangesoftware.financisto"));
+				startActivity(marketIntent);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

@@ -1,6 +1,7 @@
 package com.wheelly.widget;
 
 import com.wheelly.R;
+import com.wheelly.content.TransactionRepository;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public final class FinancistoSync extends Fragment {
+public final class FinancistoButton extends Fragment {
 	
 	public static final String TRAN_ID_EXTRA = "tranId";
 	private static final int NEW_TRANSACTION_REQUEST = 1;
@@ -31,7 +32,7 @@ public final class FinancistoSync extends Fragment {
 			public void onClick(View v) {
 				long id = getValue();
 				
-				Intent intent = new Intent("ru.orangesoftware.financisto.NEW_TRANSACTION");
+				Intent intent = new Intent(TransactionRepository.FINANCISTO_ACTION);
 				if(id > 0) {
 					intent.putExtra(TRAN_ID_EXTRA, id);
 				}

@@ -618,6 +618,11 @@
     <string name="heartbeat_button_caption">%1$05d / %2$02d</string> 
     <string name="item_add">Add</string>
     
+    <string name="item_install_mytracks">Install MyTracks</string>
+    <string name="advertise_mytracks">Google\'s MyTracks application can help Wheelly record your routes. You can install MyTracks from the options menu.</string>
+    <string name="item_install_financisto">Install Financisto</string>
+    <string name="advertise_financisto">Financisto application helps tracking your expenses. You can install it from the options menu.</string>
+    
     <string name="fuel_input_label"><b>Fuel</b>, <i>litres</i></string>
     <string name="location_input_label"><b>Location</b></string>
     <string name="amount_input_label"><b>Amount</b>, <i>litres</i></string>

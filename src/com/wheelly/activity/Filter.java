@@ -8,7 +8,7 @@
  * Contributors:
  *     Denis Solonenko - initial API and implementation
  ******************************************************************************/
-package com.wheelly.activity.filter;
+package com.wheelly.activity;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,14 +47,21 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 
-public class MileageListFilterActivity extends FragmentActivity {	
-	private ContentValues filter = new ContentValues();
+public class Filter extends FragmentActivity {	
+	private final ContentValues filter = new ContentValues();
 	
 	private DateFormat df;
 	
 	private String filterValueNotFound;
 	private ActivityLayout x;
 	private Controls c;
+	
+	public static class F {
+		public final static String SORT_ORDER	= "sort_order";
+		public final static String PERIOD		= "period";
+		public final static String LOCATION		= "location_id";
+		public final static String LOCATION_FILTER = "location_id_filter";
+	}
 	
 	private Cursor locationCursor;
 	
@@ -63,9 +71,17 @@ public class MileageListFilterActivity extends FragmentActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.blotter_filter);
 		
+		final Intent intent = getIntent();
 		final Activity ctx = this;
-		locationCursor = new LocationRepository(new DatabaseHelper(ctx).getReadableDatabase()).list("mileages");
+		
+		this.locationCursor = new LocationRepository(
+			new DatabaseHelper(ctx)
+				.getReadableDatabase())
+			.list(intent != null && intent.hasExtra(F.LOCATION_FILTER)
+				? intent.getStringExtra(F.LOCATION_FILTER) : "");
+		
 		ctx.startManagingCursor(locationCursor);
+		
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(ctx,
 					android.R.layout.simple_spinner_dropdown_item,
@@ -80,46 +96,46 @@ public class MileageListFilterActivity extends FragmentActivity {
 				public void onClick(View v) {
 					switch (v.getId()) {
 					case R.id.period:
-						Intent intent = new Intent(MileageListFilterActivity.this, DateFilterActivity.class);
+						Intent intent = new Intent(Filter.this, DateFilterActivity.class);
 						filterToIntent(filter, intent);
 						startActivityForResult(intent, 1);
 						break;
 					case R.id.period_clear:
-						filter.remove("period");
+						filter.remove(F.PERIOD);
 						c.period.setText(R.string.no_filter);
 						break;
 					case R.id.location: {
-						long locationId = filter.containsKey("location_id") ? filter.getAsLong("location_id") : -1;
+						long locationId = filter.containsKey(F.LOCATION) ? filter.getAsLong(F.LOCATION) : -1;
 						long selectedId = c != null ? locationId : -1;
 						
-						x.select(MileageListFilterActivity.this,
+						x.select(Filter.this,
 							R.id.location,
 							R.string.location,
 							locationCursor,
 							adapter,
-							"_id",
+							BaseColumns._ID,
 							selectedId);
 					} break;
 					case R.id.location_clear:
-						clear("location_id", c.location);
+						clear(F.LOCATION, c.location);
 						break;
 					case R.id.sort_order: {
 						
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							MileageListFilterActivity.this,
+							Filter.this,
 							android.R.layout.simple_spinner_dropdown_item,
 							c.sortBlotterEntries);
 						
-						int selectedId = Math.min(1, filter.containsKey("sort_order") ? filter.getAsInteger("sort_order") : 0);
+						int selectedId = Math.min(1, filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0);
 						x.selectPosition(
-							MileageListFilterActivity.this,
+							Filter.this,
 							R.id.sort_order,
 							R.string.sort_order,
 							adapter,
 							selectedId);
 					} break;
 					case R.id.sort_order_clear:
-						filter.remove("sort_order");
+						filter.remove(F.SORT_ORDER);
 						updateSortOrderFromFilter(filter);
 						break;
 					}
@@ -129,7 +145,11 @@ public class MileageListFilterActivity extends FragmentActivity {
 				public void onSelectedPos(int id, int selectedPos) {
 					switch (id) {
 					case R.id.sort_order:
-						filter.put("sort_order", selectedPos == 1 ? 1 : 0);
+						if(Math.min(selectedPos, 1) > 0) {
+							filter.put(F.SORT_ORDER, 1);
+						} else {
+							filter.remove(F.SORT_ORDER);
+						}
 						updateSortOrderFromFilter(filter);
 						break;
 					}
@@ -139,7 +159,7 @@ public class MileageListFilterActivity extends FragmentActivity {
 				public void onSelectedId(int id, long selectedId) {
 					switch (id) {
 					case R.id.location:
-						filter.put("location_id", selectedId);
+						filter.put(F.LOCATION, selectedId);
 						updateLocationFromFilter(filter);
 						break;
 					}
@@ -182,48 +202,58 @@ public class MileageListFilterActivity extends FragmentActivity {
 			}
 		});		
 		
-		Intent intent = getIntent();
 		if (intent != null) {
 			intentToFilter(intent, filter);
 			updatePeriodFromFilter(filter);
 			updateLocationFromFilter(filter);
 			updateSortOrderFromFilter(filter);
 		}
-		
 	}
 	
 	public static void intentToFilter(Intent intent, ContentValues filter) {
-		if(intent.hasExtra("period")) {
-			filter.put("period", intent.getStringExtra("period"));
+		if(intent.hasExtra(F.PERIOD)) {
+			filter.put(F.PERIOD, intent.getStringExtra(F.PERIOD));
 		}
-		if(intent.hasExtra("location_id")) {
-			filter.put("location_id", intent.getLongExtra("location_id", -1));
+		if(intent.hasExtra(F.LOCATION)) {
+			filter.put(F.LOCATION, intent.getLongExtra(F.LOCATION, -1));
 		}
-		if(intent.hasExtra("sort_order")) {
-			filter.put("sort_order", intent.getIntExtra("sort_order", 0));
+		if(intent.hasExtra(F.SORT_ORDER)) {
+			filter.put(F.SORT_ORDER, intent.getIntExtra(F.SORT_ORDER, 0));
+		}
+		if(intent.hasExtra(F.LOCATION_FILTER)) {
+			filter.put(F.LOCATION_FILTER, intent.getStringExtra(F.LOCATION_FILTER));
 		}
 	}
 	
 	public static void filterToIntent(ContentValues filter, Intent intent) {
-		if(filter.containsKey("period")) {
-			intent.putExtra("period", filter.getAsString("period"));
+		if(filter.containsKey(F.PERIOD)) {
+			intent.putExtra(F.PERIOD, filter.getAsString(F.PERIOD));
 		}
-		if(filter.containsKey("location_id")) {
-			intent.putExtra("location_id", filter.getAsLong("location_id"));
+		if(filter.containsKey(F.LOCATION)) {
+			intent.putExtra(F.LOCATION, filter.getAsLong(F.LOCATION));
 		}
-		if(filter.containsKey("sort_order")) {
-			filter.put("sort_order", filter.getAsInteger("sort_order"));
+		if(filter.containsKey(F.SORT_ORDER)) {
+			if(filter.getAsInteger(F.SORT_ORDER) > 0) {
+				intent.putExtra(F.SORT_ORDER, 1);
+			} else {
+				intent.removeExtra(F.SORT_ORDER);
+			}
+		}
+		if(filter.containsKey(F.LOCATION_FILTER)) {
+			intent.putExtra(F.LOCATION_FILTER, filter.getAsString(F.LOCATION_FILTER));
 		}
 	}
 	
 	private void updateSortOrderFromFilter(ContentValues filter) {
-		int sortOrder = filter.containsKey("sort_order") ? filter.getAsInteger("sort_order") : 0;
+		int sortOrder = filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0;
 		c.sortOrder.setText(c.sortBlotterEntries[sortOrder == 1 ? 1 : 0]);
 	}
 
 	private void updateLocationFromFilter(ContentValues filter) {
-		long locationId = filter.containsKey("location_id") ? filter.getAsLong("location_id") : 0;
-		if (locationId > 0 && Utils.moveCursor(locationCursor, "_id", locationId) != -1) {
+		long locationId = filter.containsKey(F.LOCATION)
+			? filter.getAsLong(F.LOCATION)
+			: 0;
+		if (locationId > 0 && Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
 			ContentValues location = LocationRepository.deserialize(locationCursor);
 			c.location.setText(location != null ? location.getAsString("name") : filterValueNotFound);
 		} else {
@@ -232,7 +262,7 @@ public class MileageListFilterActivity extends FragmentActivity {
 	}
 
 	private void updatePeriodFromFilter(ContentValues filter) {
-		String s = filter.getAsString("period");
+		String s = filter.getAsString(F.PERIOD);
 		if (s != null) {
 			String[] tokens = s.split(",");
 			PeriodType type = PeriodType.valueOf(tokens[0]);
@@ -252,7 +282,7 @@ public class MileageListFilterActivity extends FragmentActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1) {
 			if (resultCode == RESULT_FIRST_USER) {
-				filter.remove("period");
+				filter.remove(F.PERIOD);
 				c.period.setText(R.string.no_filter);
 			} else if (resultCode == RESULT_OK) {
 				intentToFilter(data, filter);

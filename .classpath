@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/v4"/>
-	<classpathentry exported="true" kind="lib" path="/MyTracksLib/libs/protobuf-java-2.3.0-lite.jar"/>
+	<classpathentry kind="lib" path="/MyTracksLib/libs/protobuf-java-2.3.0-lite.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksLib"/>
+	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="MyTracksLib_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

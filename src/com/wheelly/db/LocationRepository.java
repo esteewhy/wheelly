@@ -18,8 +18,13 @@ public final class LocationRepository implements IRepository {
 		return this.database.rawQuery(Locations.Select, null);
 	}
 	
-	public Cursor list(String recordType) {
-		return this.database.rawQuery(Locations.SelectByMileages, null);
+	public Cursor list(String filter) {
+		String sql =
+			filter == "mileages"
+				? Locations.SelectByMileages
+				: Locations.Select;
+		
+		return this.database.rawQuery(sql, null);
 	}
 	
 	public long insert(ContentValues values) {
