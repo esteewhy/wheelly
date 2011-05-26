@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -35,6 +36,8 @@ public class HeartbeatList extends ListActivity {
 		final Cursor cursor = new HeartbeatRepository(new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
 		
+		final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(this).getInt("fuel_capacity", 60);
+		
 		setListAdapter(
 			new SimpleCursorAdapter(this, R.layout.heartbeat_list_item, cursor,
 				new String[] {
@@ -49,7 +52,9 @@ public class HeartbeatList extends ListActivity {
 					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 						switch(view.getId()) {
 						case R.id.fuelGauge:
-							((ProgressBar)view).setProgress(cursor.getInt(columnIndex));
+							ProgressBar pb = (ProgressBar)view; 
+							pb.setProgress(cursor.getInt(columnIndex));
+							pb.setMax(fuelCapacity);
 							return true;
 						case R.id.icons:
 							int mask = cursor.getInt(columnIndex);

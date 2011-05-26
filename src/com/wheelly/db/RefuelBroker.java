@@ -30,7 +30,7 @@ public class RefuelBroker {
 			refuel.put("heartbeat_id", resolveHeartbeatId(heartbeat, db));
 			
 			// Now save refuel itself.
-			IRepository repository = new RefuelRepository(db);
+			IRepository repository = new RefuelRepository(db, context);
 		
 			if(id > 0) {
 				repository.update(refuel);
@@ -50,7 +50,8 @@ public class RefuelBroker {
 		
 		try {
 			new RefuelRepository(
-				db = new DatabaseHelper(this.context).getWritableDatabase()
+				db = new DatabaseHelper(this.context).getWritableDatabase(),
+				context
 			).delete(id);
 		} finally {
 			if(null != db) {

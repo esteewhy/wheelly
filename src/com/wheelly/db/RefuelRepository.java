@@ -3,8 +3,10 @@ package com.wheelly.db;
 import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 /**
@@ -12,9 +14,11 @@ import android.provider.BaseColumns;
  */
 public final class RefuelRepository implements IRepository {
 	private final SQLiteDatabase database;
+	private final Context context;
 	
-	public RefuelRepository(SQLiteDatabase database) {
+	public RefuelRepository(SQLiteDatabase database, Context context) {
 		this.database = database;
+		this.context = context;
 	}
 	
 	public Cursor list() {
@@ -41,7 +45,10 @@ public final class RefuelRepository implements IRepository {
 	}
 	
 	public ContentValues getDefaults() {
-		Cursor cursor = this.database.rawQuery(DatabaseSchema.Refuels.Defaults, null);
+		Cursor cursor = this.database.rawQuery(DatabaseSchema.Refuels.Defaults, new String[] {
+			Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60))
+		});
+		
 		try {
 			cursor.moveToFirst();
 			return deserialize(cursor);

@@ -39,7 +39,7 @@ public class Refuel extends FragmentActivity {
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
 		final SQLiteDatabase db = new DatabaseHelper(Refuel.this).getReadableDatabase();
 		
-		final IRepository repository = new RefuelRepository(db);
+		final IRepository repository = new RefuelRepository(db, this);
 		final ContentValues refuel = id > 0 ? repository.load(id) : repository.getDefaults();
 		final IRepository heartbeatRepository = new HeartbeatRepository(db);
 		final long heartbeatId = refuel.getAsLong("heartbeat_id");

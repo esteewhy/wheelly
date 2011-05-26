@@ -60,6 +60,10 @@
 			android:configChanges="orientation|keyboardHidden"
 			android:launchMode="singleTop" />
 		
+		<activity
+			android:name	=".activity.Preferences"
+			android:label	="@string/preferences" />
+		
 		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
 			android:label="@string/amount"
 			android:theme="@android:style/Theme.Dialog"

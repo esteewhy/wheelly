@@ -12,33 +12,16 @@
       Rodrigo Sousa - google docs backup
 -->
 <resources>
-    <string name="accounts">Accounts</string>
-    <string name="blotter">Blotter</string>
-    <string name="currencies">Currencies</string>
-    <string name="categories">Categories</string>
-    <string name="budgets">Budgets</string>
-    <string name="projects">Projects</string>
     <string name="ok">OK</string>
     <string name="clear">Clear</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
-    <string name="edit_account">Edit Account</string>
-    <string name="add_account">Add account</string>
     <string name="title">Title</string>
-    <string name="payee">Payee</string>
-    <string name="currency">Currency</string>    
-    <string name="add_currency">Add Currency</string>
-    <string name="opening_amount">Opening amount</string>
-    <string name="limit_amount">Limit amount</string>
 	<string name="amount_in" formatted="false">Amount in &lt;b&gt;%s %s&lt;/b&gt;</string>
 	<string name="view">View</string>
 	<string name="edit">Edit</string>
 	<string name="delete">Delete</string>
-	<string name="add_transaction">Add Transaction</string>	
-	<string name="account">Account</string>
-	<string name="category">Category</string>
-	<string name="add_category">Add Category</string>
 	<string name="income">Income</string>
 	<string name="expense">Expense</string>
 	<string name="amount">Amount</string>
@@ -66,14 +49,9 @@
 	<string name="period_to">Period To</string>
 	<string name="period_recur">Period Recur</string>
 	<string name="preferences">Preferences</string>
-	<string name="amount_picker">Amount Picker</string>
 	<string name="integer_part_title">Number of digits</string>
 	<string name="use_hundredth_title">Use hundredths</string>
 	<string name="project">Project</string>
-	<string name="select_account">Please select account..</string>
-	<string name="select_currency">Please select currency..</string>
-	<string name="select_category">Please select category..</string>
-	<string name="select_project">Please select project..</string>	
 	<string name="warning">Warning</string>
 	<string name="no_mileages">Mileage consists of a recorded start and stop time, odometer and fuel level. You want to create ont every time starting a trip. "Close" it when You\'ve arrived to the destination. Press "Menu" button then select "Add".</string>
 	<string name="no_heartbeats">Heartbeat is a special type of record, holding basic counters of Your car. Normaly it gets created simultaneously when entering other types of records like Refuel or Mileage. Also, You are welcome to create heartbeats as frequent as possible, this way You can greatly increase usage statistics accuracy. Press "Menu" button then select "Add".</string>
@@ -100,25 +78,7 @@
 	<string name="use_my_location_summary">Use My Location to get current location for a new location</string>	
 	<string name="select_location">Select location</string>
 	<string name="no_fix">Unknown location</string>
-	<string name="attribute">Attribute</string>	
-	<string name="attributes">Attributes</string>
-	<string name="parent_attributes">Parent attributes</string>
-	<string name="change_attributes">Change attributes</string>
 	<string name="calculator">Calculator</string>
-	<string name="no_attributes">No attributes</string>
-	<string name="add_attribute">Add attribute</string>
-	<string name="new_attribute">New attribute</string>
-	<string-array name="attribute_types">
-		<item>Text</item>
-		<item>Number</item>
-		<item>List</item>
-		<item>Checkbox</item>
-	</string-array>
-	<string name="attribute_type">Type</string>
-	<string name="attribute_name">Name</string>
-	<string name="attribute_values">Values</string>
-	<string name="attribute_values_hint">Use ; to separate values</string>
-	<string name="attribute_default_value">Default value</string>
 	<string name="checkbox_values">Yes/No</string>
 	<string name="checkbox_values_yes">Yes</string>
 	<string name="checkbox_values_no">No</string>
@@ -134,38 +94,7 @@
 	<string name="service_is_not_available">Service is not available, please try again later</string>	
 	<string name="resolve_address">Resolve address</string>
 	<string name="resolving_address">Resolving address..</string>
-	<string name="report">Report</string>
-	<string name="reports">Reports</string>	
-	<string name="no_reports">No reports</string>
-	<string name="select_report">Please select report..</string>
 	<string name="overall">Overall</string>
-	<string name="report_by_period">By Period</string>
-	<string name="report_by_period_summary">Transactions report by period</string>
-	<string name="report_by_category">By Category</string>
-	<string name="report_by_category_summary">Transactions report by category</string>
-	<string name="report_by_location">By Location</string>
-	<string name="report_by_location_summary">Transactions report by location</string>
-	<string name="report_by_project">By Project</string>
-	<string name="report_by_project_summary">Transactions report by project</string>
-	
-	<string name="report_by_account_by_period">By Account / Period</string>
-	<string name="report_by_account_by_period_summary">Transactions report by account and period</string>
-	<string name="report_by_category_by_period">By Category / Period</string>
-	<string name="report_by_category_by_period_summary">Transactions report by category and period</string>
-	<string name="report_by_location_by_period">By Location / Period</string>
-	<string name="report_by_location_by_period_summary">Transactions report by location and period</string>
-	<string name="report_by_project_by_period">By Project / Period</string>
-	<string name="report_by_project_by_period_summary">Transactions report by project and period</string>
-	<string-array name="report_types">
-		<item>By Period</item>
-		<item>By Category</item>		
-		<item>By Location</item>
-		<item>By Project</item>
-		<item>By Account/Period</item>
-		<item>By Category/Period</item>
-		<item>By Location/Period</item>
-		<item>By Project/Period</item>
-	</string-array>
 	<string name="max_result_label">Max:</string>
 	<string name="min_result_label">Min:</string>
 	<string name="mean_result_label">Mean:</string>
@@ -173,13 +102,6 @@
 	<string name="report_init_res">0</string>
 	<string name="no_data_to_report">No data available to display the report.</string>
 	<string name="report_preferences_not_set">Adjust preferences on Report Preferences menu. Considering default currency and period.</string>
-	<string name="currency_not_set">Reference Currency not set on Preferences. Considering default currency.</string>
-	<string name="period_not_set">Period of Reference not set on Preferences. Considering default period.</string>
-	<string name="report_no_category">There is no category available for filtering in the report.</string>
-	<string name="report_no_project">There is no project available for filtering in the report.</string>
-	<string name="report_no_account">There is no account available for filtering in the report.</string>
-	<string name="report_no_location">There is no location available for filtering in the report.</string>
-	<string name="no_account">No account</string>
 	
 	<string name="period_today">Today</string>
 	<string name="period_yesterday">Yesterday</string>
@@ -211,33 +133,9 @@
 	<string name="delete_mileage_confirm">Delete mileage?</string>
 	<string name="delete_heartbeat_confirm">Delete heartbeat?</string>
 	<string name="delete_refuel_confirm">Delete refuel?</string>
-	<string name="delete_budget_recurring_select">You\'re about to delete a recurring budget. What to delete?</string>
-	<string name="delete_budget_one_entry">This entry</string>	
-	<string name="delete_budget_all_entries">All entries</string>
-	<string name="edit_recurring_budget">You\'re editing recurring budget, it will affect all entries</string>	
-	<string-array name="account_types">
-		<item>Bank</item>
-		<item>Cash</item>
-		<item>Credit Card</item>		
-	</string-array>
-	<string name="account_type">Account Type</string>
-	<string name="card_issuer">Card Issuer</string>	
-	<string name="account_type_cash">Cash</string>
-	<string name="account_type_bank">Bank Account</string>
-	<string name="account_type_debit_card">Debit Card</string>
-	<string name="account_type_credit_card">Credit Card</string>
-	<string name="account_type_asset">Asset</string>	
-	<string name="account_type_liability">Liability</string>
-	<string name="account_type_other">Other</string>
-	<string name="card_type">Card Type</string>
-	<string name="card_number">Card Number</string>
-	<string name="card_number_hint">Last 4 digits of the card number</string>
-	<string name="issuer">Issuer</string>
-	<string name="cash">Cash</string>	
 	<string name="sort_order">Sort Order</string>
 	<string name="force_gps_location">Force GPS Location</string>
 	<string name="whats_new">What\'s new</string>
-	<string name="attribute_delete_alert">This will delete the attribute from categories and transactions as well.</string>
 	<string name="user_interface">User interface</string>
 	<string name="sort_accounts">Sort accounts</string>
 	<string name="sort_accounts_summary">Define sort order for accounts list (requires restart)</string>
@@ -256,15 +154,6 @@
 		<item>Newer to Older</item>
 		<item>Older to Newer</item>
 	</string-array>
-	<string name="more_products">More products..</string>
-	<string name="pin_protection">PIN Protection</string>	
-	<string name="pin_protection_summary">Check to protect access with PIN</string>
-	<string name="pin_protection_notify">Please set PIN in Preferences</string>
-	<string name="change_pin">Change PIN</string>	
-	<string name="change_pin_summary">Change the PIN number.</string>
-	<string name="pin">PIN</string>
-	<string name="set_pin">Set PIN</string>
-	<string name="confirm_pin">Confirm PIN</string>			
 	<string name="restore">Restore</string>
 	<string name="backup_database">Backup Database</string>
 	<string name="backup_database_inprogress">Backing up database..</string>
@@ -277,101 +166,16 @@
 	<string name="restore_database_gdocs">Restore from Google Docs</string>
 	<string name="restore_database_inprogress_gdocs">Restoring database...</string>
 	<string name="restore_database_success">Database has been successfully restored.</string>
-	<string name="gdocs_connection_failed">Can not connect to Google Docs.</string>
-	<string name="gdocs_folder_not_found">The backup folder on Google Docs was not found.</string>
-	<string name="gdocs_credentials_not_configured">Please set Google account login and password on Preferences.</string>
-	<string name="gdocs_folder_not_configured">Please set the Google Docs backup folder on Preferences.</string>
-	<string name="gdocs_login_failed">Google account login or password not valid.</string>
-	<string name="gdocs_backup_failed">Error sending backup file to Google Docs. Please try again.</string>
-	<string name="gdocs_restore_failed">Error retrieving backup file. Please try again.</string>
-	
-    <string name="gdocs_folder_error">Erro ao acessa a pasta no Google Docs.</string>
-    <string name="gdocs_service_error">Erro no Serviço Google Docs.</string>
-    <string name="gdocs_io_error">Erro na comunicação com o Google Docs.</string>
     <string name="package_info_error">Não foi possível recuperar as informações do pacote Financisto.</string>
     
 	<string name="success">Success!</string>
 	<string name="fail">Fail..</string>
 	<string name="duplicate">Duplicate</string>
-	<string name="select_from_account">Please select from account..</string>	
-	<string name="select_to_account">Please select to account..</string>
-	<string name="update_balance">Update balance</string>
-	<string name="close_account">Close account</string>
-	<string name="reopen_account">Re-open account</string>
 	<string name="difference">Difference</string>
-	<string name="new_balance">New balance</string>
-	<string name="duplicate_success">Transaction has been duplicated with the current date and time</string>
-	<string name="duplicate_success_with_multiplier">Transaction has been duplicated with the current date and time (x%d)</string>	
-	<string name="no_category">No category</string>
-	<string name="no_project">No project</string>
-	<string name="no_period">No period</string>
 	<string name="current_location">Current location</string>
-	<string name="protection">Protection</string>
-	<string name="transaction_screen">New transaction screen</string>
-	<string name="transaction_screen_summary">Preferences for new transaction/transfer screen</string>
-	<string name="screen_layout">Screen layout</string>
-	<string name="show_location">Show location</string>	
-	<string name="show_location_summary">Show location drop-down</string>
-	<string name="show_location_order">Location order</string>	
-	<string name="show_location_order_summary">Relative position for the location drop down</string>
-	<string name="show_payee">Show payee</string>	
-	<string name="show_payee_summary">Show payee edit box</string>
-	<string name="show_payee_order">Payee order</string>	
-	<string name="show_payee_order_summary">Relative position for the payee box</string>
-	<string name="show_note">Show note</string>	
-	<string name="show_note_summary">Show note edit box</string>
-	<string name="show_note_order">Note order</string>	
-	<string name="show_note_order_summary">Relative position for the note box</string>
-	<string name="show_project">Show project</string>	
-	<string name="show_project_summary">Show project drop-down</string>
-	<string name="show_project_order">Project order</string>	
-	<string name="show_project_order_summary">Relative position for the project drop-down</string>
-	<string name="remember_selection">Remember the selection</string>
-	<string name="remember_last_account">Last account</string>	
-	<string name="remember_last_account_summary">Remember the last selected account</string>
-	<string name="remember_last_category">Last category</string>	
-	<string name="remember_last_category_summary">Remember the last category for the selected account</string>
-	<string name="remember_last_location">Last location</string>	
-	<string name="remember_last_location_summary">Remember the last location for the selected category</string>
-	<string name="remember_last_project">Last project</string>	
-	<string name="remember_last_project_summary">Remember the last project for the selected category</string>
-	<string name="position_move_top">Move to the top</string>
-	<string name="position_move_up">Move up</string>
-	<string name="position_move_down">Move down</string>
-	<string name="position_move_bottom">Move to the bottom</string>
 	<string name="add_sibling">Add sibling</string>
 	<string name="add_child">Add child</string>
 	<string name="interval">Interval</string>
-	<string name="recur_interval">Recur Interval</string>
-	<string name="recur_interval_no_recur">No recur</string>
-	<string name="recur_interval_every_x_day">Repeat every X day(s)</string>
-	<string name="recur_interval_every_x_week">Repeat every X week(s)</string>	
-	<string name="recur_interval_every_x_month">Repeat every X month(s)</string>	
-	<string name="recur_interval_every_x_year">Repeat every X year(s)</string>	
-	<string name="recur_interval_daily">Daily</string>
-	<string name="recur_interval_weekly">Weekly</string>		
-	<string name="recur_interval_monthly">Monthly</string>
-	<string name="recur_interval_semi_monthly">Semi-Monthly</string>
-	<string name="recur_interval_yearly">Yearly</string>
-	<string name="recur_stops_on_date">Stops on date</string>
-	<string name="recur_stops_on_date_summary">Stops on: %s</string>
-	<string name="recur_indefinitely">Indefinitely</string>
-	<string name="recur_exactly_n_times">Exactly N times</string>
-	<string name="recur_exactly_n_times_summary">Exactly %d time(s)</string>
-	<string name="recur_period_every">Every</string>
-	<string name="recur_period_days">days</string>
-	<string name="recur_period_semi_monthly">On the following days</string>
-	<string name="recur_repeat_indefinitely">Indefinitely</string>	
-	<string name="recur_repeat_exactly">Exactly</string>
-	<string name="recur_repeat_times">times</string>
-	<string name="recur_repeat_starts_on">Starts on</string>	
-	<string name="recur_repeat_stops_on">Stops on</string>
-	<string name="recur_error_specify_days">Please specify number of days</string>	
-	<string name="recur_error_specify_first_day">Please specify the first day</string>
-	<string name="recur_error_specify_second_day">Please specify the second day</string>
-	<string name="recur_error_specify_times">Please specify number of times</string>	
-	<string name="recur">Recur</string>
-	<string name="recur_period">Period</string>
 	<string name="day_mon">Mon</string>
 	<string name="day_tue">Tue</string>
 	<string name="day_wed">Wed</string>
@@ -389,82 +193,9 @@
 	<string name="calculating">Calculating..</string>
 	<string name="budget_mode">Ease conditions</string>
 	<string name="budget_mode_summary">Use less restrictive conditions (category OR project) to filter transactions</string>
-	<string name="gdocs_backup">Google Docs Backup</string>
-	<string name="user_login">Login</string>
-	<string name="user_login_summary">Google account login (username)</string>
-	<string name="user_password">Password</string>
-	<string name="user_password_summary">Google account password</string>
-	<string name="backup_folder">Backup Folder</string>
-	<string name="backup_folder_summary">Folder on Google Docs to store backup files.</string>
 
-    <string name="report_preferences">Report Preferences</string>
-    <string name="all_reports_preferences">General Report Preferences</string>
-    <string name="category_by_period_preferences">Category by Period Report Preferences</string>
-    <string name="report_include_sub_categories">Include sub Categories in list</string>
-	<string name="report_include_sub_categories_summary">Include sub categories in the Category by Period Reports list of categories.</string>
-	<string name="report_add_sub_categories_result">Add sub Categories result</string>
-	<string name="report_add_sub_categories_result_summary">Add sub categories result to the result of a root category.</string>
-	<string name="report_consider_null_results">Consider nulls in statistics</string>
-	<string name="report_consider_null_results_summary">Consider null result when generating statistics (min, max and mean).</string>
-	<string name="report_include_no_filter">Include No &lt;Filter&gt;</string>
-	<string name="report_include_no_filter_summary">Include non classified transactions to reports filters lists (No category, No Project and Unknown Location)</string>
-	<string name="report_reference_month">Reference Month</string>
-	<string name="report_reference_month_summary">Define the Reference Month that represents the end of the report period.</string>
-	<string name="report_last_quarter">Last quarter</string>
-	<string name="report_last_half_year">Last half year</string>
-	<string name="report_last_9_months">Last 9 months</string>
-	<string name="report_last_year">Last year</string>
-	<string-array name="report_reference_month_entities">
-        <item>6 months ago</item>
-        <item>3 months ago</item>
-        <item>Last month</item>
-        <item>Current month</item>
-        <item>Next month</item>
-        <item>3 months later</item>
-        <item>6 months later</item>
-    </string-array>
-	<string name="report_reference_period">Period of Reference</string>
-	<string name="report_reference_period_summary">Define the period of reference (number of months) to be considered when opening report charts.</string>
-	<string-array name="report_reference_period_entities">
-        <item>3 months</item>
-        <item>6 months</item>
-        <item>9 months</item>
-        <item>1 year</item>
-    </string-array>
-	<string name="report_reference_currency">Reference Currency</string>
-	<string name="report_reference_currency_summary">Define the reference currency to be considered when request data for report charts.</string>
-	<string name="report_last_n_months">Last $n months</string>
-	<string name="report_n_months_var">$n</string>
-	<string name="month_jan">JAN</string>
-	<string name="month_feb">FEB</string>
-	<string name="month_mar">MAR</string>
-	<string name="month_apr">APR</string>
-	<string name="month_mai">MAY</string>
-	<string name="month_jun">JUN</string>
-	<string name="month_jul">JUL</string>
-	<string name="month_aug">AUG</string>
-	<string name="month_sep">SEP</string>
-	<string name="month_oct">OCT</string>
-	<string name="month_nov">NOV</string>
-	<string name="month_dec">DEC</string>
-	<string name="month_x_jan">January</string>
-	<string name="month_x_feb">February</string>
-	<string name="month_x_mar">March</string>
-	<string name="month_x_apr">April</string>
-	<string name="month_x_mai">May</string>
-	<string name="month_x_jun">June</string>
-	<string name="month_x_jul">July</string>
-	<string name="month_x_aug">August</string>
-	<string name="month_x_sep">September</string>
-	<string name="month_x_oct">October</string>
-	<string name="month_x_nov">November</string>
-	<string name="month_x_dec">December</string>	
 
 	<string name="other">Other</string>
-	<string name="send_error_reports">Send error reports</string>
-	<string name="send_error_reports_summary">Send anonymous error reports to orangesoftware.ru (requires restart)</string>	
-	<string name="template_name">Template name</string>
-	<string name="transaction_templates">Templates</string>
 	<string name="transaction_template">Transaction (Template)</string>	
 	<string name="transfer_template">Transfer (Template)</string>	
 	<string name="no_templates">No templates</string>	
@@ -473,67 +204,6 @@
 	<string name="save_as_template_success">Transaction saved as template..</string>		
 	<string name="scheduled_transactions">Scheduled</string>	
 	<string name="no_scheduled_transactions">No scheduled transactions</string>	
-	<string name="recur_interval_geeky">Geeky</string>
-	<string name="recurrence_pattern">Recurrence pattern</string>
-	<string name="recurrence_period">Recurrence period</string>	
-	<string name="recurrence_period_starts_on">Starts on</string>	
-	<string name="recurrence_weekly_days">Repeat on</string>
-	<string name="recurrence_monthly_pattern">Monthly pattern</string>	
-	<string name="recurrence_monthly_every_nth_day">Every Nth day</string>
-	<string name="recurrence_monthly_specific_day">Specific day</string>
-	<string name="recur_interval_semi_monthly_1">1st day</string>	
-	<string name="recur_interval_semi_monthly_2">2nd day</string>	
-	<string name="recurrence_none">No recurrence</string>
-	<string name="specify_value">Specify value..</string>		
-	<string name="recurrence_evaluate">Evaluate dates</string>	
-	<string name="first">First</string>		
-	<string name="second">Second</string>		
-	<string name="third">Third</string>		
-	<string name="fourth">Fourth</string>		
-	<string name="last">Last</string>	
-	<string name="day">day</string>
-	<string name="weekday">weekday</string>
-	<string name="weekend_day">weekend day</string>
-	<string name="sunday">Sunday</string>
-	<string name="monday">Monday</string>
-	<string name="tuesday">Tuesday</string>
-	<string name="wednesday">Wednesday</string>
-	<string name="thursday">Thursday</string>
-	<string name="friday">Friday</string>
-	<string name="saturday">Saturday</string>
-	<string name="transaction_schedule">Transaction (Schedule)</string>	
-	<string name="transfer_schedule">Transfer (Schedule)</string>	
-	<string name="recurrence_period_starts_on_date">Starts on date</string>	
-	<string name="recurrence_period_starts_on_time">Starts on time</string>	
-	<string name="new_scheduled_transfer_title">Scheduled transfer</string>					
-	<string name="new_scheduled_transfer_text">Scheduled transfer has been made</string>					
-	<string name="new_scheduled_transaction_title">Scheduled transaction</string>
-	<string name="new_scheduled_transaction_text">Scheduled transaction has been added</string>
-	<string name="new_scheduled_transaction_notification" formatted="false">%s has been %s %s</string>
-	<string name="new_scheduled_transaction_debit">debited to</string>					
-	<string name="new_scheduled_transaction_credit">credited to</string>					
-	<string name="new_scheduled_transfer_notification_differ_currency" formatted="false">%s(%s) has been transferred from %s to %s</string>
-	<string name="new_scheduled_transfer_notification_same_currency" formatted="false">%s has been transferred from %s to %s</string>
-	<string name="notification">Notification</string>		
-	<string name="notification_options_on">On</string>	
-	<string name="notification_options_off">Off</string>					
-	<string name="notification_options_short">Z</string>					
-	<string name="notification_options_2_short">Z-Z</string>					
-	<string name="notification_options_3_short">Z-Z-Z</string>					
-	<string name="notification_options_long">Zz</string>					
-	<string name="notification_options_2_long">Zz-Zz</string>					
-	<string name="notification_options_3_long">Zz-Zz-Zz</string>	
-	<string name="notification_options_led_green">Green</string>					
-	<string name="notification_options_led_blue">Blue</string>					
-	<string name="notification_options_led_yellow">Yellow</string>					
-	<string name="notification_options_led_red">Red</string>					
-	<string name="notification_options_led_pink">Pink</string>	
-	<string name="notification_options_text" formatted="false">Sound:%s Vibration:%s Led:%s</string>
-	<string name="notification_options_custom">Custom</string>	
-	<string name="notification_options_default">Default</string>
-	<string name="notification_sound">Ringtone</string>
-	<string name="notification_vibra">Vibration</string>
-	<string name="notification_led">Led</string>
 	<string name="transaction_status">Status</string>
 	<string name="transaction_status_pending">Pending</string>
 	<string name="transaction_status_unreconciled">Unreconciled</string>
@@ -622,6 +292,8 @@
     <string name="advertise_mytracks">Google\'s MyTracks application can help Wheelly record your routes. You can install MyTracks from the options menu.</string>
     <string name="item_install_financisto">Install Financisto</string>
     <string name="advertise_financisto">Financisto application helps tracking your expenses. You can install it from the options menu.</string>
+    <string name="andicar_no_backups">To import data from AndiCar please create at least one backup.</string>
+    
     
     <string name="fuel_input_label"><b>Fuel</b>, <i>litres</i></string>
     <string name="location_input_label"><b>Location</b></string>
@@ -638,6 +310,11 @@
     <string name="mileages">Mileages</string>
     <string name="refuels">Refuels</string>
     <string name="heartbeats">Heartbeats</string>
+    
+    <string name="vehicle">Vehicle</string>
+    <string name="fuel_capacity">Fuel capacity</string>
+    <string name="fuel_capacity_summary">Fuel tank capacity</string>
 	
 	<string name="filter_value_not_found">Not found...</string>
+	<string name="amount_cannot_exceed_capacity">Amount entered cannot exceed fuel tank capacity</string>
 </resources>

@@ -37,7 +37,7 @@ public class RefuelList extends ListActivity {
 		super.onCreate(savedInstanceState);
 		super.setContentView(R.layout.refuel_list);
 		
-		final Cursor cursor = new RefuelRepository(new DatabaseHelper(this).getReadableDatabase()).list();
+		final Cursor cursor = new RefuelRepository(new DatabaseHelper(this).getReadableDatabase(), this).list();
 		super.startManagingCursor(cursor);
 		
 		super.setListAdapter(

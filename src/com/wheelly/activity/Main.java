@@ -3,13 +3,13 @@ package com.wheelly.activity;
 import ru.orangesoftware.financisto.activity.LocationsListActivity;
 
 import com.wheelly.R;
+import com.wheelly.app.AndiCarImporter;
 
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TabHost;
 
@@ -38,14 +38,22 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 		);
 		
 		tabHost.setOnTabChangedListener(this);
+		
+		new AndiCarImporter(this).attemptImporting();
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		MenuItem mi = menu.add(Menu.NONE, 1, Menu.NONE, R.string.locations);
-		mi.setIcon(R.drawable.menu_entities_locations);
-		mi.setIntent(new Intent(this, LocationsListActivity.class));
+		
+		menu.add(Menu.NONE, 1, Menu.NONE, R.string.locations)
+			.setIcon(R.drawable.menu_entities_locations)
+			.setIntent(new Intent(this, LocationsListActivity.class));
+		
+		menu.add(Menu.NONE, 2, Menu.NONE, R.string.preferences)
+			.setIcon(android.R.drawable.ic_menu_preferences)
+			.setIntent(new Intent(this, Preferences.class));
+		
 		return true;
 	}
 	

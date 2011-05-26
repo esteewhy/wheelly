@@ -3,18 +3,17 @@ package com.wheelly.widget;
 import com.wheelly.R;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 public final class FuelInput extends LinearLayout {
-	
-	private SeekBar seekBar;
-	private EditText editText;
 	
 	public FuelInput(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -25,14 +24,15 @@ public final class FuelInput extends LinearLayout {
 		super(context);
 		initialize(context);
 	}
-
+	
+	Controls c;
+	
 	private void initialize(Context context) {
 		LayoutInflater.from(context).inflate(R.layout.fuel_input, this, true);
 		
-		this.seekBar = ((SeekBar)findViewById(R.id.amount));
-		this.editText = ((EditText)findViewById(R.id.primary));
+		c = new Controls(this);
 		
-		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+		c.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 			
@@ -43,12 +43,12 @@ public final class FuelInput extends LinearLayout {
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
 				if(fromUser) {
-					editText.setText(Integer.toString(progress));
+					c.editText.setText(Integer.toString(progress));
 				}
 			}
 		});
 		
-		editText.addTextChangedListener(new TextWatcher() {
+		c.editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
@@ -59,17 +59,36 @@ public final class FuelInput extends LinearLayout {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if(s.length() > 0) {
-					seekBar.setProgress(Integer.parseInt(s.toString()));
+					int amount = Integer.parseInt(s.toString());
+					
+					if(amount > c.seekBar.getMax()) {
+						c.editText.setText(Integer.toString(amount = c.seekBar.getMax()));
+						c.editText.setError(getResources().getText(R.string.amount_cannot_exceed_capacity));
+					}
+					
+					c.seekBar.setProgress(amount);
 				}
 			}
 		});
+		
+		c.seekBar.setMax(PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("fuel_capacity", 60));
 	}
 	
 	public int getAmount() {
-		return this.seekBar.getProgress();
+		return c.seekBar.getProgress();
 	}
 	
 	public void setAmount(int amount) {
-		this.editText.setText(Integer.toString(amount));
+		c.editText.setText(Integer.toString(amount));
+	}
+	
+	private static class Controls {
+		final SeekBar seekBar;
+		final EditText editText;
+		
+		public Controls(ViewGroup v) {
+			this.seekBar = ((SeekBar)v.findViewById(R.id.amount));
+			this.editText = ((EditText)v.findViewById(R.id.primary));
+		}
 	}
 }
