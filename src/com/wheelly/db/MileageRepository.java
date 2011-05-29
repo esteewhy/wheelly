@@ -103,7 +103,7 @@ public final class MileageRepository implements IRepository {
 	public void update(ContentValues values) {
 		long id = values.getAsLong(BaseColumns._ID);
 		
-		for(String column : new String[] {BaseColumns._ID, "stop_place_id", "start_place_id"}) {
+		for(String column : new String[] {"stop_place_id", "start_place_id"}) {
 			values.remove(column);
 		}
 		

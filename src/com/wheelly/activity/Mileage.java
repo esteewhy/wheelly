@@ -123,7 +123,7 @@ public class Mileage extends FragmentActivity {
 					}
 				});
 	}
-	
+	/*
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		if (hasFocus) {
@@ -132,7 +132,7 @@ public class Mileage extends FragmentActivity {
 				.getView()
 				.requestFocusFromTouch();
 		}
-	}
+	}*/
 
 	/**
 	 * Encapsulates UI objects.

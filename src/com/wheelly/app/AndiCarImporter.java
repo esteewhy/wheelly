@@ -91,7 +91,7 @@ public final class AndiCarImporter {
 				+ " ORDER BY h.odometer DESC", null)
 		};
 		
-		long[] current = { 0, 0 };
+		long[] odo = { 0, 0 };
 		short move = WE_GO | THEY_GO;
 		boolean commit = false;
 		
@@ -103,13 +103,13 @@ public final class AndiCarImporter {
 			
 			if((move & THEY_GO) != 0) {
 				if(cursor[Theirs].moveToNext()) {
-					current[Theirs] = cursor[Theirs].getLong(cursor[Theirs].getColumnIndexOrThrow("CarIndex"));
+					odo[Theirs] = cursor[Theirs].getLong(cursor[Theirs].getColumnIndexOrThrow("CarIndex"));
 				} else break;
 			}
 			
 			if((move & WE_GO) != 0) {
 				if(cursor[Mine].moveToNext()) {
-					current[Mine] = cursor[Mine].getLong(cursor[Mine].getColumnIndexOrThrow("odometer"));
+					odo[Mine] = cursor[Mine].getLong(cursor[Mine].getColumnIndexOrThrow("odometer"));
 				} else {
 					commit = true;
 					move = WE_GO | THEY_GO;
@@ -117,15 +117,12 @@ public final class AndiCarImporter {
 				}
 			}
 			
-			if(current[Theirs] > current[Mine]) {
+			if(odo[Theirs] > odo[Mine]) {
 				move = THEY_GO;
-			} else if(current[Theirs] == current[Mine]) {
+			} else if(odo[Theirs] == odo[Mine]) {
 				move = WE_GO | THEY_GO;
 			} else {
-				if(move == THEY_GO) {
-					commit = true;
-				}
-				
+				commit = move == THEY_GO;
 				move = WE_GO;
 			}
 		}
@@ -133,7 +130,7 @@ public final class AndiCarImporter {
 		for(Cursor i : cursor) i.close();
 	}
 	
-	private static ContentValues deserializeTheirs(Cursor cursor) {
+	private static ContentValues deserializeTheirRefuel(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		values.put("CarIndex",	cursor.getLong(cursor.getColumnIndexOrThrow("CarIndex")));
 		values.put("Quantity",	cursor.getFloat(cursor.getColumnIndexOrThrow("Quantity")));
@@ -146,7 +143,7 @@ public final class AndiCarImporter {
 	private void importRefuel(Cursor cursor, SQLiteDatabase db) {
 		final long full_tank = PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60);
 		
-		final ContentValues values = deserializeTheirs(cursor);
+		final ContentValues values = deserializeTheirRefuel(cursor);
 		
 		final ContentValues heartbeat = new ContentValues();
 		heartbeat.put("_created",	values.getAsString("Date"));

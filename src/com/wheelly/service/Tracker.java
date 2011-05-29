@@ -63,7 +63,15 @@ public class Tracker {
 					synchronized (Tracker.this) {
 						if(null != listener) {
 							try {
-								listener.onStartTrack(ITrackRecordingService.Stub.asInterface(service).startNewTrack());
+								final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
+								long trackId = svc.startNewTrack();
+								
+								//TODO investigate why the latter returns 0
+								if(0 == trackId) {
+									trackId = svc.getRecordingTrackId();
+								}
+								
+								listener.onStartTrack(trackId);
 							} catch (RemoteException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

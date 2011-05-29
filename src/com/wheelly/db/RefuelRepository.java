@@ -65,10 +65,6 @@ public final class RefuelRepository implements IRepository {
 	public void update(ContentValues values) {
 		long id = values.getAsLong(BaseColumns._ID);
 		
-		for(String column : new String[] {BaseColumns._ID}) {
-			values.remove(column);
-		}
-		
 		this.database.update(
 			"refuels",
 			values,

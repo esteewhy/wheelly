@@ -34,7 +34,6 @@ public final class LocationRepository implements IRepository {
 	
 	public void update(ContentValues values) {
 		long id = values.getAsLong(BaseColumns._ID);
-		values.remove(BaseColumns._ID);
 		this.database.update(
 			"locations",
 			values,
