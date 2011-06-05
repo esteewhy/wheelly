@@ -18,12 +18,26 @@ public class MileageBroker {
 		this.context = context;
 	}
 	
+	public ContentValues loadOrCreate(long id) {
+		SQLiteDatabase db = null;
+		try {
+			final IRepository repository = new MileageRepository(
+				db = new DatabaseHelper(this.context).getReadableDatabase()
+			);
+			return id > 0 ? repository.load(id) : repository.getDefaults();
+		} finally {
+			if(null != db) {
+				db.close();
+			}
+		}
+	}
+	
 	public long update(ContentValues mileage) {
 		SQLiteDatabase db = null;
 		long id = mileage.getAsLong(BaseColumns._ID);
 		
 		try {
-			IRepository repository = new MileageRepository(
+			final IRepository repository = new MileageRepository(
 				db = new DatabaseHelper(context).getWritableDatabase()
 			);
 		

@@ -21,8 +21,9 @@ public class HeartbeatBroker {
 	public ContentValues loadOrCreate(long id) {
 		SQLiteDatabase db = null;
 		try {
-			db = new DatabaseHelper(this.context).getReadableDatabase();
-			final HeartbeatRepository repository = new HeartbeatRepository(db);
+			final IRepository repository = new HeartbeatRepository(
+				db = new DatabaseHelper(this.context).getReadableDatabase()
+			);
 			return id > 0 ? repository.load(id) : repository.getDefaults();
 		} finally {
 			if(null != db) {
@@ -36,7 +37,7 @@ public class HeartbeatBroker {
 		final long id = values.containsKey(BaseColumns._ID) ? values.getAsLong(BaseColumns._ID) : 0;
 		
 		try {
-			final HeartbeatRepository repository = new HeartbeatRepository(
+			final IRepository repository = new HeartbeatRepository(
 				db = new DatabaseHelper(this.context).getWritableDatabase()
 			);
 			

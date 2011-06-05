@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -27,13 +28,14 @@ import com.wheelly.db.HeartbeatRepository;
 public class HeartbeatList extends ListActivity {
 	private static final int NEW_REQUEST = 1;
 	private static final int EDIT_REQUEST = 2;
+	private SQLiteDatabase db;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.heartbeat_list);
 		
-		final Cursor cursor = new HeartbeatRepository(new DatabaseHelper(this).getReadableDatabase()).list();
+		final Cursor cursor = new HeartbeatRepository(db = new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
 		
 		final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(this).getInt("fuel_capacity", 60);
@@ -83,6 +85,12 @@ public class HeartbeatList extends ListActivity {
 		c.TemplateButton.setVisibility(View.GONE);
 		c.FilterButton.setVisibility(View.GONE);
 		c.TotalLayout.setVisibility(View.GONE);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		db.close();
+		super.onDestroy();
 	}
 	
 	@Override

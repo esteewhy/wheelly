@@ -17,9 +17,7 @@ import com.wheelly.app.TrackInput;
 import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.app.TripControlBarValue;
-import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.HeartbeatBroker;
-import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.widget.MileageInput;
 import com.wheelly.content.TrackRepository;
@@ -38,8 +36,7 @@ public class Mileage extends FragmentActivity {
 		//components
 		final Intent intent = this.getIntent();
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final MileageRepository repository = new MileageRepository(new DatabaseHelper(Mileage.this).getReadableDatabase());
-		final ContentValues values = id > 0 ? repository.load(id) : repository.getDefaults();
+		final ContentValues values = new MileageBroker(this).loadOrCreate(id);
 		
 		final Controls c = new Controls(this);
 		
@@ -123,17 +120,7 @@ public class Mileage extends FragmentActivity {
 					}
 				});
 	}
-	/*
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		if (hasFocus) {
-			getSupportFragmentManager()
-				.findFragmentById(R.id.heartbeats)
-				.getView()
-				.requestFocusFromTouch();
-		}
-	}*/
-
+	
 	/**
 	 * Encapsulates UI objects.
 	 */

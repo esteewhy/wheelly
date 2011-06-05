@@ -31,6 +31,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
@@ -55,12 +56,13 @@ public class Filter extends FragmentActivity {
 	private String filterValueNotFound;
 	private ActivityLayout x;
 	private Controls c;
+	private SQLiteDatabase db;
 	
 	public static class F {
 		public final static String SORT_ORDER	= "sort_order";
 		public final static String PERIOD		= "period";
 		public final static String LOCATION		= "location_id";
-		public final static String LOCATION_FILTER = "location_id_filter";
+		public final static String LOCATION_CONSTRAINT = "location_id_constraint";
 	}
 	
 	private Cursor locationCursor;
@@ -75,10 +77,10 @@ public class Filter extends FragmentActivity {
 		final Activity ctx = this;
 		
 		this.locationCursor = new LocationRepository(
-			new DatabaseHelper(ctx)
-				.getReadableDatabase())
-			.list(intent != null && intent.hasExtra(F.LOCATION_FILTER)
-				? intent.getStringExtra(F.LOCATION_FILTER) : "");
+			db = new DatabaseHelper(ctx).getReadableDatabase())
+				.list(intent != null && intent.hasExtra(F.LOCATION_CONSTRAINT)
+					? intent.getStringExtra(F.LOCATION_CONSTRAINT)
+					: "");
 		
 		ctx.startManagingCursor(locationCursor);
 		
@@ -210,37 +212,61 @@ public class Filter extends FragmentActivity {
 		}
 	}
 	
+	@Override
+	protected void onDestroy() {
+		db.close();
+		super.onDestroy();
+	}
+	
 	public static void intentToFilter(Intent intent, ContentValues filter) {
 		if(intent.hasExtra(F.PERIOD)) {
 			filter.put(F.PERIOD, intent.getStringExtra(F.PERIOD));
+		} else {
+			filter.remove(F.PERIOD);
 		}
+		
 		if(intent.hasExtra(F.LOCATION)) {
 			filter.put(F.LOCATION, intent.getLongExtra(F.LOCATION, -1));
+		} else {
+			filter.remove(F.LOCATION);
 		}
+		
 		if(intent.hasExtra(F.SORT_ORDER)) {
 			filter.put(F.SORT_ORDER, intent.getIntExtra(F.SORT_ORDER, 0));
+		} else {
+			filter.remove(F.SORT_ORDER);
 		}
-		if(intent.hasExtra(F.LOCATION_FILTER)) {
-			filter.put(F.LOCATION_FILTER, intent.getStringExtra(F.LOCATION_FILTER));
+		
+		if(intent.hasExtra(F.LOCATION_CONSTRAINT)) {
+			filter.put(F.LOCATION_CONSTRAINT, intent.getStringExtra(F.LOCATION_CONSTRAINT));
+		} else {
+			filter.remove(F.LOCATION_CONSTRAINT);
 		}
 	}
 	
 	public static void filterToIntent(ContentValues filter, Intent intent) {
 		if(filter.containsKey(F.PERIOD)) {
 			intent.putExtra(F.PERIOD, filter.getAsString(F.PERIOD));
+		} else {
+			intent.removeExtra(F.PERIOD);
 		}
+		
 		if(filter.containsKey(F.LOCATION)) {
 			intent.putExtra(F.LOCATION, filter.getAsLong(F.LOCATION));
+		} else {
+			intent.removeExtra(F.LOCATION);
 		}
-		if(filter.containsKey(F.SORT_ORDER)) {
-			if(filter.getAsInteger(F.SORT_ORDER) > 0) {
-				intent.putExtra(F.SORT_ORDER, 1);
-			} else {
-				intent.removeExtra(F.SORT_ORDER);
-			}
+		
+		if(filter.containsKey(F.SORT_ORDER) && filter.getAsInteger(F.SORT_ORDER) > 0) {
+			intent.putExtra(F.SORT_ORDER, 1);
+		} else {
+			intent.removeExtra(F.SORT_ORDER);
 		}
-		if(filter.containsKey(F.LOCATION_FILTER)) {
-			intent.putExtra(F.LOCATION_FILTER, filter.getAsString(F.LOCATION_FILTER));
+		
+		if(filter.containsKey(F.LOCATION_CONSTRAINT)) {
+			intent.putExtra(F.LOCATION_CONSTRAINT, filter.getAsString(F.LOCATION_CONSTRAINT));
+		} else {
+			intent.removeExtra(F.LOCATION_CONSTRAINT);
 		}
 	}
 	

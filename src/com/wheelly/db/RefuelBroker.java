@@ -20,6 +20,22 @@ public class RefuelBroker {
 		this.context = context;
 	}
 	
+	public ContentValues loadOrCreate(long id) {
+		SQLiteDatabase db = null;
+		
+		try {
+			final IRepository repository = new RefuelRepository(
+				db = new DatabaseHelper(this.context).getReadableDatabase(),
+				this.context);
+			
+			return id > 0 ? repository.load(id) : repository.getDefaults();
+		} finally {
+			if(null != db) {
+				db.close();
+			}
+		}
+	}
+	
 	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
 		SQLiteDatabase db = null;
 		long id = refuel.getAsLong(BaseColumns._ID);

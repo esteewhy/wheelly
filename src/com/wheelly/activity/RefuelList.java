@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -31,13 +32,14 @@ public class RefuelList extends ListActivity {
 
 	private static final int NEW_REQUEST = 1;
 	protected static final int EDIT_REQUEST = 2;
+	private SQLiteDatabase db;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		super.setContentView(R.layout.refuel_list);
 		
-		final Cursor cursor = new RefuelRepository(new DatabaseHelper(this).getReadableDatabase(), this).list();
+		final Cursor cursor = new RefuelRepository(db = new DatabaseHelper(this).getReadableDatabase(), this).list();
 		super.startManagingCursor(cursor);
 		
 		super.setListAdapter(
@@ -54,7 +56,7 @@ public class RefuelList extends ListActivity {
 					switch(v.getId()) {
 					case R.id.mileage:
 					case R.id.fuel:
-						v.setText(text == "" ? text : String.format("%+.2f", Float.parseFloat(text)));
+						v.setText("".equals(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
 						break;
 					default: super.setViewText(v, text);
 					}
@@ -76,6 +78,12 @@ public class RefuelList extends ListActivity {
 		c.TemplateButton.setVisibility(View.GONE);
 		c.FilterButton.setVisibility(View.GONE);
 		c.TotalLayout.setVisibility(View.GONE);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		db.close();
+		super.onDestroy();
 	}
 	
 	@Override

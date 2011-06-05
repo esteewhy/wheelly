@@ -2,7 +2,6 @@ package com.wheelly.activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
@@ -14,11 +13,8 @@ import android.widget.*;
 
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.HeartbeatRepository;
-import com.wheelly.db.IRepository;
+import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.RefuelBroker;
-import com.wheelly.db.RefuelRepository;
 import com.wheelly.widget.FinancistoButton;
 
 import ru.orangesoftware.financisto.widget.AmountInput;
@@ -37,13 +33,10 @@ public class Refuel extends FragmentActivity {
 		//components
 		final Intent intent = this.getIntent();
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final SQLiteDatabase db = new DatabaseHelper(Refuel.this).getReadableDatabase();
-		
-		final IRepository repository = new RefuelRepository(db, this);
-		final ContentValues refuel = id > 0 ? repository.load(id) : repository.getDefaults();
-		final IRepository heartbeatRepository = new HeartbeatRepository(db);
-		final long heartbeatId = refuel.getAsLong("heartbeat_id");
-		final ContentValues heartbeat = heartbeatId > 0 ? heartbeatRepository.load(heartbeatId) : heartbeatRepository.getDefaults();
+		final ContentValues refuel = new RefuelBroker(this).loadOrCreate(id);
+		final ContentValues heartbeat = new HeartbeatBroker(this).loadOrCreate(
+			refuel.getAsLong("heartbeat_id")
+		);
 		
 		final Controls c = new Controls(this);
 		

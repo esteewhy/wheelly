@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -32,7 +33,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /**
- * Location selection control.
+ * Location selection and creation control.
  */
 public final class LocationInput extends Fragment {
 	
@@ -44,12 +45,13 @@ public final class LocationInput extends Fragment {
 	private Location lastFix;
 	private Controls c;
 	private Cursor locationCursor;
+	private SQLiteDatabase db;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();  
-		locationCursor = new LocationRepository(new DatabaseHelper(ctx).getReadableDatabase()).list();
+		locationCursor = new LocationRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
 		ctx.startManagingCursor(locationCursor);
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(ctx,
@@ -70,9 +72,8 @@ public final class LocationInput extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.cancel();
-								locationCursor.moveToPosition(which);	
-								long selectedId = locationCursor.getLong(locationCursor.getColumnIndexOrThrow("_id")); 
-								selectedLocationId = selectedId;
+								locationCursor.moveToPosition(which);
+								setLocationFromCursor();
 							}
 						}
 					)
@@ -92,6 +93,12 @@ public final class LocationInput extends Fragment {
 		});
 		
 		return v;
+	}
+	
+	@Override
+	public void onDestroyView() {
+		db.close();
+		super.onDestroyView();
 	}
 	
 	@Override
@@ -119,14 +126,21 @@ public final class LocationInput extends Fragment {
 		if (locationId <= 0) {
 			selectCurrentLocation(false);
 		} else {
-			if (Utils.moveCursor(locationCursor, "_id", locationId) != -1) {
-				ContentValues location = LocationRepository.deserialize(locationCursor);
-				//c.locationText.setText(LocationUtils.locationToText(location));
-				c.locationText.setText(location.getAsString("name"));
-				selectedLocationId = locationId;
-				setCurrentLocation = false;
+			if (Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
+				setLocationFromCursor();
 			}
 		}
+	}
+	
+	/**
+	 * Attempts to select location from current cursor position.
+	 */
+	private void setLocationFromCursor() {
+		ContentValues location = LocationRepository.deserialize(locationCursor);
+		//c.locationText.setText(LocationUtils.locationToText(location));
+		c.locationText.setText(location.getAsString("name"));
+		selectedLocationId = location.getAsLong(BaseColumns._ID);
+		setCurrentLocation = false;
 	}
 	
 	protected void selectCurrentLocation(boolean forceUseGps) {

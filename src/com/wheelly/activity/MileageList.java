@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -24,10 +25,10 @@ import android.widget.Toast;
 
 import com.wheelly.R;
 import com.wheelly.app.StatusBarControls;
-import com.wheelly.content.TrackRepository;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.MileageRepository;
 import com.wheelly.db.MileageBroker;
+import com.wheelly.service.Tracker;
 
 public class MileageList extends ListActivity {
 
@@ -38,6 +39,7 @@ public class MileageList extends ListActivity {
 	final private ContentValues filter = new ContentValues();
 	private StatusBarControls c;
 	private boolean suggestInstall = false;
+	private SQLiteDatabase db;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -48,15 +50,13 @@ public class MileageList extends ListActivity {
 		suggestInstall =
 			null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
 				? savedInstanceState.getBoolean("suggestInstall")
-				: !new TrackRepository(this).checkAvailability();
+				: !new Tracker(this).checkAvailability();
 		
 		if(!suggestInstall) {
 			Toast.makeText(this, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
 		}
-				
-		filter.put(Filter.F.LOCATION_FILTER, "mileages");
 		
-		final Cursor cursor = new MileageRepository(new DatabaseHelper(this).getReadableDatabase()).list();
+		final Cursor cursor = new MileageRepository(db = new DatabaseHelper(this).getReadableDatabase()).list();
 		startManagingCursor(cursor);
 		
 		setListAdapter(
@@ -102,11 +102,18 @@ public class MileageList extends ListActivity {
 			public void onClick(View v) {
 				c.FilterButton.setEnabled(false);
 				Intent intent = new Intent(MileageList.this, Filter.class);
+				filter.put(Filter.F.LOCATION_CONSTRAINT, "mileages");
 				Filter.filterToIntent(filter, intent);
 				startActivityForResult(intent, FILTER_REQUEST);
 			}
 		});
 		c.TotalLayout.setVisibility(View.GONE);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		db.close();
+		super.onDestroy();
 	}
 	
 	@Override
@@ -130,7 +137,8 @@ public class MileageList extends ListActivity {
 				filter.clear();
 			} else if (resultCode == RESULT_OK) {
 				Filter.intentToFilter(data, filter);
-			}	
+			}
+			filter.remove(Filter.F.LOCATION_CONSTRAINT);
 			c.FilterButton.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 			stopManagingCursor(((SimpleCursorAdapter)this.getListAdapter()).getCursor());
 			

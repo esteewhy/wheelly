@@ -20,7 +20,7 @@ public final class LocationRepository implements IRepository {
 	
 	public Cursor list(String filter) {
 		String sql =
-			filter == "mileages"
+			"mileages".equalsIgnoreCase(filter)
 				? Locations.SelectByMileages
 				: Locations.Select;
 		
