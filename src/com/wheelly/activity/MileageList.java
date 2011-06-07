@@ -142,7 +142,7 @@ public class MileageList extends ListActivity {
 			c.FilterButton.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 			stopManagingCursor(((SimpleCursorAdapter)this.getListAdapter()).getCursor());
 			
-			MileageRepository repo = new MileageRepository(new DatabaseHelper(this).getReadableDatabase());
+			MileageRepository repo = new MileageRepository(db);
 			Cursor cursor = filter.size() == 0 ? repo.list() : repo.list(filter);
 			startManagingCursor(cursor);
 			((SimpleCursorAdapter)this.getListAdapter()).changeCursor(cursor);
@@ -218,4 +218,40 @@ public class MileageList extends ListActivity {
 		}
 		return false;
 	}
-}
+	/*
+	public static class MileageListFragment extends ListFragment {
+		private SQLiteDatabase db;
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			final FragmentActivity ctx = getActivity();
+			final Cursor cursor = new MileageRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
+			ctx.startManagingCursor(cursor);
+			
+			setListAdapter(
+				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, cursor,
+					new String[] {
+						"start_place", "stop_place", "mileage", "cost", "stop_time", "fuel", "destination"
+					},
+					new int[] {
+						R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
+					}
+				) {
+					@Override
+					public void setViewText(TextView v, String text) {
+						switch(v.getId()) {
+						case R.id.mileage:
+							int val = Integer.parseInt(text);
+							v.setText(Html.fromHtml(String.format("%c<b>%03d</b>", val >= 0 ? '+' : '-', val)));
+							break;
+						case R.id.fuel:
+							v.setText(String.format("%\u002003.2f", Float.parseFloat(text)));
+							break;
+						default: super.setViewText(v, text);
+						}
+					}
+				}
+		}
+	}
+*/}

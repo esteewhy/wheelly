@@ -62,17 +62,6 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations dest"
 			+ "		ON m.location_id = dest." + BaseColumns._ID;
 		
-		public static final String SelectWhereLocation =
-			"stop.place_id = ?1 OR start.place_id = @location_id OR m.location_id = @location_id";
-		
-		public static final String SelectWherePeriod =
-			"stop._created BETWEEN @from AND @to"
-			+ " AND start._created BETWEEN @from AND @to";
-		
-		static final String SelectOrder = " ORDER BY COALESCE(stop._created, start._created, m._created)"; 
-		public static final String SelectOrderAsc = SelectOrder + " ASC";
-		public static final String SelectOrderDesc = SelectOrder + " DESC";
-		
 		public static final String Single =
 			"SELECT "
 			+ "m." + BaseColumns._ID
@@ -145,8 +134,11 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN heartbeats h"
 			+ "		ON f.heartbeat_id = h." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations l"
-			+ "		ON h.place_id = l." + BaseColumns._ID
-			+ " ORDER BY h._created DESC";
+			+ "		ON h.place_id = l." + BaseColumns._ID;
+		
+		public static final String SelectOrderAsc = " ORDER BY h._created ASC";
+		
+		public static final String SelectOrderDesc = " ORDER BY h._created DESC";
 		
 		public static final String Single =
 			"SELECT " + BaseColumns._ID + ", name, calc_mileage, cost, amount"

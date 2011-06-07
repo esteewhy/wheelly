@@ -92,7 +92,7 @@ public class TripControlBar extends Fragment {
 										long distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
 										if(val.StartHeartbeat != null &&
 												val.StopHeartbeat != null) {
-											val.StopHeartbeat.put("odometer", val.StartHeartbeat.getAsLong("odometer" + distance));
+											val.StopHeartbeat.put("odometer", val.StartHeartbeat.getAsLong("odometer") + distance);
 										}
 										setValue(val);
 									}

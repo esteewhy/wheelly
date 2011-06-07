@@ -22,7 +22,7 @@ public final class RefuelRepository implements IRepository {
 	}
 	
 	public Cursor list() {
-		return this.database.rawQuery(Refuels.Select, null);
+		return this.database.rawQuery(Refuels.Select + Refuels.SelectOrderDesc, null);
 	}
 	
 	public ContentValues load(long id) {
