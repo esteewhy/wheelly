@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 
+/**
+ * Self-contained control which presents filter dialog and notifies underlying activity when filter values change.
+ */
 public class FilterButton extends Fragment {
 	private static final int FILTER_REQUEST = 6;
 	final private ContentValues filter = new ContentValues();
@@ -38,7 +41,6 @@ public class FilterButton extends Fragment {
 				startActivityForResult(intent, FILTER_REQUEST);
 			}
 		});
-		container.addView(btn);
 		return btn;
 	}
 	

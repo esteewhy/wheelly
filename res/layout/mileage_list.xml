@@ -15,20 +15,11 @@
 	android:layout_width	="fill_parent"
 	android:orientation		="vertical">
 	
-	<ListView
-		android:id				="@android:id/list"
+	<fragment class				="com.wheelly.activity.MileageList$MileageListFragment"
+		android:id				="@+id/mileages"
+		android:layout_weight	="1" 
 		android:layout_width	="fill_parent"
-		android:layout_weight	="1"
-		android:layout_height	="wrap_content"
-		android:scrollbarStyle	="insideInset" />
+		android:layout_height	="wrap_content" />
 	
-	<TextView
-		android:id				="@id/android:empty"
-		android:layout_width	="fill_parent"
-		android:layout_height	="wrap_content"
-		android:layout_weight	="1"
-		android:gravity			="center"
-		android:text			="@string/no_mileages" />
-	
-	<include layout="@layout/status_bar"/>
+	<include layout="@layout/status_bar_v4"/>
 </LinearLayout>
