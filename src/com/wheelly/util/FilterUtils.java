@@ -1,4 +1,4 @@
-package com.wheelly.utils;
+package com.wheelly.util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,17 +12,23 @@ import com.wheelly.activity.Filter.F;
 import com.wheelly.db.DatabaseSchema;
 
 public class FilterUtils {
+	
+	public static class FilterResult {
+		public String Where;
+		public String[] Values;
+		public String Order;
+		
+		FilterResult() {}
+	}
 	/**
 	 * Helps to construct SQL query from a given WHERE/ORDER values.
 	 * 
 	 * @param filter Map of filter values.
-	 * @param sql Accumulator of SQL string.
 	 * @param filterExpr Map of SQL expressions, corresponding to values.
 	 * @return Array of string values suitable for passing as a second parameter to SQLiteDatabase.rawQuery().
 	 */
-	public static String[] updateSqlFromFilter(
+	public static FilterResult updateSqlFromFilter(
 			ContentValues filter,
-			StringBuilder sql,
 			Map<String, String> filterExpr) {
 		ArrayList<String> conditions = new ArrayList<String>();
 		ArrayList<String> values = new ArrayList<String>();
@@ -46,16 +52,17 @@ public class FilterUtils {
 			);
 		}
 		
-		if(conditions.size() > 0) {
-			sql.append(" WHERE ("
+		final FilterResult r = new FilterResult();
+		r.Where = conditions.size() > 0
+			? "("
 				.concat(TextUtils.join(") AND (", conditions.toArray()))
-				.concat(") "));
-		}
-		
-		sql.append(filterExpr.get(F.SORT_ORDER)
+				.concat(") ")
+			: null;
+		r.Order =
+			filterExpr.get(F.SORT_ORDER)
 			+ (filter.containsKey(F.SORT_ORDER) && filter.getAsInteger(F.SORT_ORDER) != 0
-			? " ASC" : " DESC"));
-		
-		return values.toArray(new String[0]);
+				? " ASC" : " DESC");
+		r.Values = values.toArray(new String[0]);
+		return r;
 	}
 }

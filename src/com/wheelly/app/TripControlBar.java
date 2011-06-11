@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * A user control consisting of 2 buttons each of which spawn start or stop
@@ -35,7 +36,7 @@ public class TripControlBar extends Fragment {
 	private boolean canStartTracking = true;
 	
 	public static interface OnValueChangedListener {
-		void onValueChanged(TripControlBarValue value);
+		void onValueChanged(Value value);
 	}
 	
 	private OnValueChangedListener onValueChangedListener;
@@ -44,7 +45,7 @@ public class TripControlBar extends Fragment {
 		this.onValueChangedListener = listener;
 	}
 	
-	protected void onValueChanged(TripControlBarValue value) {
+	protected void onValueChanged(Value value) {
 		if(null != onValueChangedListener) {
 			onValueChangedListener.onValueChanged(value);
 		}
@@ -81,7 +82,7 @@ public class TripControlBar extends Fragment {
 					
 					// Stop tracking (if active) *before* entering final heartbeat.
 					if(requestId == editStopHeartbeatRequestId) {
-						final TripControlBarValue val = getValue();
+						final Value val = getValue();
 						if(val.TrackId < 0) {
 							val.TrackId = val.TrackId * -1;
 							new Tracker(getActivity())
@@ -89,10 +90,14 @@ public class TripControlBar extends Fragment {
 									
 									@Override
 									public void onTrackStopped() {
-										long distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
-										if(val.StartHeartbeat != null &&
-												val.StopHeartbeat != null) {
-											val.StopHeartbeat.put("odometer", val.StartHeartbeat.getAsLong("odometer") + distance);
+										float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
+										
+Toast.makeText(getActivity(), Float.toString(distance), 9000);
+										
+										if(val.StartHeartbeat != null && val.StopHeartbeat != null) {
+											val.StopHeartbeat.put("odometer",
+												val.StartHeartbeat.getAsLong("odometer")
+												+ (long)Math.ceil(distance));
 										}
 										setValue(val);
 									}
@@ -103,7 +108,7 @@ public class TripControlBar extends Fragment {
 								.Stop(val.TrackId);
 						}
 					} else if(requestId == editStartHeartbeatAndStartTrackingRequestId) {
-						final TripControlBarValue val = getValue();
+						final Value val = getValue();
 						
 						if(new Tracker(getActivity())
 							.setStartTrackListener(new TrackListener() {
@@ -143,7 +148,7 @@ public class TripControlBar extends Fragment {
 		if(resultCode == Activity.RESULT_OK) {
 			long id = data.getLongExtra(BaseColumns._ID, 0);
 			ContentValues heartbeat = data.getParcelableExtra("heartbeat");
-			final TripControlBarValue value = this.getValue();
+			final Value value = this.getValue();
 			
 			if(requestCode == editStartHeartbeatRequestId) {
 				value.StartId = id;
@@ -175,8 +180,8 @@ public class TripControlBar extends Fragment {
 	/**
 	 * Returns a pair of heartbeats been edited.
 	 */
-	public TripControlBarValue getValue() {
-		TripControlBarValue result = new TripControlBarValue();
+	public Value getValue() {
+		Value result = new Value();
 		result.StartId			= (Long)c.StartButton.getTag(R.id.tag_id);
 		result.StopId			= (Long)c.StopButton.getTag(R.id.tag_id);
 		result.StartHeartbeat	= (ContentValues)c.StartButton.getTag(R.id.tag_values);
@@ -210,7 +215,7 @@ public class TripControlBar extends Fragment {
 	/**
 	 * Initialises both edited heartbeats and updates UI.
 	 */
-	public void setValue(TripControlBarValue value) {
+	public void setValue(Value value) {
 		c.StartButton.setTag(R.id.tag_track_id, value.TrackId);
 		
 		c.StartButton.setTag(R.id.tag_id, value.StartId);
@@ -252,5 +257,14 @@ public class TripControlBar extends Fragment {
 			this.StartButton = (Button)view.findViewById(R.id.bStart);
 			this.StopButton = (Button)view.findViewById(R.id.bStop);
 		}
+	}
+	
+	public static class Value {
+		public long StartId;
+		public long StopId;
+		public ContentValues StartHeartbeat;
+		public ContentValues StopHeartbeat;
+		
+		public long TrackId;
 	}
 }

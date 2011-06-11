@@ -13,10 +13,10 @@ package ru.orangesoftware.financisto.activity;
 import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.wheelly.R;
-import com.wheelly.app.LocationUtils;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationBroker;
 import com.wheelly.db.LocationRepository;
+import com.wheelly.util.LocationUtils;
 
 import android.app.ListActivity;
 import android.content.ContentValues;

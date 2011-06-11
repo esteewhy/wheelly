@@ -6,6 +6,7 @@ import ru.orangesoftware.financisto.utils.Utils;
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
+import com.wheelly.util.LocationUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,12 +1,6 @@
 package com.wheelly.db;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.wheelly.activity.Filter.F;
 import com.wheelly.db.DatabaseSchema.Mileages;
-import com.wheelly.utils.FilterUtils;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,15 +11,7 @@ import android.provider.BaseColumns;
  */
 public final class MileageRepository implements IRepository {
 	private final SQLiteDatabase database;
-
-	public static final Map<String, String> filterExpr = new HashMap<String, String>();
-
-	static {
-		filterExpr.put(F.LOCATION, "stop.place_id = ?1 OR start.place_id = @location_id OR m.location_id = @location_id");
-		filterExpr.put(F.PERIOD, "stop._created BETWEEN @from AND @to AND start._created BETWEEN @from AND @to");
-		filterExpr.put(F.SORT_ORDER, " ORDER BY COALESCE(stop._created, start._created, m._created)");
-	}
-
+	
 	/**
 	 * @database Initialised instance of SQLite database for which the caller is
 	 *           responsible for managing life-cycle.
@@ -34,16 +20,9 @@ public final class MileageRepository implements IRepository {
 		this.database = database;
 	}
 
+	@Deprecated
 	public Cursor list() {
-		return this.database.rawQuery(Mileages.Select + filterExpr.get(F.SORT_ORDER) + " DESC", null);
-	}
-
-	public Cursor list(ContentValues filter) {
-		final StringBuilder sql = new StringBuilder(Mileages.Select);
-		final String[] values = FilterUtils.updateSqlFromFilter(filter, sql, filterExpr);
-
-		return this.database.rawQuery(sql.toString(),
-				values.length > 0 ? values : null);
+		return null;
 	}
 
 	public ContentValues load(long id) {

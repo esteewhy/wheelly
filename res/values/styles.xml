@@ -94,7 +94,6 @@
 	</style>
 	
 	<style name="LocationText" parent="@style/LocationString">
-		<item name="android:layout_gravity">center_vertical</item>
 		<item name="android:layout_weight">.5</item>
 		<item name="android:text">Kaniv</item>
 		<item name="android:layout_width">fill_parent</item>

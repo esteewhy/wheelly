@@ -5,13 +5,14 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
-import android.text.Html;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,18 +21,21 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
 import com.wheelly.R;
+import com.wheelly.activity.Filter.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.app.StatusBarControlsv4;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.MileageRepository;
+import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.service.Tracker;
+import com.wheelly.util.FilterUtils;
+import com.wheelly.util.FilterUtils.FilterResult;
 
 public class MileageList extends FragmentActivity {
 	
@@ -41,15 +45,16 @@ public class MileageList extends FragmentActivity {
 		setContentView(R.layout.mileage_list);
 	}
 	
-	public static class MileageListFragment extends ListFragment {
+	public static class MileageListFragment extends ListFragment
+		implements LoaderCallbacks<Cursor> {
+		
+		private static final int MILEAGE_LIST_LOADER = 0x01;
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
 		
-		private SQLiteDatabase db;
 		private StatusBarControlsv4 c;
 		private boolean suggestInstall = false;
 		
-		@SuppressWarnings("deprecation")
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
@@ -66,33 +71,31 @@ public class MileageList extends FragmentActivity {
 			if(!suggestInstall) {
 				Toast.makeText(ctx, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
 			}
-
-			final Cursor cursor = new MileageRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
-			ctx.startManagingCursor(cursor);
+			
+			getLoaderManager().initLoader(MILEAGE_LIST_LOADER, null, this);
 			
 			setListAdapter(
-				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, cursor,
+				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, null,
 					new String[] {
 						"start_place", "stop_place", "mileage", "cost", "stop_time", "fuel", "destination"
 					},
 					new int[] {
 						R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
-					}
+					},
+					0//CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
 				) {
 					@Override
 					public void setViewText(TextView v, String text) {
 						switch(v.getId()) {
 						case R.id.mileage:
-							int val = Integer.parseInt(text);
-							v.setText(Html.fromHtml(String.format("%c<b>%03d</b>", val >= 0 ? '+' : '-', val)));
-							break;
 						case R.id.fuel:
-							v.setText(String.format("%\u002003.2f", Float.parseFloat(text)));
+							v.setText(String.format("%+.2f", Float.parseFloat(text)));
 							break;
 						default: super.setViewText(v, text);
 						}
 					}
 				});
+			
 			registerForContextMenu(getListView());
 			setHasOptionsMenu(true);
 			
@@ -113,21 +116,13 @@ public class MileageList extends FragmentActivity {
 			c.FilterButton.SetOnFilterChangedListener(new OnFilterChangedListener() {
 				@Override
 				public void onFilterChanged(ContentValues value) {
-					getActivity().stopManagingCursor(((SimpleCursorAdapter)MileageListFragment.this.getListAdapter()).getCursor());
-					
-					MileageRepository repo = new MileageRepository(db);
-					Cursor cursor = value.size() == 0 ? repo.list() : repo.list(value);
-					getActivity().startManagingCursor(cursor);
-					((SimpleCursorAdapter)MileageListFragment.this.getListAdapter()).changeCursor(cursor);
+					final Bundle args = new Bundle();
+					args.putParcelable("filter", value);
+					getLoaderManager().restartLoader(MILEAGE_LIST_LOADER, args,
+							MileageListFragment.this);
 				}
 			});
 			c.TotalLayout.setVisibility(View.GONE);
-		}
-		
-		@Override
-		public void onDestroy() {
-			db.close();
-			super.onDestroy();
 		}
 		
 		@Override
@@ -188,7 +183,7 @@ public class MileageList extends FragmentActivity {
 				case R.id.ctx_menu_view: {
 					//viewItem(mi.position, mi.id);
 					return true;
-				} 			
+				}
 				case R.id.ctx_menu_edit:
 					onListItemClick(null, null, 0, mi.id);
 					return true;
@@ -213,6 +208,36 @@ public class MileageList extends FragmentActivity {
 		public void onSaveInstanceState(Bundle outState) {
 			super.onSaveInstanceState(outState);
 			outState.putBoolean("suggestInstall", suggestInstall);
+		}
+
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			final ContentValues filter;
+			
+			if(args != null && args.containsKey("filter")
+					&& (filter = args.getParcelable("filter")).size() > 0) {
+				final FilterResult sql = FilterUtils.updateSqlFromFilter(
+					filter, Mileages.FilterExpr);
+				
+				return new CursorLoader(getActivity(),
+					Mileages.CONTENT_URI, Mileages.Columns,
+					sql.Where, sql.Values, 	sql.Order);
+			}
+			
+			return new CursorLoader(getActivity(),
+				Mileages.CONTENT_URI, Mileages.Columns,
+				null, null,
+				Mileages.FilterExpr.get(F.SORT_ORDER) + " DESC");
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			((CursorAdapter) getListAdapter()).swapCursor(data);
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			((CursorAdapter) getListAdapter()).swapCursor(null);
 		}
 	}
 }

@@ -24,7 +24,7 @@ public class TrackRepository {
 	/*
 	 * Retrieves track distance in kilometers.
 	 */
-	public long getDistance(long trackId) {
+	public float getDistance(long trackId) {
 		final Cursor cursor = context.getContentResolver()
 			.query(TracksColumns.CONTENT_URI,
 				new String[] { TracksColumns.TOTALDISTANCE },
@@ -33,7 +33,7 @@ public class TrackRepository {
 				null);
 		try {
 			cursor.moveToFirst();
-			return cursor.getLong(cursor.getColumnIndexOrThrow(TracksColumns.TOTALDISTANCE)) / 1000;
+			return cursor.getFloat(cursor.getColumnIndexOrThrow(TracksColumns.TOTALDISTANCE)) / 1000;
 		} finally {
 			cursor.close();
 		}

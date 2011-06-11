@@ -86,6 +86,12 @@
 		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
 			android:label="@string/locations"
 			android:launchMode="singleTop" />
+			
+		<provider
+			android:authorities="com.wheelly"
+			android:multiprocess="true"
+			android:name=".content.ChronologyProvider">
+		</provider>
 	</application>
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>

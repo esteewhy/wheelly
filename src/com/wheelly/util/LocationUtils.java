@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.util;
 
 import android.content.ContentValues;
 import android.database.Cursor;

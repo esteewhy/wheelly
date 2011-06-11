@@ -1,5 +1,6 @@
 package com.wheelly.db;
 
+import com.wheelly.activity.Filter.F;
 import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.content.ContentValues;
@@ -22,7 +23,10 @@ public final class RefuelRepository implements IRepository {
 	}
 	
 	public Cursor list() {
-		return this.database.rawQuery(Refuels.Select + Refuels.SelectOrderDesc, null);
+		return this.database.query(
+			Refuels.Tables, Refuels.Columns,
+			null, null, null, null,
+			Refuels.FilterExpr.get(F.SORT_ORDER) + " DESC");
 	}
 	
 	public ContentValues load(long id) {

@@ -16,7 +16,6 @@ import com.wheelly.app.LocationInput;
 import com.wheelly.app.TrackInput;
 import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
-import com.wheelly.app.TripControlBarValue;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.widget.MileageInput;
@@ -47,15 +46,17 @@ public class Mileage extends FragmentActivity {
 			public void onTrackChanged(long trackId) {
 				// @todo Compare to default
 				if(c.Mileage.getAmount() == 0) {
-					c.Mileage.setAmount(trackId > 0 ? new TrackRepository(Mileage.this).getDistance(trackId) : 0);
+					c.Mileage.setAmount(trackId > 0
+						? (long)Math.ceil(new TrackRepository(Mileage.this).getDistance(trackId))
+						: 0);
 				}
 			}
 		});
 		c.Track.setValue(values.getAsLong("track_id"));
 		
-		final TripControlBarValue heartbeats = new TripControlBarValue() {{
+		final TripControlBar.Value heartbeats = new TripControlBar.Value() {{
 			StartId = values.getAsLong("start_heartbeat_id");
-			StopId = values.getAsLong("stop_heartbeat_id");
+			StopId  = values.getAsLong("stop_heartbeat_id");
 			TrackId = values.getAsLong("track_id");
 		}};
 		
@@ -64,7 +65,7 @@ public class Mileage extends FragmentActivity {
 		heartbeats.StopHeartbeat = broker.loadOrCreate(heartbeats.StopId);
 		c.Heartbeats.setOnValueChangedListener(new TripControlBar.OnValueChangedListener() {
 			@Override
-			public void onValueChanged(TripControlBarValue value) {
+			public void onValueChanged(TripControlBar.Value value) {
 				if(c.Mileage.getAmount() == 0
 						&& value.StartHeartbeat != null
 						&& value.StartHeartbeat.containsKey("odometer")
@@ -97,7 +98,7 @@ public class Mileage extends FragmentActivity {
 					values.put("mileage",		c.Mileage.getAmount());
 					values.put("location_id",	c.Destination.getValue());
 					
-					final TripControlBarValue heartbeats = c.Heartbeats.getValue();
+					final TripControlBar.Value heartbeats = c.Heartbeats.getValue();
 					values.put("start_heartbeat_id",	heartbeats.StartId);
 					values.put("stop_heartbeat_id",		heartbeats.StopId);
 					

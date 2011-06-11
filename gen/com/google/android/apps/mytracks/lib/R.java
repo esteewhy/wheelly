@@ -355,7 +355,7 @@ containing a value of this type.
         public static final int fuelAmt=0x7f0a008a;
         public static final int fuelGauge=0x7f0a008c;
         public static final int fuelUOM=0x7f0a008b;
-        public static final int fuel_uom=0x7f0a00a7;
+        public static final int fuel_uom=0x7f0a00a5;
         public static final int heartbeat=0x7f0a0081;
         public static final int heartbeats=0x7f0a009c;
         public static final int icon=0x7f0a007b;
@@ -448,11 +448,11 @@ containing a value of this type.
         public static final int spinnerFieldSeparator=0x7f0a006e;
         public static final int spinnerGroupSeparators=0x7f0a006d;
         public static final int start_date=0x7f0a002c;
-        public static final int start_place=0x7f0a00a5;
+        public static final int start_place=0x7f0a00a6;
         public static final int start_time=0x7f0a002d;
         public static final int status=0x7f0a0076;
         public static final int status_clear=0x7f0a0033;
-        public static final int stop_place=0x7f0a00a6;
+        public static final int stop_place=0x7f0a00a7;
         public static final int switcher=0x7f0a0096;
         public static final int symbol=0x7f0a0072;
         public static final int tag_id=0x7f0a0039;

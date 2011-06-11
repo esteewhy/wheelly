@@ -1,18 +1,24 @@
-package com.wheelly.provider;
+package com.wheelly.content;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.HeartbeatRepository;
-import com.wheelly.db.MileageRepository;
-import com.wheelly.db.RefuelRepository;
+import com.wheelly.db.DatabaseSchema;
+import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Refuels;
+import com.wheelly.db.DatabaseSchema.Mileages;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
+/**
+ * Meant to be a single entry point to Wheelly Data API.
+ */
 public class ChronologyProvider extends ContentProvider {
 	
 	private static final int MILEAGES = 100;
@@ -20,15 +26,20 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int HEARTBEATS = 300;
 	private static final int LOCATIONS = 400;
 	
+	private static final Map<Integer, String> SqlTableMap = new HashMap<Integer, String>();
 	private static final UriMatcher uriMatcher;
 	
 	static {
-		final String a = ChronologyContract.CONTENT_AUTORITY;
+		final String a = DatabaseSchema.CONTENT_AUTHORITY;
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(a, "mileages", MILEAGES);
 		uriMatcher.addURI(a, "refuels", REFUELS);
 		uriMatcher.addURI(a, "heartbeats", HEARTBEATS);
 		uriMatcher.addURI(a, "locations", LOCATIONS);
+		
+		SqlTableMap.put(MILEAGES, Mileages.Tables);
+		SqlTableMap.put(REFUELS, Refuels.Tables);
+		SqlTableMap.put(HEARTBEATS, Heartbeats.Tables);
 	}
 	
 	private SQLiteOpenHelper dbHelper;
@@ -44,11 +55,11 @@ public class ChronologyProvider extends ContentProvider {
 		final int match = uriMatcher.match(uri);
 		switch (match) {
 		case MILEAGES:
-			return "vnd.android.cursor.dir/vnd.wheelly.mileage";
+			return Mileages.CONTENT_TYPE;
 		case REFUELS:
-			return "vnd.android.cursor.dir/vnd.wheelly.refuel";
+			return Refuels.CONTENT_TYPE;
 		case HEARTBEATS:
-			return "vnd.android.cursor.dir/vnd.wheelly.heartbeat";
+			return Heartbeats.CONTENT_TYPE;
 		case LOCATIONS:
 			return "vnd.android.cursor.dir/vnd.financisto.location";
 		}
@@ -70,16 +81,16 @@ public class ChronologyProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		final SQLiteDatabase db = dbHelper.getReadableDatabase();
+		int uriCode = uriMatcher.match(uri);
 		
-		switch(uriMatcher.match(uri)) {
-		case MILEAGES:
-			return new MileageRepository(db).list();
-		case REFUELS:
-			return new RefuelRepository(db, getContext()).list();
-		case HEARTBEATS:
-			return new HeartbeatRepository(db).list();
+		if(SqlTableMap.containsKey(uriCode)) {
+			return dbHelper.getReadableDatabase().query(
+				SqlTableMap.get(uriCode),
+				projection, selection, selectionArgs,
+				null, null,
+				sortOrder);
 		}
+		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
 	}
 

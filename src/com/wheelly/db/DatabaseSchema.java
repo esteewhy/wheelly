@@ -1,8 +1,23 @@
 package com.wheelly.db;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.wheelly.activity.Filter.F;
+
+import android.content.ContentResolver;
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public final class DatabaseSchema {
+	public static final String CONTENT_AUTHORITY = "com.wheelly";
+	private static final Uri BASE_CONTENT_URI =
+		Uri.parse("content://" + CONTENT_AUTHORITY);
+
+	private static final String PATH_MILEAGES = "mileages";
+	private static final String PATH_REFUELS = "refuels";
+	private static final String PATH_HEARTBEATS = "refuels";
+	
 	public static final String DateFormat = "yyyy-MM-dd";
 	public static final String TimeFormat = "HH:mm:ss";
 	public static final String DateTimeFormat = DateFormat + " " + TimeFormat;
@@ -39,18 +54,19 @@ public final class DatabaseSchema {
 			+ "  ON r.heartbeat_id = rh." + BaseColumns._ID
 			+ " WHERE rh._created BETWEEN start._created AND stop._created";
 		
-		//TODO Convert to VIEW.
-		public static final String Select =
-			"SELECT m." + BaseColumns._ID
-			+ ", COALESCE(stop._created, start._created, m._created) stop_time"
-			+ ", mileage"
-			+ ", calc_cost		cost"
+		public static final String[] Columns = {
+			"m." + BaseColumns._ID,
+			"COALESCE(stop._created, start._created, m._created) stop_time",
+			"mileage",
+			"calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			+ ", COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel"
-			+ ", start_place.name start_place"
-			+ ", stop_place.name stop_place"
-			+ ", dest.name destination"
-			+ " FROM mileages m"
+			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
+			"start_place.name start_place",
+			"stop_place.name stop_place",
+			"dest.name destination"
+		};
+		
+		public static final String Tables = "mileages m"
 			+ " LEFT OUTER JOIN heartbeats start"
 			+ " 	ON m.start_heartbeat_id = start." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations start_place"
@@ -91,6 +107,20 @@ public final class DatabaseSchema {
 			+ ", 0					calc_amount"
 			+ ", CURRENT_TIMESTAMP	name"
 			+ " FROM mileages m;";
+		
+		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
+		static {
+			FilterExpr.put(F.LOCATION, "stop.place_id = ?1 OR start.place_id = @location_id OR m.location_id = @location_id");
+			FilterExpr.put(F.PERIOD, "stop._created BETWEEN @from AND @to AND start._created BETWEEN @from AND @to");
+			FilterExpr.put(F.SORT_ORDER, "COALESCE(stop._created, start._created, m._created)");
+		}
+		
+		public static final Uri CONTENT_URI =
+			BASE_CONTENT_URI.buildUpon().appendPath(PATH_MILEAGES).build();
+		public static final String CONTENT_ITEM_TYPE =
+			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.mileage";
+		public static final String CONTENT_TYPE =
+			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.mileages";
 	}
 	
 	public static final class Refuels {
@@ -121,24 +151,22 @@ public final class DatabaseSchema {
 			+ " ORDER BY hh._created DESC"
 			+ " LIMIT 1";
 		
-		public static final String Select =
-			"SELECT f." + BaseColumns._ID
-			+ ", f.name"
-			//+ ", f.calc_mileage mileage"
-			+ ", (" + SelectPreviousHeartbeat + ") mileage"
-			+ ", f.cost"
-			+ ", f.amount"
-			+ ", IFNULL(h._created, f._created) _created"
-			+ ", l.name place"
-			+ " FROM refuels f"
+		public static final String[] Columns = {
+			"f." + BaseColumns._ID,
+			"f.name",
+			//"f.calc_mileage mileage",
+			"(" + SelectPreviousHeartbeat + ") mileage",
+			"f.cost",
+			"f.amount",
+			"IFNULL(h._created, f._created) _created",
+			"l.name place",
+		};
+		
+		public static final String Tables = "refuels f"
 			+ " LEFT OUTER JOIN heartbeats h"
 			+ "		ON f.heartbeat_id = h." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations l"
 			+ "		ON h.place_id = l." + BaseColumns._ID;
-		
-		public static final String SelectOrderAsc = " ORDER BY h._created ASC";
-		
-		public static final String SelectOrderDesc = " ORDER BY h._created DESC";
 		
 		public static final String Single =
 			"SELECT " + BaseColumns._ID + ", name, calc_mileage, cost, amount"
@@ -167,6 +195,20 @@ public final class DatabaseSchema {
 			+") cost"
 			+" FROM heartbeats h"
 			+" ORDER BY h._created DESC LIMIT 1";
+		
+		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
+		static {
+			FilterExpr.put(F.LOCATION, "h.place_id = @location_id");
+			FilterExpr.put(F.PERIOD, "h._created BETWEEN @from AND @to");
+			FilterExpr.put(F.SORT_ORDER, "h._created");
+		}
+		
+		public static final Uri CONTENT_URI =
+			BASE_CONTENT_URI.buildUpon().appendPath(PATH_REFUELS).build();
+		public static final String CONTENT_ITEM_TYPE =
+			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.refuel";
+		public static final String CONTENT_TYPE =
+			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.refuels";
 	}
 	
 	public static final class Heartbeats {
@@ -178,22 +220,23 @@ public final class DatabaseSchema {
 			+ "fuel			NUMERIC NOT NULL,"
 			+ "place_id		LONG);";
 		
-		public static final String Select =
-			"SELECT h." + BaseColumns._ID
-			+ ", h._created"
-			+ ", h.odometer"
-			+ ", h.fuel"
-			+ ", l.name place"
-			
-			// reverse links detection
-			+ ", EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
-			+ "		| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
-			+ "		| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id) icons"
-			
-			+ " FROM heartbeats h"
-			+ " LEFT JOIN locations l"
-			+ "		ON l." + BaseColumns._ID + " = h.place_id"
-			+ " ORDER BY h._created DESC";
+		// reverse links detection
+		private static final String IconColumn =
+			"EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
+			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
+			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id) icons";
+		
+		public static final String[] Columns = {
+			"h." + BaseColumns._ID,
+			"h._created",
+			"h.odometer",
+			"h.fuel",
+			"l.name place",
+			IconColumn
+		};
+		
+		public static final String Tables = "heartbeats h"
+			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID;
 		
 		public static final String Defaults =
 			"SELECT * FROM heartbeats ORDER BY _created DESC LIMIT 1";
@@ -217,6 +260,20 @@ public final class DatabaseSchema {
 			+ " UNION "
 			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?1"
 			+ ");";
+		
+		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
+		static {
+			FilterExpr.put(F.LOCATION, "h.place_id = @location_id");
+			FilterExpr.put(F.PERIOD, "h._created BETWEEN @from AND @to");
+			FilterExpr.put(F.SORT_ORDER, "h._created");
+		}
+		
+		public static final Uri CONTENT_URI =
+			BASE_CONTENT_URI.buildUpon().appendPath(PATH_HEARTBEATS).build();
+		public static final String CONTENT_ITEM_TYPE =
+			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.heartbeat";
+		public static final String CONTENT_TYPE =
+			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.heartbeats";
 	}
 
 	public static final class Locations {
