@@ -30,11 +30,11 @@
 		android:layout_height	="wrap_content"
 		android:id				="@+id/bTemplate"
 		android:src				="@drawable/ic_input_templates"/>
-	<ImageButton
+	<fragment
+		class					="com.wheelly.app.FilterButton"
 		android:layout_width	="wrap_content"
 		android:layout_height	="wrap_content"
-		android:id				="@+id/bFilter"
-		android:src				="@drawable/ic_menu_filter_off" />
+		android:id				="@+id/bFilter" />
 	<LinearLayout	android:id	="@+id/totalLayout"
 		android:layout_width	="wrap_content"
 		android:layout_weight	="1"

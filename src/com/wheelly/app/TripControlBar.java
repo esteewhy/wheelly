@@ -22,8 +22,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 /**
- * A user control consisting of 2 buttons each of which spawn start or stop
- * heartbeat editing or creation.
+ * Widget with 2 buttons to launch editing/creating of start or stop heartbeats.
  */
 public class TripControlBar extends Fragment {
 	
@@ -92,7 +91,7 @@ public class TripControlBar extends Fragment {
 									public void onTrackStopped() {
 										float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
 										
-Toast.makeText(getActivity(), Float.toString(distance), 9000);
+Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 										
 										if(val.StartHeartbeat != null && val.StopHeartbeat != null) {
 											val.StopHeartbeat.put("odometer",

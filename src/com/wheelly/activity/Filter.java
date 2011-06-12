@@ -52,6 +52,7 @@ public class Filter extends FragmentActivity {
 	private final ContentValues filter = new ContentValues();
 	
 	private DateFormat df;
+	private static final int PERIOD_REQUEST = 1;
 	
 	private String filterValueNotFound;
 	private ActivityLayout x;
@@ -100,7 +101,7 @@ public class Filter extends FragmentActivity {
 					case R.id.period:
 						Intent intent = new Intent(Filter.this, DateFilterActivity.class);
 						filterToIntent(filter, intent);
-						startActivityForResult(intent, 1);
+						startActivityForResult(intent, PERIOD_REQUEST);
 						break;
 					case R.id.period_clear:
 						filter.remove(F.PERIOD);
@@ -119,7 +120,8 @@ public class Filter extends FragmentActivity {
 							selectedId);
 					} break;
 					case R.id.location_clear:
-						clear(F.LOCATION, c.location);
+						filter.remove(F.LOCATION);
+						c.location.setText(R.string.no_filter);
 						break;
 					case R.id.sort_order: {
 						
@@ -306,20 +308,15 @@ public class Filter extends FragmentActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
+		if (requestCode == PERIOD_REQUEST) {
 			if (resultCode == RESULT_FIRST_USER) {
 				filter.remove(F.PERIOD);
 				c.period.setText(R.string.no_filter);
 			} else if (resultCode == RESULT_OK) {
-				intentToFilter(data, filter);
+				filter.put(F.PERIOD, data.getStringExtra(F.PERIOD));
 				updatePeriodFromFilter(filter);
 			}
 		}
-	}
-	
-	private void clear(String criteria, TextView textView) {
-		filter.remove(criteria);
-		textView.setText(R.string.no_filter);
 	}
 	
 	private static class Controls {

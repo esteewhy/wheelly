@@ -22,7 +22,9 @@ public final class LocationRepository implements IRepository {
 		String sql =
 			"mileages".equalsIgnoreCase(filter)
 				? Locations.SelectByMileages
-				: Locations.Select;
+				: "refuels".equalsIgnoreCase(filter)
+					? Locations.SelectByRefuels
+					: Locations.Select;
 		
 		return this.database.rawQuery(sql, null);
 	}

@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.wheelly.R;
 import com.wheelly.activity.Filter.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
-import com.wheelly.app.StatusBarControlsv4;
+import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.service.Tracker;
@@ -52,7 +52,7 @@ public class MileageList extends FragmentActivity {
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
 		
-		private StatusBarControlsv4 c;
+		private StatusBarControls c;
 		private boolean suggestInstall = false;
 		
 		@Override
@@ -100,7 +100,7 @@ public class MileageList extends FragmentActivity {
 			setHasOptionsMenu(true);
 			
 			// Set up status bar (if present).
-			c = new StatusBarControlsv4(ctx);
+			c = new StatusBarControls(ctx);
 			c.AddButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {

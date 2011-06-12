@@ -16,7 +16,7 @@ public final class DatabaseSchema {
 
 	private static final String PATH_MILEAGES = "mileages";
 	private static final String PATH_REFUELS = "refuels";
-	private static final String PATH_HEARTBEATS = "refuels";
+	private static final String PATH_HEARTBEATS = "heartbeats";
 	
 	public static final String DateFormat = "yyyy-MM-dd";
 	public static final String TimeFormat = "HH:mm:ss";
@@ -290,13 +290,13 @@ public final class DatabaseSchema {
 			+"		resolved_address text"
 			+"	);";
 		
-		public static String Select =
+		public static final String Select =
 			"SELECT * FROM locations;";
 		
-		public static String Single =
+		public static final String Single =
 			"SELECT * FROM locations WHERE _id = ? LIMIT 1;";
 		
-		public static String SelectByMileages =
+		public static final String SelectByMileages =
 			"SELECT l.* FROM locations l"
 			+ " INNER JOIN ("
 			+ "  SELECT location_id, COUNT(" + BaseColumns._ID + ") cnt FROM ("
@@ -308,5 +308,15 @@ public final class DatabaseSchema {
 			+ "  ) GROUP BY location_id"
 			+ " ) ml ON ml.location_id = l." + BaseColumns._ID
 			+ " ORDER BY ml.cnt DESC";
+		
+		public static final String SelectByRefuels =
+			"SELECT l.* FROM locations l"
+			+ " INNER JOIN ("
+			+ "  SELECT COUNT(1) cnt, h.place_id place_id"
+			+ "  FROM refuels r"
+			+ "  INNER JOIN heartbeats h ON r.heartbeat_id = h." + BaseColumns._ID
+			+ "  GROUP BY h.place_id"
+			+ " ) rl ON rl.place_id = l." + BaseColumns._ID
+			+ " ORDER BY rl.cnt DESC";
 	}
 }

@@ -24,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -55,7 +56,7 @@ public class LocationActivity extends MapActivity {
 	private TextView location;
 	private Vibrator vibrator;
 	
-	ContentValues myLocation = new ContentValues();
+	private ContentValues myLocation = new ContentValues();
 	
     @SuppressWarnings("unused")
 	@Override 
@@ -83,7 +84,7 @@ public class LocationActivity extends MapActivity {
 		
 		mapView.setBuiltInZoomControls(true);
 		mapView.setReticleDrawMode(ReticleDrawMode.DRAW_RETICLE_OVER);
-		if (!myLocation.containsKey("_id") || myLocation.getAsLong("_id") == -1) {
+		if (!myLocation.containsKey(BaseColumns._ID) || myLocation.getAsLong(BaseColumns._ID) == -1) {
 			if (true) {
 				new Handler().postDelayed(new Runnable(){
 					@Override
