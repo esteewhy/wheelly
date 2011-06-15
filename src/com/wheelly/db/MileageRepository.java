@@ -35,10 +35,9 @@ public final class MileageRepository implements IRepository {
 			cursor.close();
 		}
 	}
-
+	
+	@Deprecated
 	public void delete(long id) {
-		this.database.delete("mileages", BaseColumns._ID + " = ?",
-				new String[] { Long.toString(id) });
 	}
 
 	public ContentValues getDefaults() {

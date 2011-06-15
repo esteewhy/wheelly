@@ -33,7 +33,6 @@ import com.wheelly.app.StatusBarControls;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.content.TransactionRepository;
 import com.wheelly.db.DatabaseSchema.Refuels;
-import com.wheelly.db.RefuelBroker;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.FilterResult;
 
@@ -186,7 +185,10 @@ public class RefuelList extends FragmentActivity {
 						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 							@Override
 							public void onClick(DialogInterface arg0, int arg1) {
-								new RefuelBroker(getActivity()).delete(mi.id);
+								getActivity().getContentResolver().delete(
+									Refuels.CONTENT_URI,
+									BaseColumns._ID + " = ?",
+									new String[] { Long.toString(mi.id) });
 								onActivityResult(0, RESULT_OK, null);
 							}
 						})

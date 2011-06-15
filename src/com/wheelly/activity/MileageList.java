@@ -32,7 +32,6 @@ import com.wheelly.activity.Filter.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseSchema.Mileages;
-import com.wheelly.db.MileageBroker;
 import com.wheelly.service.Tracker;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.FilterResult;
@@ -51,6 +50,7 @@ public class MileageList extends FragmentActivity {
 		private static final int MILEAGE_LIST_LOADER = 0x01;
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
+		private static final int DELETE_REQUEST = 3;
 		
 		private StatusBarControls c;
 		private boolean suggestInstall = false;
@@ -137,9 +137,12 @@ public class MileageList extends FragmentActivity {
 			switch(requestCode) {
 			case NEW_REQUEST:
 				c.AddButton.setEnabled(true);
+			//case DELETE_REQUEST:
+			case EDIT_REQUEST:
+				((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
 				break;
 			}
-			((SimpleCursorAdapter)this.getListAdapter()).getCursor().requery();
+			//((SimpleCursorAdapter)this.getListAdapter()).getCursor().requery();
 		}
 		
 		@Override
@@ -193,8 +196,11 @@ public class MileageList extends FragmentActivity {
 						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 							@Override
 							public void onClick(DialogInterface arg0, int arg1) {
-								new MileageBroker(getActivity()).delete(mi.id);
-								onActivityResult(0, RESULT_OK, null);
+								getActivity().getContentResolver().delete(
+									Mileages.CONTENT_URI,
+									BaseColumns._ID + " = ?",
+									new String[] { Long.toString(mi.id) });
+								onActivityResult(DELETE_REQUEST, RESULT_OK, null);
 							}
 						})
 						.setNegativeButton(R.string.no, null)

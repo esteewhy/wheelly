@@ -38,11 +38,8 @@ public final class RefuelRepository implements IRepository {
 		}
 	}
 	
+	@Deprecated
 	public void delete(long id) {
-		this.database.delete("refuels",
-			BaseColumns._ID + " = ?",
-			new String[] { Long.toString(id) }
-		);
 	}
 	
 	public ContentValues getDefaults() {

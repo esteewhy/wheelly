@@ -53,18 +53,4 @@ public class MileageBroker {
 			}
 		}
 	}
-
-	public void delete(long id) {
-		SQLiteDatabase db = null;
-		
-		try {
-			new MileageRepository(
-				db = new DatabaseHelper(context).getWritableDatabase()
-			).delete(id);
-		} finally {
-			if(null != db) {
-				db.close();
-			}
-		}
-	}
 }

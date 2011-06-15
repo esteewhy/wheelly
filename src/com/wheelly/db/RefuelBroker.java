@@ -61,21 +61,6 @@ public class RefuelBroker {
 		}
 	}
 	
-	public void delete(long id) {
-		SQLiteDatabase db = null;
-		
-		try {
-			new RefuelRepository(
-				db = new DatabaseHelper(this.context).getWritableDatabase(),
-				context
-			).delete(id);
-		} finally {
-			if(null != db) {
-				db.close();
-			}
-		}
-	}
-	
 	/**
 	 * Save heartbeat first to obtain ID.
 	 * 

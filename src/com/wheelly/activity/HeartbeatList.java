@@ -191,8 +191,11 @@ public class HeartbeatList extends FragmentActivity {
 						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 							@Override
 							public void onClick(DialogInterface arg0, int arg1) {
-								new HeartbeatRepository(new DatabaseHelper(getActivity()).getWritableDatabase())
-									.delete(mi.id);
+								getActivity().getContentResolver().delete(
+									Heartbeats.CONTENT_URI,
+									BaseColumns._ID + " = ?",
+									new String[] { Long.toString(mi.id) });
+								
 								onActivityResult(0, RESULT_OK, null);
 							}
 						})

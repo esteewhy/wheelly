@@ -3,9 +3,6 @@ package com.wheelly.db;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.wheelly.activity.Filter.F;
-import com.wheelly.db.DatabaseSchema.Heartbeats;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,11 +15,9 @@ public final class HeartbeatRepository implements IRepository {
 		this.database = database;
 	}
 	
+	@Deprecated
 	public Cursor list() {
-		return this.database.query(
-			Heartbeats.Tables, Heartbeats.Columns,
-			null, null, null, null,
-			Heartbeats.FilterExpr.get(F.SORT_ORDER) + " DESC");
+		return null;
 	}
 	
 	public long insert(ContentValues values) {
@@ -52,11 +47,8 @@ public final class HeartbeatRepository implements IRepository {
 		}
 	}
 	
+	@Deprecated
 	public void delete(long id) {
-		this.database.delete("heartbeats",
-			BaseColumns._ID + " = ?",
-			new String[] { Long.toString(id) }
-		);
 	}
 	
 	public ContentValues getDefaults() {
