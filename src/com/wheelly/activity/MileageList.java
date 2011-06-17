@@ -1,6 +1,7 @@
 package com.wheelly.activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,6 +53,7 @@ public class MileageList extends FragmentActivity {
 		private static final int EDIT_REQUEST = 2;
 		private static final int DELETE_REQUEST = 3;
 		
+		private ProgressDialog progressDialog;
 		private StatusBarControls c;
 		private boolean suggestInstall = false;
 		
@@ -59,6 +61,11 @@ public class MileageList extends FragmentActivity {
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
 			final FragmentActivity ctx = getActivity();
+			
+			progressDialog = new ProgressDialog(getActivity());
+			progressDialog.setTitle(R.string.loading);
+			progressDialog.setMessage(getString(R.string.loading_message));
+			progressDialog.setCancelable(false);
 			
 			setEmptyText(getString(R.string.no_mileages));
 			
@@ -137,12 +144,10 @@ public class MileageList extends FragmentActivity {
 			switch(requestCode) {
 			case NEW_REQUEST:
 				c.AddButton.setEnabled(true);
-			//case DELETE_REQUEST:
 			case EDIT_REQUEST:
 				((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
 				break;
 			}
-			//((SimpleCursorAdapter)this.getListAdapter()).getCursor().requery();
 		}
 		
 		@Override
@@ -172,7 +177,7 @@ public class MileageList extends FragmentActivity {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
-			menu.setHeaderTitle("Mileages");
+			menu.setHeaderTitle(R.string.mileages);
 			super.onCreateContextMenu(menu, v, menuInfo);
 		}
 		
@@ -220,6 +225,8 @@ public class MileageList extends FragmentActivity {
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			final ContentValues filter;
 			
+			progressDialog.show();
+			
 			if(args != null && args.containsKey("filter")
 					&& (filter = args.getParcelable("filter")).size() > 0) {
 				final FilterResult sql = FilterUtils.updateSqlFromFilter(
@@ -239,6 +246,7 @@ public class MileageList extends FragmentActivity {
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 			((CursorAdapter) getListAdapter()).swapCursor(data);
+			progressDialog.dismiss();
 		}
 
 		@Override

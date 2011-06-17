@@ -670,6 +670,8 @@ containing a value of this type.
         public static final int item_install_financisto=0x7f060108;
         public static final int item_install_mytracks=0x7f060106;
         public static final int lib_name=0x7f060000;
+        public static final int loading=0x7f06011d;
+        public static final int loading_message=0x7f06011e;
         public static final int location=0x7f060046;
         public static final int location_input_label=0x7f06010c;
         public static final int location_name=0x7f060057;

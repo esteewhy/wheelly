@@ -38,7 +38,7 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
 	
-	private static final Map<Integer, String[]> SqlTableMap = new HashMap<Integer, String[]>();
+	private static final Map<Integer, String[]> DataSchemaLookup = new HashMap<Integer, String[]>();
 	private static final Map<Integer, Uri> UriMap = new HashMap<Integer, Uri>();
 	private static final UriMatcher uriMatcher;
 	
@@ -48,31 +48,32 @@ public class ChronologyProvider extends ContentProvider {
 	
 	static {
 		final String a = DatabaseSchema.CONTENT_AUTHORITY;
-		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-		uriMatcher.addURI(a, "mileages", MILEAGES);
-		uriMatcher.addURI(a, "refuels", REFUELS);
-		uriMatcher.addURI(a, "heartbeats", HEARTBEATS);
-		uriMatcher.addURI(a, "locations", LOCATIONS);
+		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH) {{
+			addURI(a, "mileages", MILEAGES);
+			addURI(a, "refuels", REFUELS);
+			addURI(a, "heartbeats", HEARTBEATS);
+			addURI(a, "locations", LOCATIONS);
+			
+			addURI(a, "mileages/#", MILEAGES_ID);
+			addURI(a, "refuels/#", REFUELS_ID);
+			addURI(a, "heartbeats/#", HEARTBEATS_ID);
+			addURI(a, "locations/#", LOCATIONS_ID);
+			
+			addURI(a, "mileages/defaults", MILEAGES_DEFAULTS);
+			addURI(a, "refuels/defaults", REFUELS_DEFAULTS);
+			addURI(a, "heartbeats/defaults", HEARTBEATS_DEFAULTS);
+		}};
 		
-		uriMatcher.addURI(a, "mileages/#", MILEAGES_ID);
-		uriMatcher.addURI(a, "refuels/#", REFUELS_ID);
-		uriMatcher.addURI(a, "heartbeats/#", HEARTBEATS_ID);
-		uriMatcher.addURI(a, "locations/#", LOCATIONS_ID);
+		DataSchemaLookup.put(MILEAGES, new String[] { Mileages.CONTENT_TYPE, Mileages.Tables, "mileages" });
+		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, "mileages", "mileages" });
+		DataSchemaLookup.put(REFUELS, new String[] { Refuels.CONTENT_TYPE, Refuels.Tables, "refuels" });
+		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels", "refuels" });
+		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
+		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		
-		uriMatcher.addURI(a, "mileages/defaults", MILEAGES_DEFAULTS);
-		uriMatcher.addURI(a, "refuels/defaults", REFUELS_DEFAULTS);
-		uriMatcher.addURI(a, "heartbeats/defaults", HEARTBEATS_DEFAULTS);
-		
-		SqlTableMap.put(MILEAGES, new String[] { Mileages.CONTENT_TYPE, Mileages.Tables, "mileages" });
-		SqlTableMap.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, "mileages" });
-		SqlTableMap.put(REFUELS, new String[] { Refuels.CONTENT_TYPE, Refuels.Tables, "refuels" });
-		SqlTableMap.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels" });
-		SqlTableMap.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
-		SqlTableMap.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats" });
-		
-		UriMap.put(MILEAGES_ID, Mileages.CONTENT_URI);
-		UriMap.put(REFUELS_ID, Refuels.CONTENT_URI);
-		UriMap.put(HEARTBEATS_ID, Heartbeats.CONTENT_URI);
+		UriMap.put(MILEAGES, Mileages.CONTENT_URI);
+		UriMap.put(REFUELS, Refuels.CONTENT_URI);
+		UriMap.put(HEARTBEATS, Heartbeats.CONTENT_URI);
 	}
 	
 	private SQLiteOpenHelper dbHelper;
@@ -82,9 +83,9 @@ public class ChronologyProvider extends ContentProvider {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(SqlTableMap.containsKey(uriCode)) {
+		if(DataSchemaLookup.containsKey(uriCode)) {
 			
-			final int count = db.delete(SqlTableMap.get(uriCode)[LOOKUP_TABLE],
+			final int count = db.delete(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 				selection,
 				selectionArgs);
 			
@@ -110,8 +111,8 @@ public class ChronologyProvider extends ContentProvider {
 	public String getType(Uri uri) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(SqlTableMap.containsKey(uriCode)) {
-			return SqlTableMap.get(uriCode)[LOOKUP_CONTENT_TYPE];
+		if(DataSchemaLookup.containsKey(uriCode)) {
+			return DataSchemaLookup.get(uriCode)[LOOKUP_CONTENT_TYPE];
 		}
 		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -121,10 +122,10 @@ public class ChronologyProvider extends ContentProvider {
 	public Uri insert(Uri uri, ContentValues values) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(SqlTableMap.containsKey(uriCode) && UriMap.containsKey(uriCode)) {
+		if(DataSchemaLookup.containsKey(uriCode) && UriMap.containsKey(uriCode)) {
 			final SQLiteDatabase db = dbHelper.getWritableDatabase();
 			
-			final long id = db.insert(SqlTableMap.get(uriCode)[LOOKUP_TABLE],
+			final long id = db.insert(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 				BaseColumns._ID, values);
 			
 			Uri result = ContentUris.appendId(
@@ -157,9 +158,9 @@ public class ChronologyProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 		int uriCode = uriMatcher.match(uri);
 		
-		if(SqlTableMap.containsKey(uriCode)) {
+		if(DataSchemaLookup.containsKey(uriCode)) {
 			final Cursor cursor = dbHelper.getReadableDatabase().query(
-				SqlTableMap.get(uriCode)[LOOKUP_TABLE_LIST],
+				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE_LIST],
 				projection, selection, selectionArgs,
 				null, null,
 				sortOrder);
@@ -196,10 +197,10 @@ public class ChronologyProvider extends ContentProvider {
 			String[] selectionArgs) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(SqlTableMap.containsKey(uriCode)) {
+		if(DataSchemaLookup.containsKey(uriCode)) {
 			
 			final int count = dbHelper.getWritableDatabase()
-				.update(SqlTableMap.get(uriCode)[LOOKUP_TABLE],
+				.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 					values,
 					BaseColumns._ID + " = ?",
 					new String[] { Long.toString(getIdFromUriOrValues(uri, values)) });

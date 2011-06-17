@@ -105,7 +105,7 @@ public class Mileage extends FragmentActivity {
 					final long trackId = c.Track.getValue();
 					values.put("track_id", trackId > 0 ? trackId : heartbeats.TrackId);
 					
-					intent.putExtra(BaseColumns._ID, new MileageBroker(Mileage.this).update(values));
+					intent.putExtra(BaseColumns._ID, new MileageBroker(Mileage.this).updateOrInsert(values));
 					
 					setResult(RESULT_OK, intent);
 					finish();

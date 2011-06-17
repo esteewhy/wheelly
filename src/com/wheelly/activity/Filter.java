@@ -17,6 +17,7 @@ import java.util.Date;
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
+import com.wheelly.util.FilterUtils;
 
 import ru.orangesoftware.financisto.activity.ActivityLayout;
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
@@ -100,7 +101,7 @@ public class Filter extends FragmentActivity {
 					switch (v.getId()) {
 					case R.id.period:
 						Intent intent = new Intent(Filter.this, DateFilterActivity.class);
-						filterToIntent(filter, intent);
+						FilterUtils.filterToIntent(filter, intent);
 						startActivityForResult(intent, PERIOD_REQUEST);
 						break;
 					case R.id.period_clear:
@@ -128,7 +129,7 @@ public class Filter extends FragmentActivity {
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 							Filter.this,
 							android.R.layout.simple_spinner_dropdown_item,
-							c.sortBlotterEntries);
+							c.sortOrders);
 						
 						int selectedId = Math.min(1, filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0);
 						x.selectPosition(
@@ -184,7 +185,7 @@ public class Filter extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				Intent data = new Intent();
-				filterToIntent(filter, data);
+				FilterUtils.filterToIntent(filter, data);
 				setResult(RESULT_OK, data);
 				finish();
 			}
@@ -207,7 +208,7 @@ public class Filter extends FragmentActivity {
 		});		
 		
 		if (intent != null) {
-			intentToFilter(intent, filter);
+			FilterUtils.intentToFilter(intent, filter);
 			updatePeriodFromFilter(filter);
 			updateLocationFromFilter(filter);
 			updateSortOrderFromFilter(filter);
@@ -220,61 +221,9 @@ public class Filter extends FragmentActivity {
 		super.onDestroy();
 	}
 	
-	public static void intentToFilter(Intent intent, ContentValues filter) {
-		if(intent.hasExtra(F.PERIOD)) {
-			filter.put(F.PERIOD, intent.getStringExtra(F.PERIOD));
-		} else {
-			filter.remove(F.PERIOD);
-		}
-		
-		if(intent.hasExtra(F.LOCATION)) {
-			filter.put(F.LOCATION, intent.getLongExtra(F.LOCATION, -1));
-		} else {
-			filter.remove(F.LOCATION);
-		}
-		
-		if(intent.hasExtra(F.SORT_ORDER)) {
-			filter.put(F.SORT_ORDER, intent.getIntExtra(F.SORT_ORDER, 0));
-		} else {
-			filter.remove(F.SORT_ORDER);
-		}
-		
-		if(intent.hasExtra(F.LOCATION_CONSTRAINT)) {
-			filter.put(F.LOCATION_CONSTRAINT, intent.getStringExtra(F.LOCATION_CONSTRAINT));
-		} else {
-			filter.remove(F.LOCATION_CONSTRAINT);
-		}
-	}
-	
-	public static void filterToIntent(ContentValues filter, Intent intent) {
-		if(filter.containsKey(F.PERIOD)) {
-			intent.putExtra(F.PERIOD, filter.getAsString(F.PERIOD));
-		} else {
-			intent.removeExtra(F.PERIOD);
-		}
-		
-		if(filter.containsKey(F.LOCATION)) {
-			intent.putExtra(F.LOCATION, filter.getAsLong(F.LOCATION));
-		} else {
-			intent.removeExtra(F.LOCATION);
-		}
-		
-		if(filter.containsKey(F.SORT_ORDER) && filter.getAsInteger(F.SORT_ORDER) > 0) {
-			intent.putExtra(F.SORT_ORDER, 1);
-		} else {
-			intent.removeExtra(F.SORT_ORDER);
-		}
-		
-		if(filter.containsKey(F.LOCATION_CONSTRAINT)) {
-			intent.putExtra(F.LOCATION_CONSTRAINT, filter.getAsString(F.LOCATION_CONSTRAINT));
-		} else {
-			intent.removeExtra(F.LOCATION_CONSTRAINT);
-		}
-	}
-	
 	private void updateSortOrderFromFilter(ContentValues filter) {
 		int sortOrder = filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0;
-		c.sortOrder.setText(c.sortBlotterEntries[sortOrder == 1 ? 1 : 0]);
+		c.sortOrder.setText(c.sortOrders[sortOrder == 1 ? 1 : 0]);
 	}
 
 	private void updateLocationFromFilter(ContentValues filter) {
@@ -320,7 +269,7 @@ public class Filter extends FragmentActivity {
 	}
 	
 	private static class Controls {
-		final String[] sortBlotterEntries;
+		final String[] sortOrders;
 		
 		final TextView period;
 		final TextView location;
@@ -331,12 +280,12 @@ public class Filter extends FragmentActivity {
 		final ImageButton bNoFilter;
 		
 		public Controls(ActivityLayout x, Activity v) {
-			sortBlotterEntries = v.getResources().getStringArray(R.array.sort_blotter_entries);
+			sortOrders = v.getResources().getStringArray(R.array.sort_blotter_entries);
 			
 			LinearLayout layout = (LinearLayout)v.findViewById(R.id.layout);
 			period = x.addListNodeMinus(layout, R.id.period, R.id.period_clear, R.string.period, R.string.no_filter);
 			location = x.addListNodeMinus(layout, R.id.location, R.id.location_clear, R.string.location, R.string.no_filter);
-			sortOrder = x.addListNodeMinus(layout, R.id.sort_order, R.id.sort_order_clear, R.string.sort_order, sortBlotterEntries[0]);
+			sortOrder = x.addListNodeMinus(layout, R.id.sort_order, R.id.sort_order_clear, R.string.sort_order, sortOrders[0]);
 			
 			bOk = (Button)v.findViewById(R.id.bOK);
 			bCancel = (Button)v.findViewById(R.id.bCancel);

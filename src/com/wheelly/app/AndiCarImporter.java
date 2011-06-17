@@ -7,10 +7,12 @@ import java.util.List;
 
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.HeartbeatRepository;
-import com.wheelly.db.RefuelRepository;
+import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -98,7 +100,7 @@ public final class AndiCarImporter {
 		while(true) {
 			if(commit) {
 				commit = false;
-				importRefuel(cursor[Theirs], db[Mine]);
+				importRefuel(cursor[Theirs]);
 			}
 			
 			if((move & THEY_GO) != 0) {
@@ -140,7 +142,7 @@ public final class AndiCarImporter {
 		return values;
 	}
 	
-	private void importRefuel(Cursor cursor, SQLiteDatabase db) {
+	private void importRefuel(Cursor cursor) {
 		final long full_tank = PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60);
 		
 		final ContentValues values = deserializeTheirRefuel(cursor);
@@ -150,13 +152,15 @@ public final class AndiCarImporter {
 		heartbeat.put("odometer",	values.getAsLong("CarIndex"));
 		heartbeat.put("fuel",		full_tank);
 		
+		final ContentResolver cr = context.getContentResolver();
+		
 		final ContentValues refuel = new ContentValues();
-		refuel.put("heartbeat_id",	new HeartbeatRepository(db).insert(heartbeat));
+		refuel.put("heartbeat_id",	ContentUris.parseId(cr.insert(Heartbeats.CONTENT_URI, heartbeat)));
 		refuel.put("amount",		values.getAsFloat("Quantity"));
 		refuel.put("unit_price",	values.getAsFloat("Price"));
 		refuel.put("cost",			values.getAsFloat("Amount"));
 		refuel.put("name",			"imported from AndiCar");
 		
-		new RefuelRepository(db, context).insert(refuel);
+		cr.insert(Refuels.CONTENT_URI, refuel);
 	}
 }

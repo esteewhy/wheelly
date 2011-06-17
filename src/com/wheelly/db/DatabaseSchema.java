@@ -78,35 +78,33 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations dest"
 			+ "		ON m.location_id = dest." + BaseColumns._ID;
 		
-		public static final String Single =
-			"SELECT "
-			+ "m." + BaseColumns._ID
-			+ ", m._created"
-			+ ", name"
-			+ ", track_id"
-			+ ", start_heartbeat_id"
-			+ ", stop_heartbeat_id"
-			+ ", mileage"
-			+ ", amount"
-			+ ", location_id"
-			+ ", calc_cost"
-			+ ", calc_amount"
-			+ " FROM mileages m"
-			+ " WHERE m." + BaseColumns._ID + " = ?";
+		public static final String[] SingleProjection = {
+			BaseColumns._ID,
+			"_created",
+			"name",
+			"track_id",
+			"start_heartbeat_id",
+			"stop_heartbeat_id",
+			"mileage",
+			"amount",
+			"location_id",
+			"calc_cost",
+			"calc_amount"
+		};
 		
-		public static final String Defaults =
-			"SELECT -1 " + BaseColumns._ID
-			+ ", 0					mileage"
-			+ ", CURRENT_TIMESTAMP	_created"
-			+ ", MAX(m.amount)		amount"
-			+ ", 0					location_id"
-			+ ", NULL				track_id"
-			+ ", NULL				start_heartbeat_id"
-			+ ", NULL				stop_heartbeat_id"
-			+ ", 0					calc_cost"
-			+ ", 0					calc_amount"
-			+ ", CURRENT_TIMESTAMP	name"
-			+ " FROM mileages m;";
+		public static final String[] DefaultProjection = {
+			"-1 " + BaseColumns._ID,
+			"0 mileage",
+			"CURRENT_TIMESTAMP _created",
+			"MAX(amount) amount",
+			"0 location_id",
+			"NULL track_id",
+			"NULL start_heartbeat_id",
+			"NULL stop_heartbeat_id",
+			"0 calc_cost",
+			"0 calc_amount",
+			"CURRENT_TIMESTAMP	name"
+		};
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
 		static {
@@ -168,33 +166,34 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations l"
 			+ "		ON h.place_id = l." + BaseColumns._ID;
 		
-		public static final String Single =
-			"SELECT " + BaseColumns._ID + ", name, calc_mileage, cost, amount"
-			+", unit_price"
-			+", _created"
-			+", transaction_id"
-			+", heartbeat_id"
-			+" FROM refuels"
-			+" WHERE " + BaseColumns._ID + " = ?"
-			+" LIMIT 1";
+		public static final String[] SingleProjection = {
+			BaseColumns._ID,
+			"name",
+			"calc_mileage",
+			"cost",
+			"amount",
+			"unit_price",
+			"_created",
+			"transaction_id",
+			"heartbeat_id"
+		};
 		
-		public static final String Defaults =
-			"SELECT 0				_id"
-			+", 1					is_full"
-			+", ''					name"
-			+", NULL				calc_mileage"
-			+", (?1- h.fuel)		amount"
-			+", NULL				unit_price"
-			+", CURRENT_TIMESTAMP	_created"
-			+", NULL				transaction_id"
-			+", NULL				heartbeat_id"
-			+", (SELECT f.cost * (?1 - h.fuel) / f.amount FROM refuels f"
-			+" 		LEFT OUTER JOIN heartbeats hh"
-			+"		ON hh._id = f.heartbeat_id"
-			+"		ORDER BY IFNULL(hh._created, f._created) DESC LIMIT 1"
-			+") cost"
-			+" FROM heartbeats h"
-			+" ORDER BY h._created DESC LIMIT 1";
+		public static final String[] DefaultProjection = {
+			"0 _id",
+			"1 is_full",
+			"'' name",
+			" NULL calc_mileage",
+			"(?1- h.fuel) amount",
+			" NULL unit_price",
+			"CURRENT_TIMESTAMP _created",
+			"NULL transaction_id",
+			"NULL heartbeat_id",
+			"(SELECT f.cost * (?1 - fuel) / f.amount FROM refuels f"
+				+" 		LEFT OUTER JOIN heartbeats hh"
+				+"		ON hh._id = f.heartbeat_id"
+				+"		ORDER BY IFNULL(hh._created, f._created) DESC LIMIT 1"
+				+") cost"
+		};
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
 		static {

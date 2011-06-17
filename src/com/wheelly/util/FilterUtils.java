@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.wheelly.activity.Filter.F;
@@ -64,5 +65,57 @@ public class FilterUtils {
 				? " ASC" : " DESC");
 		r.Values = values.toArray(new String[0]);
 		return r;
+	}
+	
+	public static void intentToFilter(Intent intent, ContentValues filter) {
+		if(intent.hasExtra(F.PERIOD)) {
+			filter.put(F.PERIOD, intent.getStringExtra(F.PERIOD));
+		} else {
+			filter.remove(F.PERIOD);
+		}
+		
+		if(intent.hasExtra(F.LOCATION)) {
+			filter.put(F.LOCATION, intent.getLongExtra(F.LOCATION, -1));
+		} else {
+			filter.remove(F.LOCATION);
+		}
+		
+		if(intent.hasExtra(F.SORT_ORDER)) {
+			filter.put(F.SORT_ORDER, intent.getIntExtra(F.SORT_ORDER, 0));
+		} else {
+			filter.remove(F.SORT_ORDER);
+		}
+		
+		if(intent.hasExtra(F.LOCATION_CONSTRAINT)) {
+			filter.put(F.LOCATION_CONSTRAINT, intent.getStringExtra(F.LOCATION_CONSTRAINT));
+		} else {
+			filter.remove(F.LOCATION_CONSTRAINT);
+		}
+	}
+	
+	public static void filterToIntent(ContentValues filter, Intent intent) {
+		if(filter.containsKey(F.PERIOD)) {
+			intent.putExtra(F.PERIOD, filter.getAsString(F.PERIOD));
+		} else {
+			intent.removeExtra(F.PERIOD);
+		}
+		
+		if(filter.containsKey(F.LOCATION)) {
+			intent.putExtra(F.LOCATION, filter.getAsLong(F.LOCATION));
+		} else {
+			intent.removeExtra(F.LOCATION);
+		}
+		
+		if(filter.containsKey(F.SORT_ORDER) && filter.getAsInteger(F.SORT_ORDER) > 0) {
+			intent.putExtra(F.SORT_ORDER, 1);
+		} else {
+			intent.removeExtra(F.SORT_ORDER);
+		}
+		
+		if(filter.containsKey(F.LOCATION_CONSTRAINT)) {
+			intent.putExtra(F.LOCATION_CONSTRAINT, filter.getAsString(F.LOCATION_CONSTRAINT));
+		} else {
+			intent.removeExtra(F.LOCATION_CONSTRAINT);
+		}
 	}
 }

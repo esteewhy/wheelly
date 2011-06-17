@@ -1,11 +1,15 @@
 package com.wheelly.db;
 
+import com.wheelly.db.DatabaseSchema.Refuels;
+
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
+import android.database.Cursor;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
-import android.widget.Toast;
 
 /**
  * Higher level abstraction over refuel persistence to accommodate
@@ -21,81 +25,70 @@ public class RefuelBroker {
 	}
 	
 	public ContentValues loadOrCreate(long id) {
-		SQLiteDatabase db = null;
+		final ContentResolver cr = context.getContentResolver();
+		final Uri uri = ContentUris.appendId(Refuels.CONTENT_URI.buildUpon(), id).build();
+		final Cursor cursor =
+			id > 0
+				? cr.query(uri, Refuels.SingleProjection,
+					BaseColumns._ID + " = ?",
+					new String[] { Long.toString(id) },
+					null)
+				: cr.query(uri, Refuels.DefaultProjection,
+					null,
+					// pass parameter to some projection fields
+					new String[] {
+						Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60))
+					},
+					"_created DESC LIMIT 1");
 		
 		try {
-			final IRepository repository = new RefuelRepository(
-				db = new DatabaseHelper(this.context).getReadableDatabase(),
-				this.context);
-			
-			return id > 0 ? repository.load(id) : repository.getDefaults();
-		} finally {
-			if(null != db) {
-				db.close();
+			if(cursor.moveToFirst()) {
+				return deserialize(cursor);
+			} else {
+				final ContentValues r = new ContentValues();
+				r.put(BaseColumns._ID,	0);
+				r.put("name",			"First refuel!");
+				//r.put("_created",		"");
+				r.put("transaction_id",	0);
+				r.put("heartbeat_id",	-1);
+				r.put("calc_mileage",	0);
+				r.put("amount",			0);
+				r.put("cost",			0);
+				r.put("unit_price",		0);
+				return r;
 			}
+		} finally {
+			cursor.close();
 		}
 	}
 	
 	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
-		SQLiteDatabase db = null;
 		long id = refuel.getAsLong(BaseColumns._ID);
-		
-		try {
-			db = new DatabaseHelper(context).getWritableDatabase();
+		refuel.put("heartbeat_id", new HeartbeatBroker(context).updateOrInsert(heartbeat));
+		ContentResolver cr = context.getContentResolver();
 			
-			refuel.put("heartbeat_id", resolveHeartbeatId(heartbeat, db));
-			
-			// Now save refuel itself.
-			IRepository repository = new RefuelRepository(db, context);
-		
-			if(id > 0) {
-				repository.update(refuel);
-				return id;
-			} else {
-				return repository.insert(refuel);
-			}
-		} finally {
-			if(null != db) {
-				db.close();
-			}
+		if(id > 0) {
+			cr.update(
+				ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
+				refuel, null, null);
+			return id;
+		} else {
+			refuel.remove(BaseColumns._ID);
+			return ContentUris.parseId(cr.insert(Refuels.CONTENT_URI, refuel));
 		}
 	}
 	
-	/**
-	 * Save heartbeat first to obtain ID.
-	 * 
-	 * If this entity already exists, then update it.
-	 * If the entity doesn't yet exist but the one with the same ODO/fuel's present,
-	 *  then reuse it.
-	 * Otherwise, insert new record and obtain it's ID.
-	 */
-	long resolveHeartbeatId(ContentValues heartbeat, SQLiteDatabase db) throws SQLiteException {
-		long heartbeatId = heartbeat.getAsLong(BaseColumns._ID);
-		
-		final IRepository heartbeatRepository = new HeartbeatRepository(db);
-		
-		if(heartbeatId > 0) {
-			heartbeatRepository.update(heartbeat);
-		} else {
-			heartbeatId = heartbeatRepository.exists(heartbeat);
-			
-			if(heartbeatId > 0) {
-				final ContentValues existingHeartbeat = heartbeatRepository.load(heartbeatId);
-				existingHeartbeat.put("_created", heartbeat.getAsString("_created"));
-				heartbeatRepository.update(existingHeartbeat);
-				
-				Toast.makeText(context,
-					"Reused existing heartbeat at "
-					+ existingHeartbeat.getAsLong("odometer").toString()
-					+ " km / "
-					+ existingHeartbeat.getAsLong("fuel").toString()
-					+ " l", 500)
-					.show();
-			} else {
-				heartbeatId = heartbeatRepository.insert(heartbeat);
-			}
-		}
-		
-		return heartbeatId;
+	public static ContentValues deserialize(Cursor cursor) {
+		ContentValues values = new ContentValues();
+		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
+		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));
+		values.put("_created",		cursor.getString(cursor.getColumnIndexOrThrow("_created")));
+		values.put("transaction_id",cursor.getLong(cursor.getColumnIndexOrThrow("transaction_id")));
+		values.put("heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("heartbeat_id")));
+		values.put("calc_mileage",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_mileage")));
+		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
+		values.put("cost",			cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
+		values.put("unit_price",	cursor.getFloat(cursor.getColumnIndexOrThrow("unit_price")));
+		return values;
 	}
 }
