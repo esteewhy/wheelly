@@ -18,9 +18,10 @@ import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 import com.wheelly.util.FilterUtils;
+import com.wheelly.util.FilterUtils.F;
 
 import ru.orangesoftware.financisto.activity.ActivityLayout;
-import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
+import ru.orangesoftware.financisto.activity.ActivityLayout.ActivityLayoutListener;
 import ru.orangesoftware.financisto.activity.DateFilterActivity;
 import ru.orangesoftware.financisto.model.*;
 import ru.orangesoftware.financisto.utils.DateUtils;
@@ -59,13 +60,6 @@ public class Filter extends FragmentActivity {
 	private ActivityLayout x;
 	private Controls c;
 	private SQLiteDatabase db;
-	
-	public static class F {
-		public final static String SORT_ORDER	= "sort_order";
-		public final static String PERIOD		= "period";
-		public final static String LOCATION		= "location_id";
-		public final static String LOCATION_CONSTRAINT = "location_id_constraint";
-	}
 	
 	private Cursor locationCursor;
 	

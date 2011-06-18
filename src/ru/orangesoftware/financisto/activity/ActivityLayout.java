@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -252,5 +253,15 @@ public class ActivityLayout {
 
     public void addDivider(LinearLayout layout) {
         inflater.addDivider(layout);
+    }
+    
+    public static interface ActivityLayoutListener extends OnClickListener {
+
+    	void onSelectedPos(int id, int selectedPos);
+    	
+    	void onSelectedId(int id, long selectedId);
+
+    	void onSelected(int id, ArrayList<? extends MultiChoiceItem> items);
+    	
     }
 }

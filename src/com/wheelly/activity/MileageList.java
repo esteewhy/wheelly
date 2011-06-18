@@ -29,7 +29,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
 import com.wheelly.R;
-import com.wheelly.activity.Filter.F;
+import com.wheelly.util.FilterUtils.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseSchema.Mileages;
@@ -62,7 +62,7 @@ public class MileageList extends FragmentActivity {
 			super.onActivityCreated(savedInstanceState);
 			final FragmentActivity ctx = getActivity();
 			
-			progressDialog = new ProgressDialog(getActivity());
+			progressDialog = new ProgressDialog(ctx);
 			progressDialog.setTitle(R.string.loading);
 			progressDialog.setMessage(getString(R.string.loading_message));
 			progressDialog.setCancelable(false);
@@ -75,7 +75,7 @@ public class MileageList extends FragmentActivity {
 					? savedInstanceState.getBoolean("suggestInstall")
 					: !new Tracker(ctx).checkAvailability();
 			
-			if(!suggestInstall) {
+			if(suggestInstall) {
 				Toast.makeText(ctx, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
 			}
 			

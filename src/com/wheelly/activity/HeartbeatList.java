@@ -27,7 +27,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.support.v4.widget.SimpleCursorAdapter;
 import com.wheelly.R;
-import com.wheelly.activity.Filter.F;
+import com.wheelly.util.FilterUtils.F;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.db.DatabaseHelper;

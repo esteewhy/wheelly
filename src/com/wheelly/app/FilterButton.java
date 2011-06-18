@@ -2,6 +2,9 @@ package com.wheelly.app;
 
 import com.wheelly.R;
 import com.wheelly.activity.Filter;
+import com.wheelly.util.FilterUtils;
+import com.wheelly.util.FilterUtils.F;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -36,8 +39,8 @@ public class FilterButton extends Fragment {
 			public void onClick(View v) {
 				btn.setEnabled(false);
 				Intent intent = new Intent(getActivity(), Filter.class);
-				filter.put(Filter.F.LOCATION_CONSTRAINT, locationConstraint);
-				Filter.filterToIntent(filter, intent);
+				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
+				FilterUtils.filterToIntent(filter, intent);
 				startActivityForResult(intent, FILTER_REQUEST);
 			}
 		});
@@ -51,9 +54,9 @@ public class FilterButton extends Fragment {
 			if (resultCode == Activity.RESULT_FIRST_USER) {
 				filter.clear();
 			} else if (resultCode == Activity.RESULT_OK) {
-				Filter.intentToFilter(data, filter);
+				FilterUtils.intentToFilter(data, filter);
 			}
-			filter.remove(Filter.F.LOCATION_CONSTRAINT);
+			filter.remove(F.LOCATION_CONSTRAINT);
 			btn.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 			
 			if(null != listener) {

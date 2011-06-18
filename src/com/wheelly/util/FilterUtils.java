@@ -9,7 +9,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.wheelly.activity.Filter.F;
 import com.wheelly.db.DatabaseSchema;
 
 public class FilterUtils {
@@ -21,6 +20,14 @@ public class FilterUtils {
 		
 		FilterResult() {}
 	}
+	
+	public static class F {
+		public final static String SORT_ORDER	= "sort_order";
+		public final static String PERIOD		= "period";
+		public final static String LOCATION		= "location_id";
+		public final static String LOCATION_CONSTRAINT = "location_id_constraint";
+	}
+	
 	/**
 	 * Helps to construct SQL query from a given WHERE/ORDER values.
 	 * 

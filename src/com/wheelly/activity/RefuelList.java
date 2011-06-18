@@ -28,12 +28,12 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
 import com.wheelly.R;
-import com.wheelly.activity.Filter.F;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.content.TransactionRepository;
 import com.wheelly.db.DatabaseSchema.Refuels;
 import com.wheelly.util.FilterUtils;
+import com.wheelly.util.FilterUtils.F;
 import com.wheelly.util.FilterUtils.FilterResult;
 
 public class RefuelList extends FragmentActivity {

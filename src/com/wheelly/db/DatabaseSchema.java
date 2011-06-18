@@ -3,7 +3,7 @@ package com.wheelly.db;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.wheelly.activity.Filter.F;
+import com.wheelly.util.FilterUtils.F;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -178,21 +178,26 @@ public final class DatabaseSchema {
 			"heartbeat_id"
 		};
 		
+		private static final String EstimateAmount =
+			"SELECT ?1 - fuel FROM heartbeats ORDER BY _created DESC LIMIT 1";
+		
+		private static final String EstimateCost =
+			"SELECT f.cost * (?1 - fuel) / f.amount FROM refuels f"
+			+ " 		LEFT OUTER JOIN heartbeats hh"
+			+ "		ON hh._id = f.heartbeat_id"
+			+ "		ORDER BY IFNULL(hh._created, f._created) DESC LIMIT 1";
+		
 		public static final String[] DefaultProjection = {
 			"0 _id",
 			"1 is_full",
 			"'' name",
 			" NULL calc_mileage",
-			"(?1- h.fuel) amount",
+			"(" + EstimateAmount + ") amount",
 			" NULL unit_price",
 			"CURRENT_TIMESTAMP _created",
 			"NULL transaction_id",
 			"NULL heartbeat_id",
-			"(SELECT f.cost * (?1 - fuel) / f.amount FROM refuels f"
-				+" 		LEFT OUTER JOIN heartbeats hh"
-				+"		ON hh._id = f.heartbeat_id"
-				+"		ORDER BY IFNULL(hh._created, f._created) DESC LIMIT 1"
-				+") cost"
+			"(" + EstimateCost +") cost"
 		};
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
