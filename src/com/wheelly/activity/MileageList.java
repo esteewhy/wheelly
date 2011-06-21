@@ -95,8 +95,10 @@ public class MileageList extends FragmentActivity {
 					public void setViewText(TextView v, String text) {
 						switch(v.getId()) {
 						case R.id.mileage:
+							v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
+							break;
 						case R.id.fuel:
-							v.setText(String.format("%+.2f", Float.parseFloat(text)));
+							v.setText(text);
 							break;
 						default: super.setViewText(v, text);
 						}
@@ -225,7 +227,12 @@ public class MileageList extends FragmentActivity {
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			final ContentValues filter;
 			
-			progressDialog.show();
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					progressDialog.show();
+				}
+			});
 			
 			if(args != null && args.containsKey("filter")
 					&& (filter = args.getParcelable("filter")).size() > 0) {
@@ -246,7 +253,13 @@ public class MileageList extends FragmentActivity {
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 			((CursorAdapter) getListAdapter()).swapCursor(data);
-			progressDialog.dismiss();
+			
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					progressDialog.dismiss();
+				}
+			});
 		}
 
 		@Override

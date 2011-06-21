@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -162,12 +163,14 @@ public class HeartbeatList extends FragmentActivity {
 			AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)menuInfo;
 			getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
 			menu.setHeaderTitle("Heartbeat");
+			SQLiteDatabase db;
 			
-			if(0 < new HeartbeatRepository(new DatabaseHelper(getActivity()).getReadableDatabase())
+			if(0 < new HeartbeatRepository(db = new DatabaseHelper(getActivity()).getReadableDatabase())
 				.referenceCount(mi.id)) {
 				menu.removeItem(R.id.ctx_menu_delete);
 			}
 			
+			db.close();
 			super.onCreateContextMenu(menu, v, menuInfo);
 		}
 		
