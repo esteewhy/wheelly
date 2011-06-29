@@ -7,7 +7,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -25,14 +24,14 @@ public class MileageBroker {
 	
 	public ContentValues loadOrCreate(long id) {
 		final ContentResolver cr = context.getContentResolver();
-		final Uri uri = ContentUris.appendId(Mileages.CONTENT_URI.buildUpon(), id).build();
+		
 		final Cursor cursor =
 			id > 0
-				? cr.query(uri, Mileages.SingleProjection,
-					BaseColumns._ID + " = ?",
-					new String[] { Long.toString(id) },
-					null)
-				: cr.query(uri, Mileages.DefaultProjection,
+				? cr.query(
+					ContentUris.withAppendedId(Mileages.CONTENT_URI, id),
+					Mileages.SingleEditProjection,
+					null, null, null)
+				: cr.query(Mileages.CONTENT_URI, Mileages.DefaultProjection,
 					null, null, "_created DESC LIMIT 1");
 		
 		try {
@@ -57,18 +56,19 @@ public class MileageBroker {
 		}
 	}
 	
-	public long updateOrInsert(ContentValues mileage) {
-		long id = mileage.getAsLong(BaseColumns._ID);
+	public long updateOrInsert(ContentValues values) {
+		long id;
 		ContentResolver cr = context.getContentResolver();
 		
-		if(id > 0) {
+		if(values.containsKey(BaseColumns._ID)
+				&& (id = values.getAsLong(BaseColumns._ID)) > 0) {
 			cr.update(
 				ContentUris.withAppendedId(Mileages.CONTENT_URI, id),
-				mileage, null, null);
+				values, null, null);
 			return id;
 		} else {
-			mileage.remove(BaseColumns._ID);
-			return ContentUris.parseId(cr.insert(Mileages.CONTENT_URI, mileage));
+			values.remove(BaseColumns._ID);
+			return ContentUris.parseId(cr.insert(Mileages.CONTENT_URI, values));
 		}
 	}
 	

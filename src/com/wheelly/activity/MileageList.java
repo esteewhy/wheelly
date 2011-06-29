@@ -1,6 +1,7 @@
 package com.wheelly.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 import com.wheelly.R;
 import com.wheelly.util.FilterUtils.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
+import com.wheelly.app.InfoDialogFragment;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.service.Tracker;
@@ -84,7 +86,7 @@ public class MileageList extends FragmentActivity {
 			setListAdapter(
 				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, null,
 					new String[] {
-						"start_place", "stop_place", "mileage", "cost", "stop_time", "fuel", "destination"
+						"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination"
 					},
 					new int[] {
 						R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
@@ -96,9 +98,6 @@ public class MileageList extends FragmentActivity {
 						switch(v.getId()) {
 						case R.id.mileage:
 							v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
-							break;
-						case R.id.fuel:
-							v.setText(text);
 							break;
 						default: super.setViewText(v, text);
 						}
@@ -134,11 +133,46 @@ public class MileageList extends FragmentActivity {
 			c.TotalLayout.setVisibility(View.GONE);
 		}
 		
-		@Override
-		public void onListItemClick(ListView listView, View view, int position, final long id) {
+		private void viewItem(final long id) {
+			new InfoDialogFragment(
+				new InfoDialogFragment.Options() {{
+					
+					fields.put(R.string.odometer_input_label, "mileage");
+					fields.put(R.string.fuel_input_label, "fuel");
+					
+					titleField = "destination";
+					dataField = "_created";
+					iconResId = R.drawable.mileage;
+					
+					onClickListener = new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(which == Dialog.BUTTON_POSITIVE) {
+								editItem(id);
+							}
+						};
+					};
+					
+					loader = new CursorLoader(
+						getActivity(),
+						Mileages.CONTENT_URI,
+						Mileages.SingleViewProjection,
+						"m." + BaseColumns._ID + " = ?",
+						new String[] { Long.toString(id) },
+						"m." + BaseColumns._ID + " DESC LIMIT 1");
+				}}
+			).show(getFragmentManager(), "dialog");
+		}
+		
+		private void editItem(final long id) {
 			Intent intent = new Intent(getActivity(), Mileage.class);
 			intent.putExtra(BaseColumns._ID, id);
 			startActivityForResult(intent, EDIT_REQUEST);
+		}
+		
+		@Override
+		public void onListItemClick(ListView listView, View view, int position, final long id) {
+			viewItem(id);
 		}
 		
 		@Override
@@ -191,11 +225,11 @@ public class MileageList extends FragmentActivity {
 			
 			switch (item.getItemId()) {
 				case R.id.ctx_menu_view: {
-					//viewItem(mi.position, mi.id);
+					viewItem(mi.id);
 					return true;
 				}
 				case R.id.ctx_menu_edit:
-					onListItemClick(null, null, 0, mi.id);
+					editItem(mi.id);
 					return true;
 				case R.id.ctx_menu_delete:
 					new AlertDialog.Builder(getActivity())
@@ -240,12 +274,12 @@ public class MileageList extends FragmentActivity {
 					filter, Mileages.FilterExpr);
 				
 				return new CursorLoader(getActivity(),
-					Mileages.CONTENT_URI, Mileages.Columns,
+					Mileages.CONTENT_URI, Mileages.ListProjection,
 					sql.Where, sql.Values, 	sql.Order);
 			}
 			
 			return new CursorLoader(getActivity(),
-				Mileages.CONTENT_URI, Mileages.Columns,
+				Mileages.CONTENT_URI, Mileages.ListProjection,
 				null, null,
 				Mileages.FilterExpr.get(F.SORT_ORDER) + " DESC");
 		}

@@ -1,6 +1,7 @@
 package com.wheelly.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,11 +24,13 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
 import com.wheelly.R;
+import com.wheelly.app.InfoDialogFragment;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.content.TransactionRepository;
@@ -44,7 +47,7 @@ public class RefuelList extends FragmentActivity {
 		super.setContentView(R.layout.refuel_list);
 	}
 	
-	public static class RefuelListFragment extends ListFragment
+	public static class ItemListFragment extends ListFragment
 		implements LoaderCallbacks<Cursor> {
 		
 		private static final int REFUEL_LIST_LOADER = 0x02;
@@ -77,7 +80,7 @@ public class RefuelList extends FragmentActivity {
 						switch(v.getId()) {
 						case R.id.mileage:
 						case R.id.fuel:
-							v.setText("".equals(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
+							v.setText(TextUtils.isEmpty(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
 							break;
 						default: super.setViewText(v, text);
 						}
@@ -107,17 +110,53 @@ public class RefuelList extends FragmentActivity {
 					final Bundle args = new Bundle();
 					args.putParcelable("filter", value);
 					getLoaderManager().restartLoader(REFUEL_LIST_LOADER, args,
-							RefuelListFragment.this);
+							ItemListFragment.this);
 				}
 			});
 			c.TotalLayout.setVisibility(View.GONE);
 		}
 		
-		@Override
-		public void onListItemClick(ListView listView, View view, int position, final long id) {
+		private void viewItem(final long id) {
+			new InfoDialogFragment(
+				new InfoDialogFragment.Options() {{
+					
+					fields.put(R.string.odometer_input_label, "mileage");
+					fields.put(R.string.fuel_input_label, "amount");
+					fields.put(R.string.amount, "cost");
+					
+					titleField = "place";
+					dataField = "_created";
+					iconResId = R.drawable.refuel;
+					
+					onClickListener = new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(which == Dialog.BUTTON_POSITIVE) {
+								editItem(id);
+							}
+						};
+					};
+					
+					loader = new CursorLoader(
+						getActivity(),
+						Refuels.CONTENT_URI,
+						Refuels.ListProjection,
+						"f." + BaseColumns._ID + " = ?",
+						new String[] { Long.toString(id) },
+						"f." + BaseColumns._ID + " DESC LIMIT 1");
+				}}
+			).show(getFragmentManager(), "dialog");
+		}
+		
+		private void editItem(final long id) {
 			Intent intent = new Intent(getActivity(), Refuel.class);
 			intent.putExtra(BaseColumns._ID, id);
 			startActivityForResult(intent, EDIT_REQUEST);
+		}
+		
+		@Override
+		public void onListItemClick(ListView listView, View view, int position, final long id) {
+			viewItem(id);
 		}
 		
 		@Override
@@ -172,12 +211,11 @@ public class RefuelList extends FragmentActivity {
 			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
 			
 			switch (item.getItemId()) {
-				case R.id.ctx_menu_view: {
-					//viewItem(mi.position, mi.id);
+				case R.id.ctx_menu_view:
+					viewItem(mi.id);
 					return true;
-				} 			
 				case R.id.ctx_menu_edit:
-					onListItemClick(null, null, 0, mi.id);
+					editItem(mi.id);
 					return true;
 				case R.id.ctx_menu_delete:
 					new AlertDialog.Builder(getActivity())
@@ -209,12 +247,12 @@ public class RefuelList extends FragmentActivity {
 					filter, Refuels.FilterExpr);
 				
 				return new CursorLoader(getActivity(),
-					Refuels.CONTENT_URI, Refuels.Columns,
+					Refuels.CONTENT_URI, Refuels.ListProjection,
 					sql.Where, sql.Values, 	sql.Order);
 			}
 			
 			return new CursorLoader(getActivity(),
-				Refuels.CONTENT_URI, Refuels.Columns,
+				Refuels.CONTENT_URI, Refuels.ListProjection,
 				null, null,
 				Refuels.FilterExpr.get(F.SORT_ORDER) + " DESC");
 		}

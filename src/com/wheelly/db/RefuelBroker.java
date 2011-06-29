@@ -7,7 +7,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
@@ -26,14 +25,13 @@ public class RefuelBroker {
 	
 	public ContentValues loadOrCreate(long id) {
 		final ContentResolver cr = context.getContentResolver();
-		final Uri uri = ContentUris.appendId(Refuels.CONTENT_URI.buildUpon(), id).build();
 		final Cursor cursor =
 			id > 0
-				? cr.query(uri, Refuels.SingleProjection,
-					BaseColumns._ID + " = ?",
-					new String[] { Long.toString(id) },
-					null)
-				: cr.query(uri, Refuels.DefaultProjection,
+				? cr.query(
+					ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
+					Refuels.SingleProjection,
+					null, null, null)
+				: cr.query(Refuels.CONTENT_URI, Refuels.DefaultProjection,
 					null,
 					// pass parameter to some projection fields
 					new String[] {

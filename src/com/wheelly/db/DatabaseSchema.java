@@ -54,13 +54,13 @@ public final class DatabaseSchema {
 			+ "  ON r.heartbeat_id = rh." + BaseColumns._ID
 			+ " WHERE rh._created BETWEEN start._created AND stop._created";
 		
-		public static final String[] Columns = {
+		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,
-			"COALESCE(stop._created, start._created, m._created) stop_time",
-			"mileage",
-			"calc_cost cost",
+			"COALESCE(stop._created, start._created, m._created) _created",
+			"m.mileage",
+			"m.calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
+			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount) fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
 			"dest.name destination"
@@ -78,7 +78,19 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations dest"
 			+ "		ON m.location_id = dest." + BaseColumns._ID;
 		
-		public static final String[] SingleProjection = {
+		public static final String[] SingleViewProjection = {
+			"m." + BaseColumns._ID,
+			"COALESCE(stop._created, start._created, m._created) _created",
+			"mileage",
+			"calc_cost cost",
+			//TODO Calculate in a scheduled async. job
+			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
+			"start_place.name start_place",
+			"stop_place.name stop_place",
+			"dest.name destination"
+		};
+		
+		public static final String[] SingleEditProjection = {
 			BaseColumns._ID,
 			"_created",
 			"name",
@@ -149,7 +161,7 @@ public final class DatabaseSchema {
 			+ " ORDER BY hh._created DESC"
 			+ " LIMIT 1";
 		
-		public static final String[] Columns = {
+		public static final String[] ListProjection = {
 			"f." + BaseColumns._ID,
 			"f.name",
 			//"f.calc_mileage mileage",
@@ -230,7 +242,7 @@ public final class DatabaseSchema {
 			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
 			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id) icons";
 		
-		public static final String[] Columns = {
+		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID,
 			"h._created",
 			"h.odometer",
@@ -241,20 +253,6 @@ public final class DatabaseSchema {
 		
 		public static final String Tables = "heartbeats h"
 			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID;
-		
-		public static final String Defaults =
-			"SELECT * FROM heartbeats ORDER BY _created DESC LIMIT 1";
-		
-		public static final String Single =
-			"SELECT * FROM heartbeats"
-			+ " WHERE " + BaseColumns._ID + " = ?";
-		
-		public static final String Exists =
-			"SELECT "
-			+ BaseColumns._ID
-			+ " FROM heartbeats"
-			+ " WHERE odometer = ? AND fuel = ?"
-			+ " LIMIT 1;";
 		
 		public static final String ReferenceCount =
 			"SELECT SUM(cnt) FROM ("

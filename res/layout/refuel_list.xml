@@ -14,8 +14,8 @@
 	android:layout_width	="fill_parent"
 	android:orientation		="vertical">
 	
-	<fragment class				="com.wheelly.activity.RefuelList$RefuelListFragment"
-		android:id				="@+id/refuels"
+	<fragment class				="com.wheelly.activity.RefuelList$ItemListFragment"
+		android:id				="@+id/list"
 		android:layout_weight	="1" 
 		android:layout_width	="fill_parent"
 		android:layout_height	="wrap_content" />

@@ -1,11 +1,11 @@
 package com.wheelly.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -29,11 +29,11 @@ import android.widget.ProgressBar;
 import android.support.v4.widget.SimpleCursorAdapter;
 import com.wheelly.R;
 import com.wheelly.util.FilterUtils.F;
+import com.wheelly.app.InfoDialogFragment;
 import com.wheelly.app.StatusBarControls;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
-import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
-import com.wheelly.db.HeartbeatRepository;
+import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.FilterResult;
 
@@ -122,11 +122,46 @@ public class HeartbeatList extends FragmentActivity {
 			c.TotalLayout.setVisibility(View.GONE);
 		}
 		
-		@Override
-		public void onListItemClick(ListView listView, View view, int position, final long id) {
+		private void viewItem(final long id) {
+			new InfoDialogFragment(
+				new InfoDialogFragment.Options() {{
+					
+					fields.put(R.string.odometer_input_label, "odometer");
+					fields.put(R.string.fuel_input_label, "fuel");
+					
+					titleField = "place";
+					dataField = "_created";
+					iconResId = R.drawable.heartbeat;
+					
+					onClickListener = new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(which == Dialog.BUTTON_POSITIVE) {
+								editItem(id);
+							}
+						};
+					};
+					
+					loader = new CursorLoader(
+						getActivity(),
+						Heartbeats.CONTENT_URI,
+						Heartbeats.ListProjection,
+						"h." + BaseColumns._ID + " = ?",
+						new String[] { Long.toString(id) },
+						"h." + BaseColumns._ID + " DESC LIMIT 1");
+				}}
+			).show(getFragmentManager(), "dialog");
+		}
+		
+		private void editItem(final long id) {
 			Intent intent = new Intent(getActivity(), Heartbeat.class);
 			intent.putExtra(BaseColumns._ID, id);
 			startActivityForResult(intent, EDIT_REQUEST);
+		}
+		
+		@Override
+		public void onListItemClick(ListView listView, View view, int position, final long id) {
+			viewItem(id);
 		}
 		
 		@Override
@@ -148,7 +183,6 @@ public class HeartbeatList extends FragmentActivity {
 		@Override
 		public boolean onOptionsItemSelected(MenuItem item) {
 			switch (item.getItemId()) {
-			
 				case R.id.opt_menu_add:
 					Intent intent = new Intent(getActivity(), Heartbeat.class);
 					startActivityForResult(intent, NEW_REQUEST);
@@ -163,14 +197,11 @@ public class HeartbeatList extends FragmentActivity {
 			AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)menuInfo;
 			getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
 			menu.setHeaderTitle("Heartbeat");
-			SQLiteDatabase db;
 			
-			if(0 < new HeartbeatRepository(db = new DatabaseHelper(getActivity()).getReadableDatabase())
-				.referenceCount(mi.id)) {
+			if(0 < new HeartbeatBroker(getActivity()).referenceCount(mi.id)) {
 				menu.removeItem(R.id.ctx_menu_delete);
 			}
 			
-			db.close();
 			super.onCreateContextMenu(menu, v, menuInfo);
 		}
 		
@@ -182,11 +213,11 @@ public class HeartbeatList extends FragmentActivity {
 			
 			switch (item.getItemId()) {
 				case R.id.ctx_menu_view: {
-					//viewItem(mi.position, mi.id);
+					viewItem(mi.id);
 					return true;
 				} 			
 				case R.id.ctx_menu_edit:
-					onListItemClick(null, null, 0, mi.id);
+					editItem(mi.id);
 					return true;
 				case R.id.ctx_menu_delete:
 					new AlertDialog.Builder(getActivity())
@@ -219,12 +250,12 @@ public class HeartbeatList extends FragmentActivity {
 					filter, Heartbeats.FilterExpr);
 				
 				return new CursorLoader(getActivity(),
-					Heartbeats.CONTENT_URI, Heartbeats.Columns,
+					Heartbeats.CONTENT_URI, Heartbeats.ListProjection,
 					sql.Where, sql.Values, 	sql.Order);
 			}
 			
 			return new CursorLoader(getActivity(),
-				Heartbeats.CONTENT_URI, Heartbeats.Columns,
+				Heartbeats.CONTENT_URI, Heartbeats.ListProjection,
 				null, null,
 				Heartbeats.FilterExpr.get(F.SORT_ORDER) + " DESC");
 		}

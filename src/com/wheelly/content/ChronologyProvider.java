@@ -35,6 +35,7 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int HEARTBEATS = 300;
 	private static final int HEARTBEATS_ID = 301;
 	private static final int HEARTBEATS_DEFAULTS = 302;
+	private static final int HEARTBEATS_REFERENCES = 303;
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
 	
@@ -59,13 +60,15 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "heartbeats/#", HEARTBEATS_ID);
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
+			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
+			
 			addURI(a, "mileages/defaults", MILEAGES_DEFAULTS);
 			addURI(a, "refuels/defaults", REFUELS_DEFAULTS);
 			addURI(a, "heartbeats/defaults", HEARTBEATS_DEFAULTS);
 		}};
 		
 		DataSchemaLookup.put(MILEAGES, new String[] { Mileages.CONTENT_TYPE, Mileages.Tables, "mileages" });
-		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, "mileages", "mileages" });
+		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, Mileages.Tables, "mileages" });
 		DataSchemaLookup.put(REFUELS, new String[] { Refuels.CONTENT_TYPE, Refuels.Tables, "refuels" });
 		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels", "refuels" });
 		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
@@ -158,13 +161,31 @@ public class ChronologyProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 		int uriCode = uriMatcher.match(uri);
 		
+		switch(uriCode) {
+		case HEARTBEATS_REFERENCES:
+			return dbHelper.getReadableDatabase()
+				.rawQuery(DatabaseSchema.Heartbeats.ReferenceCount,
+					new String[] { Long.toString(ContentUris.parseId(uri)) });
+		
+		case MILEAGES_ID:
+		case REFUELS_ID:
+		case HEARTBEATS_ID:
+			return dbHelper.getReadableDatabase().query(
+				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
+				projection,
+				BaseColumns._ID + " = ?",
+				new String[] { Long.toString(ContentUris.parseId(uri)) },
+				null, null,
+				sortOrder,
+				"1");
+		}
+		
 		if(DataSchemaLookup.containsKey(uriCode)) {
 			final Cursor cursor = dbHelper.getReadableDatabase().query(
 				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE_LIST],
 				projection, selection, selectionArgs,
 				null, null,
 				sortOrder);
-			cursor.setNotificationUri(getContext().getContentResolver(), uri);
 			return cursor;
 		}
 		
