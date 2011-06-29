@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wheelly.db.DatabaseSchema.Heartbeats;
-import com.wheelly.db.DatabaseSchema.Mileages;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -59,12 +58,12 @@ public class HeartbeatBroker {
 		if(values.containsKey(BaseColumns._ID)
 				&& (id = values.getAsLong(BaseColumns._ID)) > 0) {
 			cr.update(
-				ContentUris.withAppendedId(Mileages.CONTENT_URI, id),
+				ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
 				values, null, null);
 			return id;
 		} else {
 			values.remove(BaseColumns._ID);
-			return ContentUris.parseId(cr.insert(Mileages.CONTENT_URI, values));
+			return ContentUris.parseId(cr.insert(Heartbeats.CONTENT_URI, values));
 		}
 	}
 	
