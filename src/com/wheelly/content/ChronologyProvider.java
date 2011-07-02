@@ -186,6 +186,7 @@ public class ChronologyProvider extends ContentProvider {
 				projection, selection, selectionArgs,
 				null, null,
 				sortOrder);
+			cursor.setNotificationUri(getContext().getContentResolver(), uri);
 			return cursor;
 		}
 		

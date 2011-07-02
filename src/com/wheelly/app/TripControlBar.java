@@ -196,6 +196,7 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 			int defaultTextResource,
 			int iconResource,
 			int disabledIconResource) {
+		
 		if(id > 0 && null != values) {
 			button.setTag(R.id.tag_values, values);
 			button.setText(
@@ -206,6 +207,7 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 		} else {
 			button.setText(defaultTextResource);
 		}
+		
 		// Update icons.
 		button.setCompoundDrawablesWithIntrinsicBounds(
 			id > 0 ? disabledIconResource : iconResource, 0, 0, 0);

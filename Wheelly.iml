@@ -2,11 +2,13 @@
 <module type="JAVA_MODULE" version="4">
   <component name="EclipseModuleManager" forced_jdk="true">
     <libelement value="file:///MyTracksLib/libs/protobuf-java-2.3.0-lite.jar" />
-    <varelement var="file://$_android_MyTracksLib_e2802071$/src" kind="linksrc:" value="MyTracksLib_src" />
+    <varelement var="file://$_android_MyTracksLib_e2802071$/src" value="linksrc:MyTracksLib_src" />
+    <varelement var="file://$_android_MyTracksLib_e2802071$/src" value="linksrc:MyTracksLib_src" />
     <conelement value="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" />
     <src_description expected_position="4">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
       <src_folder value="file://$MODULE_DIR$/gen" expected_position="4" />
+      <src_folder value="file://$_android_MyTracksLib_e2802071$/src" expected_position="5" />
       <src_folder value="file://$_android_MyTracksLib_e2802071$/src" expected_position="5" />
     </src_description>
   </component>
