@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.wheelly.R;
 import com.wheelly.activity.HeartbeatDialog;
 import com.wheelly.content.TrackRepository;
+import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.service.Tracker;
 import com.wheelly.service.Tracker.TrackListener;
 
@@ -19,7 +20,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 /**
  * Widget with 2 buttons to launch editing/creating of start or stop heartbeats.
@@ -68,72 +68,101 @@ public class TripControlBar extends Fragment {
 			new OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					Intent intent = new Intent(getActivity(), HeartbeatDialog.class);
-					intent.putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
-					
-					ContentValues values = (ContentValues)v.getTag(R.id.tag_values);
-					if(null != values) {
-						intent.putExtra("heartbeat", values);
-					}
-					
 					int requestId = (Integer)v.getTag(R.id.tag_request_code);
 					
 					// Stop tracking (if active) *before* entering final heartbeat.
 					if(requestId == editStopHeartbeatRequestId) {
-						final Value val = getValue();
-						if(val.TrackId < 0) {
-							val.TrackId = val.TrackId * -1;
-							new Tracker(getActivity())
-								.setStartTrackListener(new TrackListener() {
-									
-									@Override
-									public void onTrackStopped() {
-										float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
-										
-Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
-										
-										if(val.StartHeartbeat != null && val.StopHeartbeat != null) {
-											val.StopHeartbeat.put("odometer",
-												val.StartHeartbeat.getAsLong("odometer")
-												+ (long)Math.ceil(distance));
-										}
-										setValue(val);
-									}
-									
-									@Override
-									public void onStartTrack(long trackId) {}
-								})
-								.Stop(val.TrackId);
-						}
+						stop(v);
 					} else if(requestId == editStartHeartbeatAndStartTrackingRequestId) {
-						final Value val = getValue();
-						
-						if(new Tracker(getActivity())
-							.setStartTrackListener(new TrackListener() {
-								@Override
-								public void onStartTrack(long trackId) {
-									// negative means "tracking in progress".
-									val.TrackId = trackId * -1;
-									triggerValueChanged(val);
-									v.setEnabled(true);
-								}
-								
-								@Override
-								public void onTrackStopped() {}
-							})
-							.Start()) {
-							v.setEnabled(false);
-						}
-						return;
+						start(v);
+					} else {
+						startHeartbeatActivity(v, requestId);
 					}
-					
-					startActivityForResult(intent, requestId);
 				}
 			};
 		
 		c.StartButton.setOnClickListener(listener);
 		c.StopButton.setOnClickListener(listener);
 		return view;
+	}
+	
+	private void startHeartbeatActivity(View v, int requestId) {
+		Intent intent = new Intent(getActivity(), HeartbeatDialog.class);
+		intent.putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
+		
+		ContentValues values = (ContentValues)v.getTag(R.id.tag_values);
+		if(null != values) {
+			intent.putExtra("heartbeat", values);
+		}
+		
+		startActivityForResult(intent, requestId);
+	}
+	
+	private void stop(final View v) {
+		final Value val = getValue();
+		
+		if(val.TrackId < 0) {
+			val.TrackId = val.TrackId * -1;
+			new Tracker(getActivity())
+				.setStartTrackListener(new TrackListener() {
+					@Override
+					public void onTrackStopped() {
+						presetStopMileage(val);
+						setValue(val);
+						startHeartbeatActivity(v, editStopHeartbeatRequestId);
+					}
+					
+					@Override
+					public void onStartTrack(long trackId) {}
+				})
+				.Stop(val.TrackId);
+		} else {
+			startHeartbeatActivity(v, editStopHeartbeatRequestId);
+		}
+	}
+	
+	/**
+	 * Calculate final mileage in case track length is known.
+	 */
+	private void presetStopMileage(Value val) {
+		float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
+		
+//Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
+		
+		if(val.StartHeartbeat != null) {
+			// On new mileage there's no stop heartbeat until after [stop]
+			// button been clicked and heartbeat form submitted,
+			// so we have to create default heartbeat values in advance
+			// to pre-set mileage to.
+			if(null == val.StopHeartbeat) {
+				val.StopHeartbeat = new HeartbeatBroker(getActivity()).loadOrCreate(-1);
+			}
+			
+			val.StopHeartbeat.put("odometer",
+				val.StartHeartbeat.getAsLong("odometer")
+				+ (long)Math.ceil(distance));
+		}
+	}
+	
+	private void start(final View v) {
+		final Value val = getValue();
+		
+		if(new Tracker(getActivity())
+			.setStartTrackListener(new TrackListener() {
+				@Override
+				public void onStartTrack(long trackId) {
+					// negative means "tracking in progress".
+					val.TrackId = trackId * -1;
+					triggerValueChanged(val);
+					v.setEnabled(true);
+				}
+				
+				@Override
+				public void onTrackStopped() {}
+			})
+			.Start()) {
+			v.setEnabled(false);
+		}
 	}
 	
 	/**
@@ -145,6 +174,15 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 		
 		if(resultCode == Activity.RESULT_OK) {
 			ContentValues heartbeat = data.getParcelableExtra("heartbeat");
+			
+			final long id = heartbeat.containsKey(BaseColumns._ID)
+				? heartbeat.getAsLong(BaseColumns._ID)
+				: -1;
+			
+			if(id <= 0 && data.hasExtra(BaseColumns._ID)) {
+				heartbeat.put(BaseColumns._ID, data.getLongExtra(BaseColumns._ID, -1));
+			}
+			
 			final Value value = this.getValue();
 			
 			if(requestCode == editStartHeartbeatRequestId) {
@@ -191,8 +229,11 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 			int iconResource,
 			int disabledIconResource) {
 		
-		if(id > 0 && null != values) {
+		if(null != values) {
 			button.setTag(R.id.tag_values, values);
+		}
+		
+		if(id > 0 && null != values) {
 			button.setText(
 				String.format(
 					getString(R.string.heartbeat_button_caption),

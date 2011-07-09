@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wheelly.R;
-import com.wheelly.db.DatabaseSchema;
+import com.wheelly.util.DateUtils;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -40,15 +40,15 @@ public final class DateTimeBar extends LinearLayout {
 		final long time = timeButton.getTime();
 		
 		return
-			new SimpleDateFormat(DatabaseSchema.DateFormat).format(new Date(date))
+			new SimpleDateFormat(DateUtils.DateFormat).format(new Date(date))
 			+ " "
-			+ new SimpleDateFormat(DatabaseSchema.TimeFormat).format(new Date(time));
+			+ new SimpleDateFormat(DateUtils.TimeFormat).format(new Date(time));
 	}
 	
 	public void setDateTime(String dateTime) {
 		try {
 			long millis = dateTime != null
-				? new SimpleDateFormat(DatabaseSchema.DateTimeFormat).parse(dateTime).getTime()
+				? DateUtils.dbFormat.parse(dateTime).getTime()
 				: new Date().getTime();
 			dateButton.setDate(millis);
 			timeButton.setTime(millis);

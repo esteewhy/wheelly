@@ -18,10 +18,6 @@ public final class DatabaseSchema {
 	private static final String PATH_REFUELS = "refuels";
 	private static final String PATH_HEARTBEATS = "heartbeats";
 	
-	public static final String DateFormat = "yyyy-MM-dd";
-	public static final String TimeFormat = "HH:mm:ss";
-	public static final String DateTimeFormat = DateFormat + " " + TimeFormat;
-	
 	public static final class Mileages {
 		public static final String Create = 
 			"CREATE TABLE mileages ("
@@ -44,7 +40,7 @@ public final class DatabaseSchema {
 			/// Constraints arent's supported prior 2.2
 			//+ ",FOREIGN KEY start_heartbeat_id REFERENCES heartbeats(_id)"
 			//+ ",FOREIGN KEY stop_heartbeat_id REFERENCES heartbeats(_id)"
-			+ ");";
+			+ ")";
 		
 		//Calculates amount of refuels occurred in progress of a given trip.
 		private static final String EnRouteRefuelAmount =
@@ -234,7 +230,7 @@ public final class DatabaseSchema {
 			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			+ "odometer		NUMERIC NOT NULL,"
 			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG);";
+			+ "place_id		LONG)";
 		
 		// reverse links detection
 		private static final String IconColumn =
@@ -261,7 +257,7 @@ public final class DatabaseSchema {
 			+ "SELECT COUNT(1) cnt FROM mileages WHERE stop_heartbeat_id = ?1"
 			+ " UNION "
 			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?1"
-			+ ");";
+			+ ")";
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
 		static {
@@ -290,13 +286,13 @@ public final class DatabaseSchema {
 			+"		longitude double,"
 			+"		is_payee integer not null default 0,"
 			+"		resolved_address text"
-			+"	);";
+			+"	)";
 		
 		public static final String Select =
-			"SELECT * FROM locations;";
+			"SELECT * FROM locations";
 		
 		public static final String Single =
-			"SELECT * FROM locations WHERE _id = ? LIMIT 1;";
+			"SELECT * FROM locations WHERE _id = ? LIMIT 1";
 		
 		public static final String SelectByMileages =
 			"SELECT l.* FROM locations l"

@@ -25,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.support.v4.widget.SimpleCursorAdapter;
 import com.wheelly.R;
@@ -77,6 +78,9 @@ public class HeartbeatList extends FragmentActivity {
 						@Override
 						public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 							switch(view.getId()) {
+							case R.id.date:
+								((TextView)view).setText(com.wheelly.util.DateUtils.formatVarying(cursor.getString(columnIndex)));
+								return true;
 							case R.id.fuelGauge:
 								ProgressBar pb = (ProgressBar)view; 
 								pb.setProgress(cursor.getInt(columnIndex));

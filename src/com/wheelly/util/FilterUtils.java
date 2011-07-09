@@ -1,6 +1,5 @@
 package com.wheelly.util;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -8,8 +7,6 @@ import java.util.Map;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.text.TextUtils;
-
-import com.wheelly.db.DatabaseSchema;
 
 public class FilterUtils {
 	
@@ -49,13 +46,12 @@ public class FilterUtils {
 		
 		if(filter.containsKey(F.PERIOD)) {
 			String[] parts = filter.getAsString(F.PERIOD).split(",");
-			SimpleDateFormat date = new SimpleDateFormat(DatabaseSchema.DateTimeFormat); 
 			conditions.add(filterExpr.get(F.PERIOD)
 				.replace("@from",
-					values.add(date.format(new Date(Long.valueOf(parts[1]))))
+					values.add(DateUtils.dbFormat.format(new Date(Long.valueOf(parts[1]))))
 					? "?" + values.size() : "clever?")
 				.replace("@to",
-					values.add(date.format(new Date(Long.valueOf(parts[2]))))
+					values.add(DateUtils.dbFormat.format(new Date(Long.valueOf(parts[2]))))
 					? "?" + values.size() : "hell yeah!")
 			);
 		}

@@ -1,9 +1,10 @@
 package com.wheelly.db;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.util.DateUtils;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -47,7 +48,7 @@ public class HeartbeatBroker {
 			
 		}
 		values.put(BaseColumns._ID, -1);
-		values.put("_created", new SimpleDateFormat(DatabaseSchema.DateTimeFormat).format(new Date()));
+		values.put("_created", DateUtils.dbFormat.format(new Date()));
 		return values;
 	}
 	

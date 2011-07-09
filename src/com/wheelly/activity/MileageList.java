@@ -82,7 +82,6 @@ public class MileageList extends FragmentActivity {
 			}
 			
 			getLoaderManager().initLoader(MILEAGE_LIST_LOADER, null, this);
-			
 			setListAdapter(
 				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, null,
 					new String[] {
@@ -96,6 +95,9 @@ public class MileageList extends FragmentActivity {
 					@Override
 					public void setViewText(TextView v, String text) {
 						switch(v.getId()) {
+						case R.id.date:
+							v.setText(com.wheelly.util.DateUtils.formatVarying(text));
+							break;
 						case R.id.mileage:
 							v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
 							break;

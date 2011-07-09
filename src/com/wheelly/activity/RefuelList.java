@@ -78,6 +78,9 @@ public class RefuelList extends FragmentActivity {
 					@Override
 					public void setViewText(TextView v, String text) {
 						switch(v.getId()) {
+						case R.id.date:
+							v.setText(com.wheelly.util.DateUtils.formatVarying(text));
+							break;
 						case R.id.mileage:
 						case R.id.fuel:
 							v.setText(TextUtils.isEmpty(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
