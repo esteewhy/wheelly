@@ -44,7 +44,7 @@ public class TripControlBar extends Fragment {
 		this.onValueChangedListener = listener;
 	}
 	
-	protected void onValueChanged(Value value) {
+	protected void triggerValueChanged(Value value) {
 		if(null != onValueChangedListener) {
 			onValueChangedListener.onValueChanged(value);
 		}
@@ -68,9 +68,8 @@ public class TripControlBar extends Fragment {
 			new OnClickListener() {
 				@Override
 				public void onClick(final View v) {
-					Intent intent = new Intent(getActivity(), HeartbeatDialog.class) {{
-						putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
-					}};
+					Intent intent = new Intent(getActivity(), HeartbeatDialog.class);
+					intent.putExtra(BaseColumns._ID, (Long)v.getTag(R.id.tag_id));
 					
 					ContentValues values = (ContentValues)v.getTag(R.id.tag_values);
 					if(null != values) {
@@ -115,7 +114,7 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 								public void onStartTrack(long trackId) {
 									// negative means "tracking in progress".
 									val.TrackId = trackId * -1;
-									onValueChanged(val);
+									triggerValueChanged(val);
 									v.setEnabled(true);
 								}
 								
@@ -145,15 +144,12 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if(resultCode == Activity.RESULT_OK) {
-			long id = data.getLongExtra(BaseColumns._ID, 0);
 			ContentValues heartbeat = data.getParcelableExtra("heartbeat");
 			final Value value = this.getValue();
 			
 			if(requestCode == editStartHeartbeatRequestId) {
-				value.StartId = id;
 				value.StartHeartbeat = heartbeat;
 			} else if (requestCode == editStopHeartbeatRequestId) {
-				value.StopId = id;
 				value.StopHeartbeat = heartbeat;
 				
 				if(value.TrackId > 0
@@ -172,7 +168,7 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 				}
 			}
 			
-			onValueChanged(value);
+			triggerValueChanged(value);
 		}
 	}
 	
@@ -180,9 +176,7 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 	 * Returns a pair of heartbeats been edited.
 	 */
 	public Value getValue() {
-		Value result = new Value();
-		result.StartId			= (Long)c.StartButton.getTag(R.id.tag_id);
-		result.StopId			= (Long)c.StopButton.getTag(R.id.tag_id);
+		final Value result = new Value();
 		result.StartHeartbeat	= (ContentValues)c.StartButton.getTag(R.id.tag_values);
 		result.StopHeartbeat	= (ContentValues)c.StopButton.getTag(R.id.tag_values);
 		result.TrackId			= (Long)c.StartButton.getTag(R.id.tag_track_id);
@@ -219,21 +213,28 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 	public void setValue(Value value) {
 		c.StartButton.setTag(R.id.tag_track_id, value.TrackId);
 		
-		c.StartButton.setTag(R.id.tag_id, value.StartId);
-		c.StopButton.setTag(R.id.tag_id, value.StopId);
+		final long startId = value.StartHeartbeat != null
+				&& value.StartHeartbeat.containsKey(BaseColumns._ID)
+			? value.StartHeartbeat.getAsLong(BaseColumns._ID)
+			: -1;
 		
-		this.canStartTracking = value.StartId > 0
+		final long stopId = value.StopHeartbeat != null
+				&& value.StopHeartbeat.containsKey(BaseColumns._ID)
+			? value.StopHeartbeat.getAsLong(BaseColumns._ID)
+			: -1;
+		
+		this.canStartTracking = startId > 0
 			&& value.TrackId == 0
-			&& value.StopId == 0
+			&& stopId <= 0
 			&& new Tracker(getActivity()).checkAvailability();
 		
 		// Store temp values into controls.
-		initButton(c.StartButton, value.StartId,  value.StartHeartbeat,
+		initButton(c.StartButton, startId,  value.StartHeartbeat,
 			R.string.start, R.drawable.btn_start, canStartTracking ? R.drawable.btn_record : R.drawable.btn_start_disabled);
-		initButton(c.StopButton, value.StopId, value.StopHeartbeat,
+		initButton(c.StopButton, stopId, value.StopHeartbeat,
 			R.string.stop, R.drawable.btn_stop, R.drawable.btn_stop_disabled);
 		
-		c.StopButton.setEnabled(value.StartId > 0);
+		c.StopButton.setEnabled(startId > 0);
 		
 		// Pass request id signaling whether to start tracking after edit activity finishes.
 		c.StartButton.setTag(R.id.tag_request_code,
@@ -261,8 +262,6 @@ Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
 	}
 	
 	public static class Value {
-		public long StartId;
-		public long StopId;
 		public ContentValues StartHeartbeat;
 		public ContentValues StopHeartbeat;
 		

@@ -96,7 +96,7 @@
 		android:progress				="40"
 		android:paddingBottom			="4dp"
 		android:layout_height			="12dp"
-		style							="@style/ProgressBarBudget"
+		style							="@style/ProgressBarFuel"
 		android:layout_below			="@id/layout"
 		android:layout_alignLeft		="@id/layout" />
 	

@@ -54,15 +54,12 @@ public class Mileage extends FragmentActivity {
 		});
 		c.Track.setValue(values.getAsLong("track_id"));
 		
-		final TripControlBar.Value heartbeats = new TripControlBar.Value() {{
-			StartId = values.getAsLong("start_heartbeat_id");
-			StopId  = values.getAsLong("stop_heartbeat_id");
-			TrackId = values.getAsLong("track_id");
-		}};
+		final TripControlBar.Value heartbeats = new TripControlBar.Value();
+		heartbeats.TrackId = values.getAsLong("track_id");
 		
 		HeartbeatBroker broker = new HeartbeatBroker(this);
-		heartbeats.StartHeartbeat = broker.loadOrCreate(heartbeats.StartId);
-		heartbeats.StopHeartbeat = broker.loadOrCreate(heartbeats.StopId);
+		heartbeats.StartHeartbeat = broker.loadOrCreate(values.getAsLong("start_heartbeat_id"));
+		heartbeats.StopHeartbeat = broker.loadOrCreate(values.getAsLong("stop_heartbeat_id"));
 		c.Heartbeats.setOnValueChangedListener(new TripControlBar.OnValueChangedListener() {
 			@Override
 			public void onValueChanged(TripControlBar.Value value) {
@@ -81,7 +78,7 @@ public class Mileage extends FragmentActivity {
 					c.Track.setValue(value.TrackId);
 				}
 				
-				if(c.Destination.getValue() == 0
+				if(c.Destination.getValue() <= 0
 						&& value.StopHeartbeat != null
 						&& value.StopHeartbeat.containsKey("place_id")) {
 					c.Destination.setValue(value.StopHeartbeat.getAsLong("place_id"));
@@ -99,8 +96,16 @@ public class Mileage extends FragmentActivity {
 					values.put("location_id",	c.Destination.getValue());
 					
 					final TripControlBar.Value heartbeats = c.Heartbeats.getValue();
-					values.put("start_heartbeat_id",	heartbeats.StartId);
-					values.put("stop_heartbeat_id",		heartbeats.StopId);
+					
+					if(null != heartbeats.StartHeartbeat
+							&& heartbeats.StartHeartbeat.containsKey(BaseColumns._ID)) {
+						values.put("start_heartbeat_id",	heartbeats.StartHeartbeat.getAsLong(BaseColumns._ID));
+					}
+					
+					if(null != heartbeats.StopHeartbeat
+							&& heartbeats.StopHeartbeat.containsKey(BaseColumns._ID)) {
+						values.put("stop_heartbeat_id",	heartbeats.StopHeartbeat.getAsLong(BaseColumns._ID));
+					}
 					
 					final long trackId = c.Track.getValue();
 					values.put("track_id", trackId > 0 ? trackId : heartbeats.TrackId);

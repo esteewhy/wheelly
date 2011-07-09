@@ -125,12 +125,66 @@ public final class LocationInput extends Fragment {
 	
 	public void setValue(long locationId) {
 		if (locationId <= 0) {
-			selectCurrentLocation(false);
+			if(!selectNearestExistingLocation()) { 
+				selectCurrentLocation(false);
+			}
 		} else {
 			if (Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
 				setLocationFromCursor();
 			}
 		}
+	}
+	
+	private boolean selectNearestExistingLocation() {
+		LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+		
+		Criteria criteria = new Criteria(); 
+		criteria.setPowerRequirement(Criteria.POWER_LOW); 
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE); 
+		criteria.setAltitudeRequired(false); 
+		criteria.setBearingRequired(false); 
+		criteria.setSpeedRequired(false); 
+		criteria.setCostAllowed(false); 
+		String provider = lm.getBestProvider(criteria, true);
+		
+		if(provider != null) {
+			final Location mLocation = lm.getLastKnownLocation(provider);
+			
+			if(null!= mLocation) {
+				long locationId = resolveLocation(mLocation);
+				
+				if(locationId > 0) {
+					setValue(locationId);
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Attempts to find a closest to given location among existing in the db.
+	 */
+	private long resolveLocation(Location location) {
+		long locationId = -1;
+		float minDistance = 10e+9f;
+		
+		if(locationCursor.moveToFirst()) {
+			do {
+				final float distance = location.distanceTo(new Location("existing") {{
+					setLongitude(locationCursor.getDouble(locationCursor.getColumnIndex("longitude")));
+					setLatitude(locationCursor.getDouble(locationCursor.getColumnIndex("latitude")));
+				}});
+				
+				if(minDistance >= distance) {
+					minDistance = distance;
+					locationId = locationCursor.getLong(locationCursor.getColumnIndex(BaseColumns._ID)); 
+				}
+			} while(locationCursor.moveToNext());
+		}
+		
+		return locationId;
 	}
 	
 	/**

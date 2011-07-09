@@ -230,7 +230,7 @@ containing a value of this type.
         public static final int notification_icon_transaction=0x7f02009d;
         public static final int notification_icon_transfer=0x7f02009e;
         public static final int orangesoftware=0x7f02009f;
-        public static final int progress_horizontal_budget=0x7f0200a0;
+        public static final int progress_fuel=0x7f0200a0;
         public static final int refuel=0x7f0200a1;
         public static final int report_icon_default=0x7f0200a2;
         public static final int right_arrow=0x7f0200a3;
@@ -854,7 +854,7 @@ containing a value of this type.
         public static final int MinusButton=0x7f0b0005;
         public static final int MoreButton=0x7f0b0007;
         public static final int PlusButton=0x7f0b0006;
-        public static final int ProgressBarBudget=0x7f0b0010;
+        public static final int ProgressBarFuel=0x7f0b0010;
         public static final int TallTitleBarTheme=0x7f0b000e;
         public static final int TextAppearance=0x7f0b0001;
         public static final int TextAppearance_NegativeAmount=0x7f0b0003;

@@ -73,11 +73,12 @@
 		<item name="android:paddingBottom">1dip</item> 
 		<item name="android:background">@android:drawable/bottom_bar</item> 
 	</style>	
-	<style name="ProgressBarBudget" parent="@android:style/Widget.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_horizontal_budget</item>
-        <item name="android:minHeight">12dip</item>
-        <item name="android:maxHeight">12dip</item>
-    </style>
+	
+	<style name="ProgressBarFuel" parent="@android:style/Widget.ProgressBar.Horizontal">
+		<item name="android:progressDrawable">@drawable/progress_fuel</item>
+		<item name="android:minHeight">12dip</item>
+		<item name="android:maxHeight">12dip</item>
+	</style>
 	
 	<style name="HeartbeatTypeIcon">
 		<item name="android:layout_width">11dp</item>
