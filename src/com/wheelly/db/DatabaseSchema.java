@@ -74,7 +74,7 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations dest"
 			+ "		ON m.location_id = dest." + BaseColumns._ID;
 		
-		public static final String[] SingleViewProjection = {
+		public static final String[] SINGLE_VIEW_PROJECTION = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
 			"mileage",
@@ -83,6 +83,7 @@ public final class DatabaseSchema {
 			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
+			"start._created start_time",
 			"dest.name destination"
 		};
 		

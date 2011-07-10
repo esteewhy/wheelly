@@ -1,9 +1,8 @@
 package com.wheelly.app;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ru.orangesoftware.financisto.view.NodeInflater;
 
 import com.wheelly.R;
@@ -132,7 +131,7 @@ public class InfoDialogFragment extends DialogFragment {
 		/**
 		 * Hash of 'label resource id' : 'string value' to display in a property grid.
 		 */
-		public final Map<Integer, String> fields = new HashMap<Integer, String>();
+		public final Map<Integer, String> fields = new LinkedHashMap<Integer, String>();
 		/**
 		 * Lazy loaded cursor containing a single record to display.
 		 */

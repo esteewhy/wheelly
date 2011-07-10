@@ -139,8 +139,11 @@ public class MileageList extends FragmentActivity {
 			new InfoDialogFragment(
 				new InfoDialogFragment.Options() {{
 					
-					fields.put(R.string.odometer_input_label, "mileage");
-					fields.put(R.string.fuel_input_label, "fuel");
+					fields.put(R.string.mileage_input_label, "mileage");
+					fields.put(R.string.fuel_consumption, "fuel");
+					fields.put(R.string.departure, "start_time");
+					fields.put(R.string.origin, "start_place");
+					fields.put(R.string.finish, "stop_place");
 					
 					titleField = "destination";
 					dataField = "_created";
@@ -158,7 +161,7 @@ public class MileageList extends FragmentActivity {
 					loader = new CursorLoader(
 						getActivity(),
 						Mileages.CONTENT_URI,
-						Mileages.SingleViewProjection,
+						Mileages.SINGLE_VIEW_PROJECTION,
 						"m." + BaseColumns._ID + " = ?",
 						new String[] { Long.toString(id) },
 						"m." + BaseColumns._ID + " DESC LIMIT 1");
