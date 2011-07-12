@@ -127,10 +127,8 @@ public class TripControlBar extends Fragment {
 	private void presetStopMileage(Value val) {
 		float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
 		
-//Toast.makeText(getActivity(), Float.toString(distance), 9000).show();
-		
 		if(val.StartHeartbeat != null) {
-			// On new mileage there's no stop heartbeat until after [stop]
+			// On new mileage there might no stop heartbeat until after [stop]
 			// button been clicked and heartbeat form submitted,
 			// so we have to create default heartbeat values in advance
 			// to pre-set mileage to.

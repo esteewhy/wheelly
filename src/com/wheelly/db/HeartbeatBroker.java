@@ -45,10 +45,13 @@ public class HeartbeatBroker {
 			values.put("odometer", 0);
 			values.put("fuel", 0);
 			values.put("place_id", -1);
-			
 		}
-		values.put(BaseColumns._ID, -1);
-		values.put("_created", DateUtils.dbFormat.format(new Date()));
+		
+		if(id <= 0) {
+			values.put(BaseColumns._ID, -1);
+			values.put("_created", DateUtils.dbFormat.format(new Date()));
+		}
+		
 		return values;
 	}
 	
