@@ -5,18 +5,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.wheelly.R;
 import com.wheelly.activity.HeartbeatDialog;
 import com.wheelly.content.TrackRepository;
+import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.service.Tracker;
 import com.wheelly.service.Tracker.TrackListener;
+import com.wheelly.util.DateUtils;
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -98,6 +105,80 @@ public class TripControlBar extends Fragment {
 		startActivityForResult(intent, requestId);
 	}
 	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		if(v == c.StartButton || v == c.StopButton) {
+			final Cursor cursor =
+				getActivity().getContentResolver()
+					.query(
+						Heartbeats.CONTENT_URI,
+						new String[] {
+							"h." + BaseColumns._ID,
+							"odometer",
+							"fuel",
+							"_created"
+						},
+						Heartbeats.IconColumnExpression + " = 0",
+						null,
+						"h._created");
+			
+			if(cursor.moveToFirst()) {
+				menu.setHeaderTitle("Orphan heartbeats");
+				
+				int[] indices = new int[] {
+					cursor.getColumnIndex(BaseColumns._ID),
+					cursor.getColumnIndex("odometer"),
+					cursor.getColumnIndex("fuel"),
+					cursor.getColumnIndex("_created"),
+				};
+				
+				long[] ids = new long[cursor.getCount()];
+				int idx = 0;
+				
+				while(cursor.moveToNext()) {
+					
+					ids[idx] = cursor.getLong(indices[0]);
+					
+					menu.add(v.getId(), idx++, Menu.NONE,
+						DateUtils.formatVarying(cursor.getString(indices[3]))
+						+ ": " + cursor.getLong(indices[1])
+						+ " / " + cursor.getLong(indices[2]));
+				}
+				
+				v.setTag(ids);
+			}
+			
+			cursor.close();
+		}
+		
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		int viewId = item.getGroupId();
+		
+		int action = viewId == c.StartButton.getId()
+			? 1 : viewId == c.StopButton.getId() ? 2 : 0;
+		
+		if(action > 0) {
+			final Value val = getValue();
+			long[] ids = (long[])(action == 1 ? c.StartButton : c.StopButton).getTag();
+			final ContentValues h = new HeartbeatBroker(getActivity()).loadOrCreate(ids[item.getItemId()]);
+			
+			switch(action) {
+			case 1: val.StartHeartbeat = h; break;
+			case 2: val.StopHeartbeat = h; break;
+			}
+			
+			setValue(val);
+			return true;
+		}
+		
+		return super.onContextItemSelected(item);
+	}
+	
 	private void stop(final View v) {
 		final Value val = getValue();
 		
@@ -128,7 +209,7 @@ public class TripControlBar extends Fragment {
 		float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
 		
 		if(val.StartHeartbeat != null) {
-			// On new mileage there might no stop heartbeat until after [stop]
+			// On new mileage there might be no stop heartbeat until after [stop]
 			// button been clicked and heartbeat form submitted,
 			// so we have to create default heartbeat values in advance
 			// to pre-set mileage to.
@@ -237,8 +318,10 @@ public class TripControlBar extends Fragment {
 					getString(R.string.heartbeat_button_caption),
 					values.getAsLong("odometer"),
 					values.getAsLong("fuel")));
+			unregisterForContextMenu(button);
 		} else {
 			button.setText(defaultTextResource);
+			registerForContextMenu(button);
 		}
 		
 		// Update icons.

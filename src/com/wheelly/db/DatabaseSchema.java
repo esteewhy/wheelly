@@ -234,10 +234,10 @@ public final class DatabaseSchema {
 			+ "place_id		LONG)";
 		
 		// reverse links detection
-		private static final String IconColumn =
-			"EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
+		public static final String IconColumnExpression =
+			"(EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
 			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
-			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id) icons";
+			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id))";
 		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID,
@@ -245,7 +245,7 @@ public final class DatabaseSchema {
 			"h.odometer",
 			"h.fuel",
 			"l.name place",
-			IconColumn
+			IconColumnExpression + "  icons"
 		};
 		
 		public static final String Tables = "heartbeats h"
