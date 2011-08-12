@@ -7,8 +7,11 @@ import com.wheelly.content.TrackRepository;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
@@ -21,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Recorded track selection (using MyTracks app as a source).
@@ -54,15 +58,7 @@ public final class TrackInput extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
-		
-		ctx.startManagingCursor(tracksCursor = new TrackRepository(ctx).list());
-		final ListAdapter adapter =
-			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_spinner_dropdown_item,
-					tracksCursor, 
-					new String[] {"name"},
-					new int[] { android.R.id.text1 }
-			);
+		tracksCursor = new TrackRepository(ctx).list();
 		
 		final View v = inflater.inflate(R.layout.select_entry_plus, container, true);
 		
@@ -73,26 +69,49 @@ public final class TrackInput extends Fragment {
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		
-		v.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new AlertDialog.Builder(ctx)
-					.setSingleChoiceItems(adapter,
-						Utils.moveCursor(tracksCursor, BaseColumns._ID, selectedTrackId),
-						new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-								tracksCursor.moveToPosition(which);	
-								long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id"));
-								onTrackChanged(selectedId);
+		if(null != tracksCursor) {
+		
+			ctx.startManagingCursor(tracksCursor);
+			final ListAdapter adapter =
+				new SimpleCursorAdapter(ctx,
+						android.R.layout.simple_spinner_dropdown_item,
+						tracksCursor, 
+						new String[] {"name"},
+						new int[] { android.R.id.text1 }
+				);
+		
+			v.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new AlertDialog.Builder(ctx)
+						.setSingleChoiceItems(adapter,
+							Utils.moveCursor(tracksCursor, BaseColumns._ID, selectedTrackId),
+							new DialogInterface.OnClickListener(){
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.cancel();
+									tracksCursor.moveToPosition(which);	
+									long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id"));
+									onTrackChanged(selectedId);
+								}
 							}
-						}
-					)
-					.setTitle(R.string.tracks)
-					.show();
-			}
-		});
+						)
+						.setTitle(R.string.tracks)
+						.show();
+				}
+			});
+		} else {
+			v.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					try {
+				        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.mytracks")));
+				    } catch (ActivityNotFoundException e) {
+				        Toast.makeText(getActivity(), "Market not installed. Please install MyTracks app manually.", Toast.LENGTH_SHORT).show();
+				    }
+				}
+			});
+		}
 		
 		c = new Controls(v);
 		c.labelView.setText(R.string.track);
