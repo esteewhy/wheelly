@@ -1,0 +1,309 @@
+package com.wheelly.activity;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.BaseColumns;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
+import android.widget.ListView;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Toast;
+
+import com.wheelly.R;
+import com.wheelly.util.FilterUtils.F;
+import com.wheelly.app.FilterButton.OnFilterChangedListener;
+import com.wheelly.app.InfoDialogFragment;
+import com.wheelly.app.StatusBarControls;
+import com.wheelly.db.DatabaseSchema.Mileages;
+import com.wheelly.service.Tracker;
+import com.wheelly.util.FilterUtils;
+import com.wheelly.util.FilterUtils.FilterResult;
+
+public class MileageList extends FragmentActivity {
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.mileage_list);
+	}
+	
+	public static class MileageListFragment extends ListFragment
+		implements LoaderCallbacks<Cursor> {
+		
+		private static final int MILEAGE_LIST_LOADER = 0x01;
+		private static final int NEW_REQUEST = 1;
+		private static final int EDIT_REQUEST = 2;
+		private static final int DELETE_REQUEST = 3;
+		
+		private ProgressDialog progressDialog;
+		private StatusBarControls c;
+		private boolean suggestInstall = false;
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			final FragmentActivity ctx = getActivity();
+			
+			progressDialog = new ProgressDialog(ctx);
+			progressDialog.setTitle(R.string.loading);
+			progressDialog.setMessage(getString(R.string.loading_message));
+			progressDialog.setCancelable(false);
+			
+			setEmptyText(getString(R.string.no_mileages));
+			
+			//Advise user installing MyTracks app.
+			suggestInstall =
+				null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
+					? savedInstanceState.getBoolean("suggestInstall")
+					: !new Tracker(ctx).checkAvailability();
+			
+			if(suggestInstall) {
+				Toast.makeText(ctx, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
+			}
+			
+			getLoaderManager().initLoader(MILEAGE_LIST_LOADER, null, this);
+			setListAdapter(
+				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, null,
+					new String[] {
+						"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination"
+					},
+					new int[] {
+						R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
+					},
+					0//CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
+				) {
+					@Override
+					public void setViewText(TextView v, String text) {
+						switch(v.getId()) {
+						case R.id.date:
+							v.setText(com.wheelly.util.DateUtils.formatVarying(text));
+							break;
+						case R.id.mileage:
+							v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
+							break;
+						default: super.setViewText(v, text);
+						}
+					}
+				});
+			
+			registerForContextMenu(getListView());
+			setHasOptionsMenu(true);
+			
+			// Set up status bar (if present).
+			c = new StatusBarControls(ctx);
+			c.AddButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					c.AddButton.setEnabled(false);
+					Intent intent = new Intent(ctx, Mileage.class);
+					startActivityForResult(intent, NEW_REQUEST);
+				}
+			});
+			c.TransferButton.setVisibility(View.GONE);
+			c.TemplateButton.setVisibility(View.GONE);
+			
+			c.FilterButton.setLocationConstraint("mileages");
+			c.FilterButton.SetOnFilterChangedListener(new OnFilterChangedListener() {
+				@Override
+				public void onFilterChanged(ContentValues value) {
+					final Bundle args = new Bundle();
+					args.putParcelable("filter", value);
+					getLoaderManager().restartLoader(MILEAGE_LIST_LOADER, args,
+							MileageListFragment.this);
+				}
+			});
+			c.TotalLayout.setVisibility(View.GONE);
+		}
+		
+		private void viewItem(final long id) {
+			new InfoDialogFragment(
+				new InfoDialogFragment.Options() {{
+					
+					fields.put(R.string.mileage_input_label, "mileage");
+					fields.put(R.string.fuel_consumption, "fuel");
+					fields.put(R.string.departure, "start_time");
+					fields.put(R.string.origin, "start_place");
+					fields.put(R.string.finish, "stop_place");
+					
+					titleField = "destination";
+					dataField = "_created";
+					iconResId = R.drawable.mileage;
+					
+					onClickListener = new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(which == Dialog.BUTTON_POSITIVE) {
+								editItem(id);
+							}
+						};
+					};
+					
+					loader = new CursorLoader(
+						getActivity(),
+						Mileages.CONTENT_URI,
+						Mileages.SINGLE_VIEW_PROJECTION,
+						"m." + BaseColumns._ID + " = ?",
+						new String[] { Long.toString(id) },
+						"m." + BaseColumns._ID + " DESC LIMIT 1");
+				}}
+			).show(getFragmentManager(), "dialog");
+		}
+		
+		private void editItem(final long id) {
+			Intent intent = new Intent(getActivity(), Mileage.class);
+			intent.putExtra(BaseColumns._ID, id);
+			startActivityForResult(intent, EDIT_REQUEST);
+		}
+		
+		@Override
+		public void onListItemClick(ListView listView, View view, int position, final long id) {
+			viewItem(id);
+		}
+		
+		@Override
+		public void onActivityResult(int requestCode, int resultCode, Intent data) {
+			switch(requestCode) {
+			case NEW_REQUEST:
+				c.AddButton.setEnabled(true);
+			case EDIT_REQUEST:
+				((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
+				break;
+			}
+		}
+		
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			super.onCreateOptionsMenu(menu, inflater);
+			inflater.inflate(R.menu.mileages_menu, menu);
+			menu.findItem(R.id.opt_menu_install_mytracks).setVisible(suggestInstall);
+		}
+		
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+				case R.id.opt_menu_add:
+					Intent intent = new Intent(getActivity(), Mileage.class);
+					startActivityForResult(intent, NEW_REQUEST);
+					return true;
+				case R.id.opt_menu_install_mytracks:
+					Intent marketIntent = new Intent(Intent.ACTION_VIEW)
+						.setData(Uri.parse("market://details?id=com.google.android.maps.mytracks"));
+					startActivity(marketIntent);
+					return true;
+				default:
+					return super.onOptionsItemSelected(item);
+			}
+		}
+		
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
+			menu.setHeaderTitle(R.string.mileages);
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
+		
+		@Override
+		public boolean onContextItemSelected(MenuItem item) {
+			super.onContextItemSelected(item);
+			
+			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
+			
+			switch (item.getItemId()) {
+				case R.id.ctx_menu_view: {
+					viewItem(mi.id);
+					return true;
+				}
+				case R.id.ctx_menu_edit:
+					editItem(mi.id);
+					return true;
+				case R.id.ctx_menu_delete:
+					new AlertDialog.Builder(getActivity())
+						.setMessage(R.string.delete_mileage_confirm)
+						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								getActivity().getContentResolver().delete(
+									Mileages.CONTENT_URI,
+									BaseColumns._ID + " = ?",
+									new String[] { Long.toString(mi.id) });
+								onActivityResult(DELETE_REQUEST, RESULT_OK, null);
+							}
+						})
+						.setNegativeButton(R.string.no, null)
+						.show();
+					return true;
+			}
+			return false;
+		}
+		
+		@Override
+		public void onSaveInstanceState(Bundle outState) {
+			super.onSaveInstanceState(outState);
+			outState.putBoolean("suggestInstall", suggestInstall);
+		}
+
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			final ContentValues filter;
+			
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					progressDialog.show();
+				}
+			});
+			
+			if(args != null && args.containsKey("filter")
+					&& (filter = args.getParcelable("filter")).size() > 0) {
+				final FilterResult sql = FilterUtils.updateSqlFromFilter(
+					filter, Mileages.FilterExpr);
+				
+				return new CursorLoader(getActivity(),
+					Mileages.CONTENT_URI, Mileages.ListProjection,
+					sql.Where, sql.Values, 	sql.Order);
+			}
+			
+			return new CursorLoader(getActivity(),
+				Mileages.CONTENT_URI, Mileages.ListProjection,
+				null, null,
+				Mileages.FilterExpr.get(F.SORT_ORDER) + " DESC");
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			((CursorAdapter) getListAdapter()).swapCursor(data);
+			
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					progressDialog.dismiss();
+				}
+			});
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			((CursorAdapter) getListAdapter()).swapCursor(null);
+		}
+	}
+}

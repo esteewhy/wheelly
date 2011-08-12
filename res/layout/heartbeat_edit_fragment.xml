@@ -1,0 +1,45 @@
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<com.wheelly.widget.DateTimeBar
+		android:id				="@+id/datetimebar"
+		android:layout_height	="wrap_content"
+		android:layout_width	="fill_parent"
+		style					="@style/ButtonBar"/>
+	
+	<com.wheelly.widget.LabeledLayout
+		xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+		android:layout_width	="fill_parent"
+		android:layout_height	="wrap_content"
+		wheelly:label			="@string/odometer_input_label">
+		<com.wheelly.widget.MileageInput
+			android:id				="@+id/odometer"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent" />
+	</com.wheelly.widget.LabeledLayout>
+	
+	<include
+		layout	="@layout/edit_divider" />
+	
+	<com.wheelly.widget.LabeledLayout
+		xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
+		android:layout_width	="fill_parent"
+		android:layout_height	="wrap_content"
+		wheelly:label			="@string/fuel_input_label">
+		<com.wheelly.widget.FuelInput
+			android:id				="@+id/fuel"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent"/>
+	</com.wheelly.widget.LabeledLayout>
+	
+	<include
+		layout	="@layout/edit_divider" />
+	
+	<fragment
+		class					="com.wheelly.app.LocationInput"
+		android:id				="@+id/place"
+		android:layout_height	="wrap_content"
+		android:layout_width	="fill_parent" />
+</LinearLayout>

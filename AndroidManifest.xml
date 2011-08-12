@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		package="com.wheelly"
+		android:versionCode="4"
+		android:versionName="20110615">
+	<application
+			android:icon="@drawable/icon"
+			android:label="@string/app_name">
+		
+		<uses-library android:name="com.google.android.maps" android:required="false" />
+		
+		<activity
+				android:label="@string/app_name"
+				android:configChanges="orientation|keyboardHidden"
+				android:taskAffinity=".Main"
+				android:name=".activity.Main">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name=".activity.HeartbeatList" />
+		<activity android:name=".activity.Heartbeat"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
+		<activity android:name=".activity.HeartbeatDialog"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		<activity android:name=".activity.MileageList"></activity>
+		<activity android:name=".activity.Mileage"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Mileage"
+			android:launchMode="singleTop" />
+		<activity android:name=".activity.RefuelList"></activity>
+		<activity android:name=".activity.Refuel"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
+		<activity android:name=".widget.QuickMultiNumberInput"
+			android:label="@string/amount"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	="ru.orangesoftwar.financisto.activity.DateFilterActivity"
+			android:label	="@string/filter"
+			android:theme	="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	=".activity.Filter"
+			android:label	="@string/filter"
+			android:theme	="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	=".activity.Preferences"
+			android:label	="@string/preferences" />
+		
+		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
+			android:label="@string/amount"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
+			android:label="@string/calculator"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.DateFilterActivity"
+			android:label="@string/filter"
+			android:theme="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity"
+			android:label="@string/location"
+			android:launchMode="singleTop" />
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
+			android:label="@string/locations"
+			android:launchMode="singleTop" />
+			
+		<provider
+			android:authorities="com.wheelly"
+			android:multiprocess="true"
+			android:name=".content.ChronologyProvider">
+		</provider>
+	</application>
+	
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
+	
+	<supports-screens 
+		android:smallScreens="true"
+		android:normalScreens="true"
+		android:largeScreens="true"
+		android:anyDensity="true"/>
+
+	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+	<uses-feature android:name="android.hardware.location" android:required="false" />
+	<uses-feature android:name="android.hardware.location.network" android:required="false" />
+	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
+
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.VIBRATE"/>
+	<uses-permission android:name="com.google.android.apps.mytracks.WRITE_TRACK_DATA" />
+	<uses-permission android:name="com.google.android.apps.mytracks.READ_TRACK_DATA"/>
+	
+</manifest> 

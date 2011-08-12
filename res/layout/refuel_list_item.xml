@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2010 Denis Solonenko.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the GNU Public License v2.0
+  which accompanies this distribution, and is available at
+  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  
+  Contributors:
+      Denis Solonenko - initial API and implementation
+  
+	2011-02-27: Adapted for Wheelly by esteewhy
+-->
+<RelativeLayout
+	xmlns:android			="http://schemas.android.com/apk/res/android"
+	android:layout_width	="wrap_content"
+	android:layout_height	="wrap_content"
+	android:paddingLeft		="10dp"
+	android:paddingRight	="12dp">
+
+	<TextView
+		android:layout_width	="wrap_content"
+		android:layout_height	="wrap_content"
+		android:singleLine		="true"
+		android:id				="@+id/date"
+		android:text			="2011-03-21 09:01"
+		android:textSize		="10dp"
+		android:paddingTop		="2dp" />
+	
+	<TextView android:id		="@+id/cost"
+		android:layout_width	="wrap_content"
+		android:layout_height	="wrap_content"
+		android:layout_alignParentRight="true"
+		android:singleLine		="true"
+		android:text			="$12.00"
+		android:textAppearance	="?android:attr/textAppearanceSmall"/>
+	
+	<LinearLayout
+		android:layout_height	="wrap_content"
+		android:id				="@+id/layout"
+		android:layout_alignLeft="@id/date"
+		android:layout_below	="@id/date"
+		android:layout_width	="fill_parent">
+		
+		<TextView
+			android:id				="@+id/mileage"
+			android:text			="283.5"
+			android:textAppearance	="?android:attr/textAppearanceLarge"
+			android:layout_alignParentLeft	="true"
+			android:layout_marginRight	="3dip"
+			android:layout_height	="wrap_content"
+			android:layout_width	="wrap_content"/>
+		
+		<TextView style="@style/LocationText"
+			android:id				="@+id/place"
+			android:layout_weight	="1"/>
+		
+		<TextView android:id		="@+id/fuel"
+			android:gravity			="center_vertical"
+			android:layout_marginLeft	="5dip"
+			android:layout_marginRight	="3dip"
+			android:layout_width	="wrap_content"
+			android:layout_height	="wrap_content"
+			android:layout_alignParentTop	="true"
+			android:textAppearance	="?android:attr/textAppearanceLarge"
+			android:singleLine		="true"
+			android:text			="+32.22"
+			android:textColor		="@color/positive_amount"/>
+		
+		<TextView android:id		="@+id/fuel_uom"
+			android:gravity			="center_vertical"
+			android:layout_width	="wrap_content"
+			android:layout_height	="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentTop="true"
+			android:textAppearance	="?android:attr/textAppearanceLarge"
+			android:textColor		="#ccc"
+			android:text			="L"/>
+		
+	</LinearLayout>
+</RelativeLayout>
