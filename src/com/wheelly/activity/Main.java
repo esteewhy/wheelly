@@ -23,17 +23,17 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 		final Resources res = getResources();
 		
 		tabHost.addTab(tabHost.newTabSpec("mileages")
-			.setIndicator(getString(R.string.mileages), res.getDrawable(R.drawable.ic_tab_mileage))
+			.setIndicator(getString(R.string.mileages), res.getDrawable(R.drawable.ic_tab_jet))
 			.setContent(new Intent(this, MileageList.class))
 		);
 		
 		tabHost.addTab(tabHost.newTabSpec("refuels")
-			.setIndicator(getString(R.string.refuels), res.getDrawable(R.drawable.ic_tab_refuel))
+			.setIndicator(getString(R.string.refuels), res.getDrawable(R.drawable.ic_tab_utensils))
 			.setContent(new Intent(this, RefuelList.class))
 		);
 		
 		tabHost.addTab(tabHost.newTabSpec("heartbeats")
-			.setIndicator(getString(R.string.heartbeats), res.getDrawable(R.drawable.ic_tab_heartbeat))
+			.setIndicator(getString(R.string.heartbeats), res.getDrawable(R.drawable.ic_tab_cam))
 			.setContent(new Intent(this, HeartbeatList.class))
 		);
 		

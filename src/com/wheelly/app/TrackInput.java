@@ -7,11 +7,8 @@ import com.wheelly.content.TrackRepository;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
@@ -24,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Recorded track selection (using MyTracks app as a source).
@@ -58,7 +54,6 @@ public final class TrackInput extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
-		tracksCursor = new TrackRepository(ctx).list();
 		
 		final View v = inflater.inflate(R.layout.select_entry_plus, container, true);
 		
@@ -69,8 +64,11 @@ public final class TrackInput extends Fragment {
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		
-		if(null != tracksCursor) {
 		
+		tracksCursor = new TrackRepository(ctx).list();
+		
+		//@todo implement notification about disabled sharing in MyTracks
+		if(null != tracksCursor) {
 			ctx.startManagingCursor(tracksCursor);
 			final ListAdapter adapter =
 				new SimpleCursorAdapter(ctx,
@@ -79,7 +77,8 @@ public final class TrackInput extends Fragment {
 						new String[] {"name"},
 						new int[] { android.R.id.text1 }
 				);
-		
+			
+			
 			v.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -98,17 +97,6 @@ public final class TrackInput extends Fragment {
 						)
 						.setTitle(R.string.tracks)
 						.show();
-				}
-			});
-		} else {
-			v.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try {
-				        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.mytracks")));
-				    } catch (ActivityNotFoundException e) {
-				        Toast.makeText(getActivity(), "Market not installed. Please install MyTracks app manually.", Toast.LENGTH_SHORT).show();
-				    }
 				}
 			});
 		}

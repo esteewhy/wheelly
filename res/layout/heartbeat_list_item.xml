@@ -22,7 +22,6 @@
 		android:singleLine		="true"
 		android:id				="@+id/date"
 		android:text			="2011-03-21 09:01"
-		android:textSize		="10dp"
 		android:paddingTop		="2dp" />
 	
 	<LinearLayout

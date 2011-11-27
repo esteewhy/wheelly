@@ -38,13 +38,17 @@ public class HeartbeatBroker {
 					"_created DESC LIMIT 1");
 		
 		ContentValues values;
-		if(cursor.moveToFirst()) {
-			values = deserialize(cursor);
-		} else {
-			values = new ContentValues();
-			values.put("odometer", 0);
-			values.put("fuel", 0);
-			values.put("place_id", -1);
+		try {
+			if(cursor.moveToFirst()) {
+				values = deserialize(cursor);
+			} else {
+				values = new ContentValues();
+				values.put("odometer", 0);
+				values.put("fuel", 0);
+				values.put("place_id", -1);
+			}
+		} finally {
+			cursor.close();
 		}
 		
 		if(id <= 0) {
