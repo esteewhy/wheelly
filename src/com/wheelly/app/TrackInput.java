@@ -55,15 +55,6 @@ public final class TrackInput extends Fragment {
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
 		
-		ctx.startManagingCursor(tracksCursor = new TrackRepository(ctx).list());
-		final ListAdapter adapter =
-			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_spinner_dropdown_item,
-					tracksCursor, 
-					new String[] {"name"},
-					new int[] { android.R.id.text1 }
-			);
-		
 		final View v = inflater.inflate(R.layout.select_entry_plus, container, true);
 		
 		// prepend MyTracks icon
@@ -73,26 +64,42 @@ public final class TrackInput extends Fragment {
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		
-		v.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new AlertDialog.Builder(ctx)
-					.setSingleChoiceItems(adapter,
-						Utils.moveCursor(tracksCursor, BaseColumns._ID, selectedTrackId),
-						new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-								tracksCursor.moveToPosition(which);	
-								long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id"));
-								onTrackChanged(selectedId);
+		
+		tracksCursor = new TrackRepository(ctx).list();
+		
+		//@todo implement notification about disabled sharing in MyTracks
+		if(null != tracksCursor) {
+			ctx.startManagingCursor(tracksCursor);
+			final ListAdapter adapter =
+				new SimpleCursorAdapter(ctx,
+						android.R.layout.simple_spinner_dropdown_item,
+						tracksCursor, 
+						new String[] {"name"},
+						new int[] { android.R.id.text1 }
+				);
+			
+			
+			v.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new AlertDialog.Builder(ctx)
+						.setSingleChoiceItems(adapter,
+							Utils.moveCursor(tracksCursor, BaseColumns._ID, selectedTrackId),
+							new DialogInterface.OnClickListener(){
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.cancel();
+									tracksCursor.moveToPosition(which);	
+									long selectedId = tracksCursor.getLong(tracksCursor.getColumnIndexOrThrow("_id"));
+									onTrackChanged(selectedId);
+								}
 							}
-						}
-					)
-					.setTitle(R.string.tracks)
-					.show();
-			}
-		});
+						)
+						.setTitle(R.string.tracks)
+						.show();
+				}
+			});
+		}
 		
 		c = new Controls(v);
 		c.labelView.setText(R.string.track);
