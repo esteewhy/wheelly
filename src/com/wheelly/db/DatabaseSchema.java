@@ -48,7 +48,9 @@ public final class DatabaseSchema {
 			+ " FROM refuels r"
 			+ " INNER JOIN heartbeats rh"
 			+ "  ON r.heartbeat_id = rh." + BaseColumns._ID
-			+ " WHERE rh._created BETWEEN start._created AND stop._created";
+			+ " WHERE rh._created BETWEEN start._created AND stop._created"
+			//not strictly necessary, but to reassure order
+			;//+ "  AND rh.odometer BETWEEN start.odometer AND stop.odometer";
 		
 		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,

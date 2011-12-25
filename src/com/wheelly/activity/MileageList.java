@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
+import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.util.FilterUtils.F;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
@@ -50,7 +51,7 @@ public class MileageList extends FragmentActivity {
 	public static class MileageListFragment extends ListFragment
 		implements LoaderCallbacks<Cursor> {
 		
-		private static final int MILEAGE_LIST_LOADER = 0x01;
+		private static final int LIST_LOADER = 0x01;
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
 		private static final int DELETE_REQUEST = 3;
@@ -81,7 +82,7 @@ public class MileageList extends FragmentActivity {
 				Toast.makeText(ctx, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
 			}
 			
-			getLoaderManager().initLoader(MILEAGE_LIST_LOADER, null, this);
+			//getLoaderManager().initLoader(MILEAGE_LIST_LOADER, null, this);
 			setListAdapter(
 				new SimpleCursorAdapter(ctx, R.layout.mileage_list_item, null,
 					new String[] {
@@ -109,6 +110,8 @@ public class MileageList extends FragmentActivity {
 			registerForContextMenu(getListView());
 			setHasOptionsMenu(true);
 			
+			final ContentValues globalFiler = ((IFilterHolder)ctx.getApplicationContext()).getFilter();
+			
 			// Set up status bar (if present).
 			c = new StatusBarControls(ctx);
 			c.AddButton.setOnClickListener(new OnClickListener() {
@@ -128,11 +131,24 @@ public class MileageList extends FragmentActivity {
 				public void onFilterChanged(ContentValues value) {
 					final Bundle args = new Bundle();
 					args.putParcelable("filter", value);
-					getLoaderManager().restartLoader(MILEAGE_LIST_LOADER, args,
+					getLoaderManager().restartLoader(LIST_LOADER, args,
 							MileageListFragment.this);
+					
+					globalFiler.clear();
+					globalFiler.putAll(value);
 				}
 			});
 			c.TotalLayout.setVisibility(View.GONE);
+		}
+		
+		@Override
+		public void onResume() {
+			final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
+			c.FilterButton.setFilter(filter);
+			if(null == getLoaderManager().getLoader(LIST_LOADER)) {
+				getLoaderManager().initLoader(LIST_LOADER, null, this);
+			}
+			super.onResume();
 		}
 		
 		private void viewItem(final long id) {

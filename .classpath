@@ -1,15 +1,12 @@
-<?xml version="1.0" encoding="Uon="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/v4"/>
 	<classpathentry kind="lib" path="/MyTracksLib/libs/protobuf-java-2.3.0-lite.jar"/>
-
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="MyTracksLib_src"/>
-	<classpathentry kind="output" path="bin"/>
 	<classpathentry kind="lib" path="C:/Program Files/Android/android-sdk-windows/android-compatibility/v13/android-support-v13.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksLib"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
-</classpath
+</classpath>
