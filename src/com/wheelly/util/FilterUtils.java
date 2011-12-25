@@ -88,12 +88,6 @@ public class FilterUtils {
 		} else {
 			filter.remove(F.SORT_ORDER);
 		}
-		
-		if(intent.hasExtra(F.LOCATION_CONSTRAINT)) {
-			filter.put(F.LOCATION_CONSTRAINT, intent.getStringExtra(F.LOCATION_CONSTRAINT));
-		} else {
-			filter.remove(F.LOCATION_CONSTRAINT);
-		}
 	}
 	
 	public static void filterToIntent(ContentValues filter, Intent intent) {
@@ -113,12 +107,6 @@ public class FilterUtils {
 			intent.putExtra(F.SORT_ORDER, 1);
 		} else {
 			intent.removeExtra(F.SORT_ORDER);
-		}
-		
-		if(filter.containsKey(F.LOCATION_CONSTRAINT)) {
-			intent.putExtra(F.LOCATION_CONSTRAINT, filter.getAsString(F.LOCATION_CONSTRAINT));
-		} else {
-			intent.removeExtra(F.LOCATION_CONSTRAINT);
 		}
 	}
 }

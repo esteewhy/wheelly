@@ -1,5 +1,6 @@
 package com.wheelly.app;
 
+import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.activity.Filter;
 import com.wheelly.util.FilterUtils;
@@ -20,9 +21,9 @@ import android.widget.ImageButton;
 /**
  * Self-contained control which presents filter dialog and notifies underlying activity when filter values change.
  */
-public class FilterButton extends Fragment {
+public class FilterButton extends Fragment implements IFilterHolder {
 	private static final int FILTER_REQUEST = 6;
-	final private ContentValues filter = new ContentValues();
+	private final ContentValues filter = new ContentValues();
 	ImageButton btn;
 	public String locationConstraint = null; 
 	
@@ -31,6 +32,11 @@ public class FilterButton extends Fragment {
 			LayoutInflater inflater,
 			ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		if(null != savedInstanceState && savedInstanceState.containsKey(F.LOCATION_CONSTRAINT)) {
+			locationConstraint = savedInstanceState.getString(F.LOCATION_CONSTRAINT);
+		}
+		
 		btn = new ImageButton(this.getActivity());
 		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		btn.setImageResource(R.drawable.ic_menu_filter_off);
@@ -39,8 +45,8 @@ public class FilterButton extends Fragment {
 			public void onClick(View v) {
 				btn.setEnabled(false);
 				Intent intent = new Intent(getActivity(), Filter.class);
-				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
 				FilterUtils.filterToIntent(filter, intent);
+				intent.putExtra(F.LOCATION_CONSTRAINT, locationConstraint);
 				startActivityForResult(intent, FILTER_REQUEST);
 			}
 		});
@@ -48,19 +54,22 @@ public class FilterButton extends Fragment {
 	}
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString(F.LOCATION_CONSTRAINT, locationConstraint);
+		super.onSaveInstanceState(outState);
+	}
+	
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(requestCode) {
 		case FILTER_REQUEST:
 			if (resultCode == Activity.RESULT_FIRST_USER) {
-				filter.clear();
+				setFilter(null);
 			} else if (resultCode == Activity.RESULT_OK) {
-				FilterUtils.intentToFilter(data, filter);
-			}
-			filter.remove(F.LOCATION_CONSTRAINT);
-			btn.setImageResource(filter.size() == 0 ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
-			
-			if(null != listener) {
-				listener.onFilterChanged(filter);
+				data.removeExtra(F.LOCATION_CONSTRAINT);
+				ContentValues newFilter = new ContentValues();
+				FilterUtils.intentToFilter(data, newFilter);
+				setFilter(newFilter);
 			}
 			
 			btn.setEnabled(true);
@@ -73,8 +82,22 @@ public class FilterButton extends Fragment {
 	}
 	
 	public void setFilter(ContentValues filter) {
-		this.filter.clear();
-		this.filter.putAll(filter);
+		if(!this.filter.equals(filter)
+				&& (this.filter.size() > 0 || null != filter)) {
+			boolean reset = null == filter || 0 == filter.size();
+			
+			this.filter.clear();
+			
+			if(!reset) {
+				this.filter.putAll(filter);
+			}
+			
+			btn.setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
+			
+			if(null != listener) {
+				listener.onFilterChanged(this.filter);
+			}
+		}
 	}
 	
 	public String getLocationConstraint() {

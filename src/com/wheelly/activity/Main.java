@@ -18,6 +18,7 @@ public class Main extends TabActivity implements TabHost.OnTabChangeListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		final TabHost tabHost = getTabHost();
 		final Resources res = getResources();

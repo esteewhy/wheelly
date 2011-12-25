@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Location selection and creation control.
@@ -151,9 +152,11 @@ public final class LocationInput extends Fragment {
 			final Location mLocation = lm.getLastKnownLocation(provider);
 			
 			if(null!= mLocation) {
+				Toast.makeText(getActivity(), "Obtained location", 5).show();
 				long locationId = resolveLocation(mLocation);
 				
 				if(locationId > 0) {
+					Toast.makeText(getActivity(), "Resolved location id: " + locationId, 5).show();
 					setValue(locationId);
 					return true;
 				}

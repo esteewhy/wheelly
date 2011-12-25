@@ -28,6 +28,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.support.v4.widget.SimpleCursorAdapter;
+
+import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.util.FilterUtils.F;
 import com.wheelly.app.InfoDialogFragment;
@@ -49,7 +51,7 @@ public class HeartbeatList extends FragmentActivity {
 	public static class HeartbeatListFragment extends ListFragment
 		implements LoaderCallbacks<Cursor> {
 		
-		private static final int HEARTBEAT_LIST_LOADER = 0x03;
+		private static final int LIST_LOADER = 0x03;
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
 		
@@ -61,7 +63,6 @@ public class HeartbeatList extends FragmentActivity {
 			final FragmentActivity ctx = getActivity();
 			
 			setEmptyText(getString(R.string.no_heartbeats));
-			getLoaderManager().initLoader(HEARTBEAT_LIST_LOADER, null, this);
 			final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("fuel_capacity", 60);
 			
 			setListAdapter(
@@ -100,6 +101,7 @@ public class HeartbeatList extends FragmentActivity {
 			
 			registerForContextMenu(getListView());
 			setHasOptionsMenu(true);
+			final ContentValues globalFilter = ((IFilterHolder)ctx.getApplicationContext()).getFilter();
 			
 			// Set up status bar (if present).
 			c = new StatusBarControls(ctx);
@@ -119,11 +121,24 @@ public class HeartbeatList extends FragmentActivity {
 				public void onFilterChanged(ContentValues value) {
 					final Bundle args = new Bundle();
 					args.putParcelable("filter", value);
-					getLoaderManager().restartLoader(HEARTBEAT_LIST_LOADER, args,
+					getLoaderManager().restartLoader(LIST_LOADER, args,
 							HeartbeatListFragment.this);
+					
+					globalFilter.clear();
+					globalFilter.putAll(value);
 				}
 			});
 			c.TotalLayout.setVisibility(View.GONE);
+		}
+		
+		@Override
+		public void onResume() {
+			final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
+			c.FilterButton.setFilter(filter);
+			if(null == getLoaderManager().getLoader(LIST_LOADER)) {
+				getLoaderManager().initLoader(LIST_LOADER, null, this);
+			}
+			super.onResume();
 		}
 		
 		private void viewItem(final long id) {

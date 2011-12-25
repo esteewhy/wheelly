@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Toast;
 
+import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.app.InfoDialogFragment;
 import com.wheelly.app.StatusBarControls;
@@ -50,7 +51,7 @@ public class RefuelList extends FragmentActivity {
 	public static class ItemListFragment extends ListFragment
 		implements LoaderCallbacks<Cursor> {
 		
-		private static final int REFUEL_LIST_LOADER = 0x02;
+		private static final int LIST_LOADER = 0x02;
 		private static final int NEW_REQUEST = 1;
 		private static final int EDIT_REQUEST = 2;
 		
@@ -62,9 +63,6 @@ public class RefuelList extends FragmentActivity {
 			final FragmentActivity ctx = getActivity();
 			
 			setEmptyText(getString(R.string.no_refuels));
-			
-			getLoaderManager().initLoader(REFUEL_LIST_LOADER, null, this);
-			
 			setListAdapter(
 				new SimpleCursorAdapter(getActivity(), R.layout.refuel_list_item, null,
 					new String[] {
@@ -93,6 +91,7 @@ public class RefuelList extends FragmentActivity {
 			
 			registerForContextMenu(getListView());
 			setHasOptionsMenu(true);
+			final ContentValues globalFilter = ((IFilterHolder)ctx.getApplicationContext()).getFilter();
 			
 			// Set up status bar (if present).
 			c = new StatusBarControls(ctx);
@@ -112,11 +111,24 @@ public class RefuelList extends FragmentActivity {
 				public void onFilterChanged(ContentValues value) {
 					final Bundle args = new Bundle();
 					args.putParcelable("filter", value);
-					getLoaderManager().restartLoader(REFUEL_LIST_LOADER, args,
+					getLoaderManager().restartLoader(LIST_LOADER, args,
 							ItemListFragment.this);
+					
+					globalFilter.clear();
+					globalFilter.putAll(value);
 				}
 			});
 			c.TotalLayout.setVisibility(View.GONE);
+		}
+		
+		@Override
+		public void onResume() {
+			final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
+			c.FilterButton.setFilter(filter);
+			if(null == getLoaderManager().getLoader(LIST_LOADER)) {
+				getLoaderManager().initLoader(LIST_LOADER, null, this);
+			}
+			super.onResume();
 		}
 		
 		private void viewItem(final long id) {

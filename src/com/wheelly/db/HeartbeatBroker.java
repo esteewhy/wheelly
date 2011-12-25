@@ -54,6 +54,10 @@ public class HeartbeatBroker {
 		if(id <= 0) {
 			values.put(BaseColumns._ID, -1);
 			values.put("_created", DateUtils.dbFormat.format(new Date()));
+			//enforce location auto-selection in editor
+			///@todo move auto-selection logic down to BL
+			///to provide fall-back to history value
+			values.put("place_id", 0);
 		}
 		
 		return values;
