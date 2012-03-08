@@ -8,12 +8,19 @@ import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.CursorLoader;
 import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
+
+import com.google.android.apps.mytracks.io.sendtogoogle.SendActivity;
 import com.wheelly.R;
 import com.wheelly.app.ConfigurableListFragment;
 import com.wheelly.app.InfoDialogFragment;
@@ -99,21 +106,10 @@ public class HeartbeatList extends FragmentActivity {
 							"h." + BaseColumns._ID + " DESC LIMIT 1"
 						);
 				}
-				
-				@Override
-				public void onCreateContextMenu(ContextMenu menu,
-						ContextMenuInfo menuInfo) {
-					AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)menuInfo;
-					if(0 < new HeartbeatBroker(getActivity()).referenceCount(mi.id)) {
-						menu.removeItem(R.id.ctx_menu_delete);
-					}
-				}
 			};
 			
 			cfg.ConfirmDeleteResourceId = R.string.delete_heartbeat_confirm;
-			cfg.ContextMenuHeaderResourceId = R.string.heartbeats;
 			cfg.EmptyTextResourceId = R.string.no_heartbeats;
-			cfg.OptionsMenuResourceId = R.menu.heartbeats_menu;
 			cfg.ItemActivityClass = Heartbeat.class;
 			cfg.LocationFacetTable = "heartbeats";
 			cfg.ContentUri = Heartbeats.CONTENT_URI;
@@ -121,6 +117,47 @@ public class HeartbeatList extends FragmentActivity {
 			cfg.FilterExpr = Heartbeats.FilterExpr;
 			
 			return cfg;
+		}
+		
+		@Override
+		public boolean onContextItemSelected(MenuItem item) {
+			if(!super.onContextItemSelected(item)) {
+				if(item.getItemId() == R.id.ctx_menu_sync) {
+					final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
+					SendActivity.sendToGoogle(getActivity(), mi.id);
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			super.onCreateOptionsMenu(menu, inflater);
+			inflater.inflate(R.menu.heartbeats_menu, menu);
+			
+			menu.add(Menu.NONE, 5, Menu.NONE, "Sync")
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						SendActivity.sendToGoogle(getActivity(), -1);
+						return true;
+					}
+				});
+		}
+		
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			super.onCreateContextMenu(menu, v, menuInfo);
+			menu.setHeaderTitle(R.string.heartbeats);
+			
+			AdapterView.AdapterContextMenuInfo mi = (AdapterView.AdapterContextMenuInfo)menuInfo;
+			if(0 < new HeartbeatBroker(getActivity()).referenceCount(mi.id)) {
+				menu.removeItem(R.id.ctx_menu_delete);
+			}
+			
+			menu.add(Menu.NONE, R.id.ctx_menu_sync, Menu.NONE, "Sync");
 		}
 	}
 }

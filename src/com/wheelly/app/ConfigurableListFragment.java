@@ -3,6 +3,8 @@ package com.wheelly.app;
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
+import com.wheelly.db.DatabaseHelper;
+import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
 import com.wheelly.util.FilterUtils.FilterResult;
@@ -28,6 +30,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
@@ -63,8 +66,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		progressDialog.setTitle(R.string.loading);
 		progressDialog.setMessage(getString(R.string.loading_message));
 		progressDialog.setCancelable(false);
-		
-		cfg.onActivityCreated(ctx, savedInstanceState);
 		
 		setEmptyText(getString(cfg.EmptyTextResourceId));
 		setListAdapter(cfg.createListAdapter(ctx));
@@ -155,33 +156,50 @@ public abstract class ConfigurableListFragment extends ListFragment
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(getConfiguration().OptionsMenuResourceId, menu);
-		getConfiguration().onCreateOptionsMenu(menu);
+		
+		menu.add(Menu.NONE, 3, 13, "Backup to SD card")
+			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					return BackupUtils.backupDatabase(
+						new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+							.getReadableDatabase()
+							.getPath(),
+						"/sdcard/wheelly.db");
+				}
+			});
+		
+		menu.add(Menu.NONE, 4, 15, "Restore from SD card")
+			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					return BackupUtils.backupDatabase(
+						"/sdcard/wheelly.db",
+						new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+							.getReadableDatabase()
+							.getPath()
+						);
+				}
+			});
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		final ListConfiguration cfg = getConfiguration();
 		
-		if(!cfg.onOptionsItemSelected(item)) {
-			switch (item.getItemId()) {
-				case R.id.opt_menu_add:
-					Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
-					startActivityForResult(intent, NEW_REQUEST);
-					return true;
-				default:
-					return super.onOptionsItemSelected(item);
-			}
+		switch (item.getItemId()) {
+			case R.id.opt_menu_add:
+				Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
+				startActivityForResult(intent, NEW_REQUEST);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
-		
-		return true;
 	}
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
-		menu.setHeaderTitle(getConfiguration().ContextMenuHeaderResourceId);
-		getConfiguration().onCreateContextMenu(menu, menuInfo);
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
 	
@@ -219,12 +237,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		return false;
 	}
 	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		getConfiguration().onSaveInstanceState(outState);
-	}
-
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		final ContentValues filter;

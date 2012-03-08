@@ -9,6 +9,7 @@ import com.wheelly.db.DatabaseSchema;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Refuels;
 import com.wheelly.db.DatabaseSchema.Mileages;
+import com.wheelly.db.DatabaseSchema.Timeline;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -36,6 +37,8 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int HEARTBEATS_ID = 301;
 	private static final int HEARTBEATS_DEFAULTS = 302;
 	private static final int HEARTBEATS_REFERENCES = 303;
+	private static final int TIMELINE = 305;
+	private static final int TIMELINE_ID = 307;
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
 	
@@ -53,11 +56,13 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "mileages", MILEAGES);
 			addURI(a, "refuels", REFUELS);
 			addURI(a, "heartbeats", HEARTBEATS);
+			addURI(a, "timeline", TIMELINE);
 			addURI(a, "locations", LOCATIONS);
 			
 			addURI(a, "mileages/#", MILEAGES_ID);
 			addURI(a, "refuels/#", REFUELS_ID);
 			addURI(a, "heartbeats/#", HEARTBEATS_ID);
+			addURI(a, "timeline/#", TIMELINE_ID);
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
@@ -73,10 +78,13 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels", "refuels" });
 		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
+		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, Timeline.Tables });
+		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, Timeline.Tables });
 		
 		UriMap.put(MILEAGES, Mileages.CONTENT_URI);
 		UriMap.put(REFUELS, Refuels.CONTENT_URI);
 		UriMap.put(HEARTBEATS, Heartbeats.CONTENT_URI);
+		UriMap.put(TIMELINE, Timeline.CONTENT_URI);
 	}
 	
 	private SQLiteOpenHelper dbHelper;
@@ -100,6 +108,7 @@ public class ChronologyProvider extends ContentProvider {
 				case MILEAGES:
 				case REFUELS:
 					cr.notifyChange(Heartbeats.CONTENT_URI, null);
+					cr.notifyChange(Timeline.CONTENT_URI, null);
 					break;
 				}
 			}
@@ -141,6 +150,7 @@ public class ChronologyProvider extends ContentProvider {
 			case MILEAGES:
 			case REFUELS:
 				cr.notifyChange(Heartbeats.CONTENT_URI, null);
+				cr.notifyChange(Timeline.CONTENT_URI, null);
 				break;
 			}
 			
@@ -170,6 +180,7 @@ public class ChronologyProvider extends ContentProvider {
 		case MILEAGES_ID:
 		case REFUELS_ID:
 		case HEARTBEATS_ID:
+		case TIMELINE_ID:
 			return dbHelper.getReadableDatabase().query(
 				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 				projection,
@@ -235,15 +246,18 @@ public class ChronologyProvider extends ContentProvider {
 				case MILEAGES_ID:
 				case MILEAGES:
 					cr.notifyChange(Mileages.CONTENT_URI, null);
+					cr.notifyChange(Timeline.CONTENT_URI, null);
 					break;
 				case REFUELS_ID:
 				case REFUELS:
 					cr.notifyChange(Refuels.CONTENT_URI, null);
 					cr.notifyChange(Mileages.CONTENT_URI, null);
+					cr.notifyChange(Timeline.CONTENT_URI, null);
 					break;
 				case HEARTBEATS_ID:
 				case HEARTBEATS:
 					cr.notifyChange(Heartbeats.CONTENT_URI, null);
+					cr.notifyChange(Timeline.CONTENT_URI, null);
 					cr.notifyChange(Mileages.CONTENT_URI, null);
 					cr.notifyChange(Refuels.CONTENT_URI, null);
 					break;

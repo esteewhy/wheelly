@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.CursorLoader;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,49 +34,11 @@ public class MileageList extends FragmentActivity {
 	}
 	
 	public static class MileageListFragment extends ConfigurableListFragment {
+		boolean suggestInstall;
+		
 		@Override
 		protected ListConfiguration configure() {
 			ListConfiguration cfg = new ListConfiguration() {
-				
-				boolean suggestInstall;
-				
-				@Override
-				public void onSaveInstanceState(Bundle outState) {
-					outState.putBoolean("suggestInstall", suggestInstall);
-				}
-				
-				@Override
-				public boolean onOptionsItemSelected(MenuItem item) {
-					switch (item.getItemId()) {
-					case R.id.opt_menu_install_mytracks:
-						Intent marketIntent = new Intent(Intent.ACTION_VIEW)
-							.setData(Uri.parse("market://details?id=com.google.android.maps.mytracks"));
-						startActivity(marketIntent);
-						return true;
-					default:
-						return false;
-					}
-				}
-				
-				@Override
-				public void onCreateOptionsMenu(Menu menu) {
-					menu.findItem(R.id.opt_menu_install_mytracks).setVisible(suggestInstall);
-				}
-				
-				@Override
-				public void onActivityCreated(Context context,
-						Bundle savedInstanceState) {
-					//Advise user installing MyTracks app.
-					suggestInstall =
-						null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
-							? savedInstanceState.getBoolean("suggestInstall")
-							: !new Tracker(context).checkAvailability();
-					
-					if(suggestInstall) {
-						Toast.makeText(context, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
-					}
-				}
-				
 				@Override
 				public SimpleCursorAdapter createListAdapter(Context context) {
 					return
@@ -134,8 +100,6 @@ public class MileageList extends FragmentActivity {
 			
 			cfg.ConfirmDeleteResourceId = R.string.delete_mileage_confirm;
 			cfg.EmptyTextResourceId = R.string.no_mileages;
-			cfg.OptionsMenuResourceId = R.menu.mileages_menu;
-			cfg.ContextMenuHeaderResourceId = R.string.mileages;
 			cfg.ItemActivityClass = Mileage.class;
 			cfg.LocationFacetTable = "mileages";
 			cfg.ContentUri = Mileages.CONTENT_URI;
@@ -143,6 +107,55 @@ public class MileageList extends FragmentActivity {
 			cfg.FilterExpr = Mileages.FilterExpr;
 			
 			return cfg;
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			final Context context = getActivity();
+			//Advise user installing MyTracks app.
+			suggestInstall =
+				null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
+					? savedInstanceState.getBoolean("suggestInstall")
+					: !new Tracker(context).checkAvailability();
+			
+			if(suggestInstall) {
+				Toast.makeText(context, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
+			}
+			
+			super.onActivityCreated(savedInstanceState);
+		}
+		
+		@Override
+		public void onSaveInstanceState(Bundle outState) {
+			outState.putBoolean("suggestInstall", suggestInstall);
+			super.onSaveInstanceState(outState);
+		}
+		
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			super.onCreateOptionsMenu(menu, inflater);
+			inflater.inflate(R.menu.mileages_menu, menu);
+			menu.findItem(R.id.opt_menu_install_mytracks).setVisible(suggestInstall);
+		}
+		
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v,
+				ContextMenuInfo menuInfo) {
+			menu.setHeaderTitle(R.string.mileages);
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
+		
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+			case R.id.opt_menu_install_mytracks:
+				Intent marketIntent = new Intent(Intent.ACTION_VIEW)
+					.setData(Uri.parse("market://details?id=com.google.android.maps.mytracks"));
+				startActivity(marketIntent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+			}
 		}
 	}
 }

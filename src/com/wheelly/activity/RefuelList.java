@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.CursorLoader;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.widget.TextView;
@@ -34,28 +38,6 @@ public class RefuelList extends FragmentActivity {
 		@Override
 		protected ListConfiguration configure() {
 			ListConfiguration cfg = new ListConfiguration() {
-				
-				@Override
-				public boolean onOptionsItemSelected(MenuItem item) {
-					switch (item.getItemId()) {
-					case R.id.opt_menu_install_financisto:
-						Intent marketIntent = new Intent(Intent.ACTION_VIEW)
-							.setData(Uri.parse("market://details?id=ru.orangesoftware.financisto"));
-						startActivity(marketIntent);
-						return true;
-					default:
-						return false;
-					}
-				}
-				
-				@Override
-				public void onCreateOptionsMenu(Menu menu) {
-					if(!new TransactionRepository(getActivity()).checkAvailability()) {
-						menu.findItem(R.id.opt_menu_install_financisto).setVisible(true);
-						Toast.makeText(getActivity(), R.string.advertise_financisto, Toast.LENGTH_LONG).show();
-					}
-				}
-				
 				@Override
 				public SimpleCursorAdapter createListAdapter(Context context) {
 					return
@@ -114,9 +96,7 @@ public class RefuelList extends FragmentActivity {
 			};
 			
 			cfg.ConfirmDeleteResourceId = R.string.delete_refuel_confirm;
-			cfg.ContextMenuHeaderResourceId = R.string.refuels;
 			cfg.EmptyTextResourceId = R.string.no_refuels;
-			cfg.OptionsMenuResourceId = R.menu.refuels_menu;
 			cfg.ItemActivityClass = Refuel.class;
 			cfg.LocationFacetTable = "refuels";
 			cfg.ContentUri = Refuels.CONTENT_URI;
@@ -124,6 +104,36 @@ public class RefuelList extends FragmentActivity {
 			cfg.FilterExpr = Refuels.FilterExpr;
 			
 			return cfg;
+		}
+		
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			super.onCreateOptionsMenu(menu, inflater);
+			inflater.inflate(R.menu.refuels_menu, menu);
+			if(!new TransactionRepository(getActivity()).checkAvailability()) {
+				menu.findItem(R.id.opt_menu_install_financisto).setVisible(true);
+				Toast.makeText(getActivity(), R.string.advertise_financisto, Toast.LENGTH_LONG).show();
+			}
+		}
+		
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v,
+				ContextMenuInfo menuInfo) {
+			menu.setHeaderTitle(R.string.refuels);
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
+		
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			switch (item.getItemId()) {
+			case R.id.opt_menu_install_financisto:
+				Intent marketIntent = new Intent(Intent.ACTION_VIEW)
+					.setData(Uri.parse("market://details?id=ru.orangesoftware.financisto"));
+				startActivity(marketIntent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+			}
 		}
 	}
 }

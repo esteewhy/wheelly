@@ -17,6 +17,7 @@ public final class DatabaseSchema {
 	private static final String PATH_MILEAGES = "mileages";
 	private static final String PATH_REFUELS = "refuels";
 	private static final String PATH_HEARTBEATS = "heartbeats";
+	private static final String PATH_TIMELINE = "timeline";
 	
 	public static final class Mileages {
 		public static final String Create = 
@@ -247,7 +248,7 @@ public final class DatabaseSchema {
 			"h.odometer",
 			"h.fuel",
 			"l.name place",
-			IconColumnExpression + "  icons"
+			IconColumnExpression + " icons"
 		};
 		
 		public static final String Tables = "heartbeats h"
@@ -277,6 +278,39 @@ public final class DatabaseSchema {
 			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.heartbeats";
 	}
 
+	public static final class Timeline {
+		// reverse links detection
+		public static final String IconColumnExpression =
+			"((r._id IS NOT NULL) * 4"
+			+ "	| (m1._id IS NOT NULL) * 2"
+			+ "	| (m2._id IS NOT NULL))";
+		
+		public static final String[] ListProjection = {
+			"h." + BaseColumns._ID + " " + BaseColumns._ID,
+			"h._created",
+			"h.odometer",
+			"h.fuel",
+			"l.name place",
+			"m2.mileage distance",
+			"r.cost",
+			"r.amount",
+			IconColumnExpression + " icons"
+		};
+		
+		public static final String Tables = "heartbeats h"
+			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID
+			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + BaseColumns._ID;
+		
+		public static final Uri CONTENT_URI =
+			BASE_CONTENT_URI.buildUpon().appendPath(PATH_TIMELINE).build();
+		public static final String CONTENT_ITEM_TYPE =
+			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.timeline_entry";
+		public static final String CONTENT_TYPE =
+			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.timeline";
+	}
+	
 	public static final class Locations {
 		public static String Create =
 			"create table if not exists locations ("
