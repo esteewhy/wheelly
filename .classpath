@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="C:/Program Files/Android/android-sdk-windows/android-compatibility/v13/android-support-v13.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksLib"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="D:/src/_eval/android/mytracks/MyTracks/libs/google-common.jar"/>
+	<classpathentry kind="lib" path="D:/src/_eval/android/mytracks/MyTracks/libs/googleloginclient-helper.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
