@@ -25,7 +25,7 @@
 		android:layout_height		="wrap_content"
 		android:layout_marginLeft	="8dip"
 		android:layout_marginTop	="3dip" 
-		andrteParentState			="true">
+		android:duplicateParentState	="true">
 		
 		<TextView
 			android:id				="@+id/label"
