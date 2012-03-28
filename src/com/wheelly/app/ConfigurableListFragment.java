@@ -1,5 +1,7 @@
 package com.wheelly.app;
 
+import java.io.File;
+
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.app.FilterButton.OnFilterChangedListener;
@@ -18,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
@@ -157,30 +160,35 @@ public abstract class ConfigurableListFragment extends ListFragment
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		
-		menu.add(Menu.NONE, 3, 13, "Backup to SD card")
-			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					return BackupUtils.backupDatabase(
-						new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-							.getReadableDatabase()
-							.getPath(),
-						"/sdcard/wheelly.db");
-				}
-			});
-		
-		menu.add(Menu.NONE, 4, 15, "Restore from SD card")
-			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					return BackupUtils.backupDatabase(
-						"/sdcard/wheelly.db",
-						new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-							.getReadableDatabase()
-							.getPath()
-						);
-				}
-			});
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			
+			final String backupPath= Environment.getExternalStorageDirectory().getPath() + File.separator + "wheelly.db";
+			
+			menu.add(Menu.NONE, 3, 13, "Backup to SD card")
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						return BackupUtils.backupDatabase(
+							new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+								.getReadableDatabase()
+								.getPath(),
+								backupPath);
+					}
+				});
+			
+			menu.add(Menu.NONE, 4, 15, "Restore from SD card")
+				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						return BackupUtils.backupDatabase(
+								backupPath,
+							new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+								.getReadableDatabase()
+								.getPath()
+							);
+					}
+				});
+		}
 	}
 	
 	@Override

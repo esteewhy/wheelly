@@ -3,6 +3,8 @@
 		package="com.wheelly"
 		android:versionCode="4"
 		android:versionName="20120107">
+	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="7"/>
+	
 	<application
 			android:name=".app.WheellyApplication"
 			android:icon="@drawable/icon"
@@ -96,8 +98,6 @@
 			android:name=".content.ChronologyProvider">
 		</provider>
 	</application>
-	
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
 	
 	<supports-screens 
 		android:smallScreens="true"

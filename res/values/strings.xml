@@ -157,9 +157,9 @@
 	<string name="csv_export">CSV Export</string>
 	<string name="csv_export_inprogress">Exporting database to CSV..</string>	
 	<string name="restore_database">Restore Database</string>
-	<string name="restore_database_inprogress">Restoring database...</string>
+	<string name="restore_database_inprogress">Restoring database&#8230;</string>
 	<string name="restore_database_gdocs">Restore from Google Docs</string>
-	<string name="restore_database_inprogress_gdocs">Restoring database...</string>
+	<string name="restore_database_inprogress_gdocs">Restoring database&#8230;</string>
 	<string name="restore_database_success">Database has been successfully restored.</string>
     <string name="package_info_error">Não foi possível recuperar as informações do pacote Financisto.</string>
     
@@ -306,7 +306,7 @@
     <string name="departure"><b>Departure</b></string>
     <string name="arrival"><b>Arrival</b></string>
     
-    <string name="transaction_create">New transaction...</string>
+    <string name="transaction_create">New transaction&#8230;</string>
     <string name="transaction_edit">Transaction: <b>%1$d</b></string>
     
     <string name="mileages">Mileages</string>
@@ -317,10 +317,10 @@
     <string name="fuel_capacity">Fuel capacity</string>
     <string name="fuel_capacity_summary">Fuel tank capacity</string>
 	
-	<string name="filter_value_not_found">Not found...</string>
+	<string name="filter_value_not_found">Not found&#8230;</string>
 	<string name="amount_cannot_exceed_capacity">Amount entered cannot exceed fuel tank capacity</string>
 	
-	<string name="loading">Loading...</string>
+	<string name="loading">Loading&#8230;</string>
 	<string name="loading_message">Please wait while the data is loading</string>
 	
 	<!-- My Tracks -->
@@ -392,7 +392,7 @@
 	<string name="generic_progress_title"
 		translation_description="The title on a progress dialog asking the user to wait.
 
-      Screenshot: sc_card_progress_write_file.png">Please wait...</string>
+      Screenshot: sc_card_progress_write_file.png">Please wait&#8230;</string>
 	<string name="send_google_progress_sending"
 		translation_description="When sending a track to Google service, the message on the progress
       dialog indicating My Tracks is sending the track data.
