@@ -1,6 +1,7 @@
 package com.wheelly.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,7 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
-import com.google.android.apps.mytracks.io.sendtogoogle.SendActivity;
+import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.wheelly.R;
 import com.wheelly.app.ConfigurableListFragment;
 import com.wheelly.app.InfoDialogFragment;
@@ -28,6 +29,7 @@ import com.wheelly.app.ListConfiguration;
 import com.wheelly.app.InfoDialogFragment.Options;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.HeartbeatBroker;
+import com.wheelly.io.docs.SyncDocsActivity;
 
 public class HeartbeatList extends FragmentActivity {
 	
@@ -124,7 +126,9 @@ public class HeartbeatList extends FragmentActivity {
 			if(!super.onContextItemSelected(item)) {
 				if(item.getItemId() == R.id.ctx_menu_sync) {
 					final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-					SendActivity.sendToGoogle(getActivity(), mi.id);
+					Intent intent = new Intent(getActivity(), SyncDocsActivity.class);
+					intent.putExtra(SendRequest.SEND_REQUEST_KEY, new SendRequest(mi.id, false, false, true));
+					startActivity(intent);
 					return true;
 				}
 				return false;
@@ -141,7 +145,9 @@ public class HeartbeatList extends FragmentActivity {
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
-						SendActivity.sendToGoogle(getActivity(), -1);
+						Intent intent = new Intent(getActivity(), SyncDocsActivity.class);
+						intent.putExtra(SendRequest.SEND_REQUEST_KEY, new SendRequest(-1, false, false, true));
+						startActivity(intent);
 						return true;
 					}
 				});
