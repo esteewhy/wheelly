@@ -35,17 +35,17 @@
 		<link>
 			<name>MyTracks_gen</name>
 			<type>2</type>
-			<location>C:/usr/src/android/mytracks/MyTracks/gen</location>
+			<location>d:/usr/src/android/mytracks/MyTracks/gen</location>
 		</link>
 		<link>
 			<name>MyTracks_src</name>
 			<type>2</type>
-			<location>C:/usr/src/android/mytracks/MyTracks/src</location>
+			<location>d:/usr/src/android/mytracks/MyTracks/src</location>
 		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1333987522457</id>
+			<id>1333997046723</id>
 			<name>MyTracks_src</name>
 			<type>30</type>
 			<matcher>
@@ -54,7 +54,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987522472</id>
+			<id>1333997046737</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
@@ -63,7 +63,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987522491</id>
+			<id>1333997046752</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
@@ -72,7 +72,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987522504</id>
+			<id>1333997046765</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
@@ -81,12 +81,111 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987522522</id>
-			<name>MyTracks_src</name>
-			<type>22</type>
+			<id>1334000721896</id>
+			<name>MyTracks_gen/com/dsi/ant</name>
+			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-true-(Api|Analytics|Eula|PlayTrack).*\.java</arguments>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333996029193</id>
+			<name>MyTracks_src/com/dsi/ant</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333995490680</id>
+			<name>MyTracks_src/com/dsi/ant/exception</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333995490749</id>
+			<name>MyTracks_src/com/dsi/ant/exception</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333996004854</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks</name>
+			<type>5</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-Constants.java</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000703372</id>
+			<name>MyTracks_gen/com/google/android/apps/mytracks/lib</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333996071750</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/content</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000598233</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/maps</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1333996118784</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/services</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000617043</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/stats</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000046827</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/util</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-Api*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000046839</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/util</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-true-(Analytics|PlayTrack)Utils.java</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -99,7 +198,43 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987597477</id>
+			<id>1334012700232</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/docs</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-SendDocsA*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000540313</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/file</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000557750</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/fusiontables</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000577966</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/maps</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334000188389</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/sensors</name>
 			<type>6</type>
 			<matcher>
@@ -108,7 +243,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987583095</id>
+			<id>1333998761223</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/tasks</name>
 			<type>6</type>
 			<matcher>

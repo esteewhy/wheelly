@@ -119,7 +119,11 @@
 			android:launchMode="singleTop" />
 		<activity android:name=".io.docs.SyncDocsActivity"
 			android:launchMode="singleTop"/>
-			
+		
+		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.AccountChooserActivity" />
+		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.UploadResultActivity" />
+		<activity android:name="com.google.android.apps.mytracks.io.docs.SendDocsActivity" />
+		
 		<provider
 			android:authorities="com.wheelly"
 			android:multiprocess="true"
