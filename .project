@@ -35,12 +35,12 @@
 		<link>
 			<name>MyTracks_gen</name>
 			<type>2</type>
-			<location>d:/usr/src/android/mytracks/MyTracks/gen</location>
+			<location>c:/usr/src/android/mytracks/MyTracks/gen</location>
 		</link>
 		<link>
 			<name>MyTracks_src</name>
 			<type>2</type>
-			<location>d:/usr/src/android/mytracks/MyTracks/src</location>
+			<location>c:/usr/src/android/mytracks/MyTracks/src</location>
 		</link>
 	</linkedResources>
 	<filteredResources>
@@ -81,7 +81,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000721896</id>
+			<id>1334045516023</id>
 			<name>MyTracks_gen/com/dsi/ant</name>
 			<type>6</type>
 			<matcher>
@@ -90,7 +90,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333996029193</id>
+			<id>1334044974556</id>
 			<name>MyTracks_src/com/dsi/ant</name>
 			<type>6</type>
 			<matcher>
@@ -99,7 +99,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333995490680</id>
+			<id>1334044991612</id>
 			<name>MyTracks_src/com/dsi/ant/exception</name>
 			<type>6</type>
 			<matcher>
@@ -108,16 +108,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333995490749</id>
-			<name>MyTracks_src/com/dsi/ant/exception</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1333996004854</id>
+			<id>1334045115661</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks</name>
 			<type>5</type>
 			<matcher>
@@ -126,7 +117,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000703372</id>
+			<id>1334045502846</id>
 			<name>MyTracks_gen/com/google/android/apps/mytracks/lib</name>
 			<type>6</type>
 			<matcher>
@@ -135,7 +126,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333996071750</id>
+			<id>1334045137054</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/content</name>
 			<type>6</type>
 			<matcher>
@@ -144,7 +135,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000598233</id>
+			<id>1334045331146</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/maps</name>
 			<type>6</type>
 			<matcher>
@@ -153,7 +144,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333996118784</id>
+			<id>1334045598039</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services</name>
 			<type>6</type>
 			<matcher>
@@ -162,7 +153,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000617043</id>
+			<id>1334045403130</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/stats</name>
 			<type>6</type>
 			<matcher>
@@ -171,25 +162,16 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000046827</id>
+			<id>1334045458760</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/util</name>
 			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-Api*</arguments>
+				<arguments>1.0-name-matches-false-true-(A|Play).*</arguments>
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000046839</id>
-			<name>MyTracks_src/com/google/android/apps/mytracks/util</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-true-(Analytics|PlayTrack)Utils.java</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1333987558994</id>
+			<id>1334045472642</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/widgets</name>
 			<type>6</type>
 			<matcher>
@@ -198,7 +180,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334012700232</id>
+			<id>1334045238087</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/docs</name>
 			<type>6</type>
 			<matcher>
@@ -207,7 +189,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000540313</id>
+			<id>1334045253399</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/file</name>
 			<type>6</type>
 			<matcher>
@@ -216,7 +198,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000557750</id>
+			<id>1334045267500</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/fusiontables</name>
 			<type>6</type>
 			<matcher>
@@ -225,7 +207,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000577966</id>
+			<id>1334045305630</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/maps</name>
 			<type>6</type>
 			<matcher>
@@ -234,7 +216,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334000188389</id>
+			<id>1334045357333</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/sensors</name>
 			<type>6</type>
 			<matcher>
@@ -243,7 +225,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333998761223</id>
+			<id>1334045388863</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/tasks</name>
 			<type>6</type>
 			<matcher>
@@ -252,7 +234,16 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333987632672</id>
+			<id>1334045291341</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/gdata/maps</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1334045372088</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/sensors/ant</name>
 			<type>6</type>
 			<matcher>
