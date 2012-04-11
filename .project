@@ -35,7 +35,7 @@
 		<link>
 			<name>MyTracks_src</name>
 			<type>2</type>
-			<location>c:/usr/src/android/mytracks/MyTracks/src</location>
+			<location>d:/usr/src/android/mytracks/MyTracks/src</location>
 		</link>
 	</linkedResources>
 	<filteredResources>
