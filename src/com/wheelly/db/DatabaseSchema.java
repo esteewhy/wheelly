@@ -234,7 +234,9 @@ public final class DatabaseSchema {
 			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			+ "odometer		NUMERIC NOT NULL,"
 			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG)";
+			+ "place_id		LONG,"
+			+ "sync_id		TEXT,"
+			+ "sync_date	TIMESTAMP)";
 		
 		// reverse links detection
 		public static final String IconColumnExpression =
@@ -294,7 +296,9 @@ public final class DatabaseSchema {
 			"m2.mileage distance",
 			"r.cost",
 			"r.amount",
-			IconColumnExpression + " icons"
+			IconColumnExpression + " icons",
+			"h.sync_id",
+			"h.sync_date"
 		};
 		
 		public static final String Tables = "heartbeats h"

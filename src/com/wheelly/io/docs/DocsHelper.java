@@ -34,9 +34,15 @@ public class DocsHelper {
    * @param metricUnits true to use metric
    * @param context the context
    */
-  static String getRowContent(Cursor track, boolean metricUnits, Context context) {
+  static String getRowContent(Cursor track, boolean metricUnits, Context context, String worksheetUri) {
     StringBuilder builder = new StringBuilder().append("<entry xmlns='http://www.w3.org/2005/Atom' "
         + "xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>");
+    
+    String syncId = track.getString(track.getColumnIndex("sync_id"));
+    
+    if(null != syncId) {
+    	appendGenericTag(builder, "id", worksheetUri);
+    }
     
     appendTag(builder, "type", iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons"))));
     appendTag(builder, "date", track.getString(track.getColumnIndexOrThrow("_created")));
@@ -56,14 +62,18 @@ public class DocsHelper {
    * @param value the value
    */
   static void appendTag(StringBuilder stringBuilder, String name, String value) {
-    stringBuilder
-        .append("<gsx:")
-        .append(name)
-        .append(">")
-        .append(StringUtils.formatCData(value))
-        .append("</gsx:")
-        .append(name)
-        .append(">");
+      appendGenericTag(stringBuilder, "gsx:" + name, StringUtils.formatCData(value));
+  }
+  
+  static void appendGenericTag(StringBuilder stringBuilder, String name, String value) {
+	  stringBuilder
+	  	.append("<")
+	  	.append(name)
+	  	.append(">")
+	  	.append(value)
+	  	.append("</")
+	  	.append(name)
+	  	.append(">");
   }
   
   private static String iconFlagsToTypeString(int flags) {

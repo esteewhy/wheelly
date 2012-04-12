@@ -16,11 +16,20 @@
 package com.wheelly.io.docs;
 
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
+import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
 import com.google.android.apps.mytracks.util.ResourceUtils;
+import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.android.maps.mytracks.R;
+import com.google.wireless.gdata.data.Entry;
+import com.google.wireless.gdata.parser.GDataParser;
+import com.google.wireless.gdata.parser.ParseException;
+import com.wheelly.db.HeartbeatBroker;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -29,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.NumberFormat;
@@ -161,10 +171,34 @@ public class SendDocsUtils {
     SharedPreferences prefs = context.getSharedPreferences(
         Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     boolean metricUnits = prefs.getBoolean(context.getString(R.string.metric_units_key), true);
-
-    addRow(worksheetUri, DocsHelper.getRowContent(track, metricUnits, context), authToken);
+    
+    String rowId = track.getString(track.getColumnIndex("sync_id"));
+    if(null != rowId) {
+    	worksheetUri += "/" + rowId;
+    }
+    	
+    
+    Entry entry = addRow(worksheetUri, DocsHelper.getRowContent(track, metricUnits, context, worksheetUri), authToken);
+    
+    if(parseOdometer(entry.getContent()) == track.getLong(track.getColumnIndex("odometer"))) {
+    	String[] parts = entry.getId().split("/");
+    	String syncId = parts[parts.length - 1];
+    	final ContentValues values = new ContentValues();
+    	
+    	values.put(BaseColumns._ID, track.getLong(track.getColumnIndex(BaseColumns._ID)));
+    	values.put("sync_id", syncId);
+    	values.put("sync_date", entry.getUpdateDate());
+    	new HeartbeatBroker(context).updateOrInsert(values);
+    }
   }
-
+  
+  private static long parseOdometer(String content) {
+    int start = content.indexOf("odometer: ");
+    int end = content.indexOf(",", start);
+    String number = content.substring(start + 10, end);
+    return Long.parseLong(number);
+  }
+  
   /**
    * Adds a row to a Google Spreadsheet worksheet.
    *
@@ -172,23 +206,37 @@ public class SendDocsUtils {
    * @param rowContent the row content
    * @param authToken the auth token
    */
-  private static final void addRow(String worksheetUri, String rowContent, String authToken)
+  private static final Entry addRow(String worksheetUri, String rowContent, String authToken)
       throws IOException {
     URL url = new URL(worksheetUri);
     URLConnection conn = url.openConnection();
     conn.addRequestProperty(CONTENT_TYPE, ATOM_FEED_MIME_TYPE);
     conn.addRequestProperty(AUTHORIZATION, AUTHORIZATION_PREFIX + authToken);
     conn.setDoOutput(true);
+    
+    if(rowContent.contains("<id>")) {
+    	((HttpURLConnection)conn).setRequestMethod("PUT");
+    }
+    
+    
     OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
     writer.write(rowContent);
     writer.flush();
-
-    // Get the response
-    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-    while ((reader.readLine()) != null) {
-      // Just read till the end
-    }
+    Entry entry = null;
+    try {
+		GDataParser parser = new XmlDocsGDataParserFactory(new AndroidXmlParserFactory())
+			.createParser(SpreadsheetEntry.class, conn.getInputStream());
+	
+		while(parser.hasMoreData()) {
+			entry = parser.parseStandaloneEntry();
+		}
+		parser.close();
+	} catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+    
     writer.close();
-    reader.close();
+    return entry;
   }
 }

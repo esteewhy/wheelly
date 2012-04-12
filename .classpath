@@ -4,12 +4,10 @@
 	<classpathentry kind="src" path="MyTracks_src"/>
 	<classpathentry kind="src" path="MyTracks_stubs"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/MyTracksLib/libs/protobuf-java-2.3.0-lite.jar"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK/MyTracksLib"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-common.jar"/>
 	<classpathentry kind="lib" path="/MyTracks/libs/guava-r09.jar"/>
+	<classpathentry exported="true" kind="lib" path="/MyTracks/libs/google-common.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
