@@ -16,6 +16,7 @@
 package com.wheelly.io.docs;
 
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
 import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
 import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
 import com.google.android.apps.mytracks.util.ResourceUtils;
@@ -24,6 +25,7 @@ import com.google.android.maps.mytracks.R;
 import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
+import com.google.wireless.gdata.client.QueryParams;
 import com.wheelly.db.HeartbeatBroker;
 import android.content.ContentValues;
 import android.content.Context;
@@ -239,4 +241,30 @@ public class SendDocsUtils {
     writer.close();
     return entry;
   }
+  
+	public static SpreadsheetEntry getLatestRow(
+		  String spreadsheetId, String worksheetId, SpreadsheetsClient spreadsheetClient, String authToken) {
+		String worksheetUri = String.format(GET_WORKSHEET_URI, spreadsheetId, worksheetId);
+		try {
+			QueryParams query = spreadsheetClient.createQueryParams();
+			query.setQuery(worksheetUri);
+			query.setMaxResults("1");
+			query.setParamValue("reverse", "true");
+//			String tmp = query.generateQueryUrl(null);
+			GDataParser parser = spreadsheetClient.getParserForFeed(null, query.getQuery(), authToken);
+			
+			parser.init();
+			
+			return parser.hasMoreData()
+					? (SpreadsheetEntry)parser.readNextEntry(new SpreadsheetEntry())
+					: null;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?> 
 <!--
   Copyright (c) 2010 Denis Solonenko.
   All rights reserved. This program and the accompanying materials
@@ -9,6 +9,7 @@
   Contributors:
       Denis Solonenko - initial API and implementation
 -->
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <translate android:fromXDelta="0" android:toXDelta="100%p" android:duration="800"/>
-</set>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:id="@+android:id/background" android:drawable="@android:drawable/btn_default" />
+  <item android:id="@+android:id/toggle" android:drawable="@drawable/btn_toggle_income_expense" />
+</layer-list>
