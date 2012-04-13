@@ -19,8 +19,6 @@ import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
 import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendAsyncTask;
 import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.google.android.apps.mytracks.io.sendtogoogle.UploadResultActivity;
-import com.google.android.maps.mytracks.R;
-
 import android.content.Intent;
 
 /**

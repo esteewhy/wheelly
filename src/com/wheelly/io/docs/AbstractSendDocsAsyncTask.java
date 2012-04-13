@@ -57,7 +57,7 @@ public abstract class AbstractSendDocsAsyncTask<EntityType> extends AbstractSend
   protected final Context context;
   private final GDataClient gDataClient;
   private final DocumentsClient documentsClient;
-  private final SpreadsheetsClient spreadsheetsClient;
+  protected final SpreadsheetsClient spreadsheetsClient;
   
   // The following variables are for per upload states
   private String documentsAuthToken;
