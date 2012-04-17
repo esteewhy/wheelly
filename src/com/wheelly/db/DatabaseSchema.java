@@ -236,6 +236,7 @@ public final class DatabaseSchema {
 			+ "fuel			NUMERIC NOT NULL,"
 			+ "place_id		LONG,"
 			+ "sync_id		TEXT,"
+			+ "sync_etag	TEXT,"
 			+ "sync_date	TIMESTAMP)";
 		
 		// reverse links detection
@@ -244,13 +245,21 @@ public final class DatabaseSchema {
 			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
 			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id))";
 		
+		public static final String StatusColumnExpression =
+			"CASE"
+			+ " WHEN sync_etag IS NOT NULL THEN 1"
+			+ " WHEN sync_id IS NOT NULL THEN -1"
+			+ " ELSE 0"
+			+ " END";
+		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID,
 			"h._created",
 			"h.odometer",
 			"h.fuel",
 			"l.name place",
-			IconColumnExpression + " icons"
+			IconColumnExpression + " icons",
+			StatusColumnExpression + " status"
 		};
 		
 		public static final String Tables = "heartbeats h"
@@ -298,6 +307,7 @@ public final class DatabaseSchema {
 			"r.amount",
 			IconColumnExpression + " icons",
 			"h.sync_id",
+			"h.sync_etag",
 			"h.sync_date"
 		};
 		

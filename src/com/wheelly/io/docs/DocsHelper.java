@@ -38,9 +38,9 @@ public class DocsHelper {
     StringBuilder builder = new StringBuilder().append("<entry xmlns='http://www.w3.org/2005/Atom' "
         + "xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>");
     
-    String syncId = track.getString(track.getColumnIndex("sync_id"));
+    String syncEtag = track.getString(track.getColumnIndex("sync_etag"));
     
-    if(null != syncId) {
+    if(null != syncEtag) {
     	appendGenericTag(builder, "id", worksheetUri);
     }
     

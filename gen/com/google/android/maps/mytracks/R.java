@@ -71,9 +71,9 @@ containing a value of this type.
          */
         public static final int cadence_border=0x7f08000e;
         public static final int cadence_fill=0x7f08000f;
-        public static final int category_type_expense=0x7f080023;
-        public static final int category_type_income=0x7f080022;
-        public static final int cleared_transaction_color=0x7f080021;
+        public static final int category_type_expense=0x7f080026;
+        public static final int category_type_income=0x7f080025;
+        public static final int cleared_transaction_color=0x7f080024;
         /**  Chart colors by series. 
  Green and a transparent green 
          */
@@ -82,27 +82,27 @@ containing a value of this type.
         /**  Red 
          */
         public static final int fast_path=0x7f080016;
-        public static final int future_color=0x7f08001c;
+        public static final int future_color=0x7f08001f;
         public static final int gray=0x7f080003;
         public static final int green=0x7f080002;
         /**  Red and a transparent red 
          */
         public static final int heartrate_border=0x7f08000c;
         public static final int heartrate_fill=0x7f08000d;
-        public static final int negative_amount=0x7f080019;
-        public static final int neutral_amount=0x7f08001a;
+        public static final int negative_amount=0x7f08001c;
+        public static final int neutral_amount=0x7f08001d;
         /**  Blue 
          */
         public static final int normal_path=0x7f080015;
-        public static final int pending_transaction_color=0x7f08001e;
-        public static final int positive_amount=0x7f080018;
+        public static final int pending_transaction_color=0x7f080021;
+        public static final int positive_amount=0x7f08001b;
         /**  Purple and a transparent purple 
          */
         public static final int power_border=0x7f080010;
         public static final int power_fill=0x7f080011;
-        public static final int reconciled_transaction_color=0x7f080020;
+        public static final int reconciled_transaction_color=0x7f080023;
         public static final int red=0x7f080004;
-        public static final int restored_transaction_color=0x7f08001d;
+        public static final int restored_transaction_color=0x7f080020;
         public static final int scheduled=0x7f080017;
         /**  Colors for dynamic track drawing 
  Green 
@@ -114,8 +114,13 @@ containing a value of this type.
         public static final int speed_fill=0x7f08000b;
         public static final int stat_label_background=0x7f080005;
         public static final int stat_label_text=0x7f080006;
-        public static final int transfer_color=0x7f08001b;
-        public static final int unreconciled_transaction_color=0x7f08001f;
+        public static final int sync_failed=0x7f080019;
+        /**  GDocs sync status 
+         */
+        public static final int sync_succeeded=0x7f080018;
+        public static final int sync_unknown=0x7f08001a;
+        public static final int transfer_color=0x7f08001e;
+        public static final int unreconciled_transaction_color=0x7f080022;
         public static final int white=0x7f080007;
     }
     public static final class dimen {
@@ -343,20 +348,20 @@ containing a value of this type.
         public static final int financisto=0x7f0d0091;
         public static final int flipperTotal=0x7f0d00a4;
         public static final int fuel=0x7f0d0072;
-        public static final int fuelAmt=0x7f0d0079;
-        public static final int fuelGauge=0x7f0d007b;
+        public static final int fuelAmt=0x7f0d007b;
+        public static final int fuelGauge=0x7f0d0079;
         public static final int fuelUOM=0x7f0d007a;
         public static final int fuel_uom=0x7f0d008b;
         public static final int heartbeat=0x7f0d006f;
         public static final int heartbeats=0x7f0d0074;
         public static final int icon=0x7f0d0064;
-        public static final int icon_refuel=0x7f0d0078;
-        public static final int icon_start=0x7f0d0076;
+        public static final int icon_refuel=0x7f0d0076;
+        public static final int icon_start=0x7f0d0078;
         public static final int icon_stop=0x7f0d0077;
-        public static final int icons=0x7f0d0075;
         public static final int include_credit=0x7f0d0032;
         public static final int include_subcategories=0x7f0d0018;
         public static final int increment=0x7f0d008e;
+        public static final int indicator=0x7f0d0075;
         public static final int is_ccard_payment=0x7f0d0037;
         public static final int is_included_into_totals=0x7f0d0026;
         public static final int label=0x7f0d007f;

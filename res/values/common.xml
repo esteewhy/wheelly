@@ -14,6 +14,11 @@
     <string name="app_description">Open-source personal car manager</string>
     <string name="about_copyright1">Released under GNU GPL v2</string>
 	<color name="scheduled">#7cc623</color>
+	<!-- GDocs sync status -->
+	<color name="sync_succeeded">#39b54a</color>
+	<color name="sync_failed">#f26522</color>
+	<color name="sync_unknown">#444</color>
+	
 	<color name="positive_amount">#39b54a</color>
 	<color name="negative_amount">#f26522</color>
 	<color name="neutral_amount">#FFFF00</color>

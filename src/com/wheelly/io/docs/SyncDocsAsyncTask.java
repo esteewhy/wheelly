@@ -1,18 +1,14 @@
 package com.wheelly.io.docs;
 
 import android.accounts.Account;
-import android.content.ContentResolver;
-import android.database.CharArrayBuffer;
-import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.database.MatrixCursor;
-import android.net.Uri;
-import android.os.Bundle;
-
 import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
 import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
 
+/**
+ * @author tstrypko
+ */
 public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 	
 	public SyncDocsAsyncTask(AbstractSendActivity activity, long trackId, Account account) {
@@ -37,6 +33,7 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 		if(MatrixCursor.class == track.getClass()) {
 			SpreadsheetEntry entry = SendDocsUtils.getLatestRow(spreadsheetId, worksheetId, spreadsheetsClient, spreadsheetsAuthToken);
 			track.toString();
+			return false;
 		}
 		
 		return super.addTrackInfo(track);

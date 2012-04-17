@@ -1,102 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copyright (c) 2010 Denis Solonenko.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v2.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-  
-  Contributors:
-      Denis Solonenko - initial API and implementation
--->
 <RelativeLayout
 	xmlns:android			="http://schemas.android.com/apk/res/android"
 	android:layout_width	="wrap_content"
-	android:layout_height	="wrap_content"
-	android:paddingLeft		="10dp"
+	
+	android:layout_height="64dp"
 	android:paddingRight	="12dp">
-
+	
 	<TextView
+		android:id="@+id/indicator"
+		android:background="@color/sync_unknown"
+		android:layout_alignParentLeft="true"
+		android:layout_height="fill_parent"
+		android:layout_width="3dp"
+		android:layout_marginBottom="3dp"
+		android:layout_marginTop="3dp"/>
+	
+	<TextView android:id		="@+id/date"
 		android:layout_width	="wrap_content"
 		android:layout_height	="wrap_content"
+		android:layout_alignParentTop="true"
 		android:singleLine		="true"
-		android:id				="@+id/date"
+		android:layout_toRightOf="@id/indicator"
+		android:paddingLeft		="10dp"
 		android:text			="2011-03-21 09:01"
 		android:paddingTop		="2dp" />
 	
-	<LinearLayout
-		android:layout_width		="wrap_content"
-		android:layout_height		="wrap_content"
-		android:layout_marginTop	="2dp"
-		android:id					="@+id/icons"
-		android:layout_alignParentRight="true">
+	<ImageView android:id	="@+id/icon_refuel"
+		style="@style/HeartbeatTypeIcon"
+		android:contentDescription="@string/refuels"
+		android:src	="@drawable/hb_refuel" />
 	
-		<ImageView style="@style/HeartbeatTypeIcon"
-			android:id	="@+id/icon_start"
-			android:src	="@drawable/hb_start"/>
-		
-		<ImageView style="@style/HeartbeatTypeIcon"
-			android:id	="@+id/icon_stop"
-			android:src	="@drawable/hb_stop"/>
-		
-		<ImageView style="@style/HeartbeatTypeIcon"
-			android:id	="@+id/icon_refuel"
-			android:src	="@drawable/hb_refuel"/>
-	</LinearLayout>
+	<ImageView android:id	="@+id/icon_stop"
+		style="@style/HeartbeatTypeIcon"
+		android:contentDescription="@string/stop"
+		android:src	="@drawable/hb_stop" />
 	
-	<LinearLayout
-		android:layout_height	="wrap_content"
-		android:id				="@+id/layout"
-		android:layout_alignLeft="@id/date"
+	<ImageView android:id	="@+id/icon_start"
+		style="@style/HeartbeatTypeIcon"
+		android:contentDescription="@string/start"
+		android:src	="@drawable/hb_start" />
+	
+	<ProgressBar android:id		="@+id/fuelGauge"
+		android:max				="60"
+		android:layout_width	="fill_parent"
+		android:progress		="40"
+		android:paddingBottom	="4dp"
+		android:paddingLeft		="10dp"
+		android:layout_height	="12dp"
+		style					="@style/ProgressBarFuel"
+		android:layout_toRightOf="@id/indicator"
+		android:layout_alignParentBottom="true" />
+		
+	<TextView android:id		="@+id/odometer"
+		android:text			="39881"
+		android:textAppearance	="?android:attr/textAppearanceLarge"
+		android:paddingLeft		="10dp"
+		android:gravity			="bottom"
+		android:layout_above	="@id/fuelGauge"
 		android:layout_below	="@id/date"
-		android:layout_width	="fill_parent">
-		
-		<TextView
-			android:id				="@+id/odometer"
-			android:text			="39881"
-			android:textAppearance	="?android:attr/textAppearanceLarge"
-			android:layout_alignParentLeft	="true"
-			android:layout_marginRight	="3dip"
-			android:layout_height	="wrap_content"
-			android:layout_width	="wrap_content"/>
-			
-		<TextView style				="@style/LocationText"
-			android:id				="@+id/place"
-			android:layout_weight	="1"/>
-		
-		<TextView android:id		="@+id/fuelAmt"
-			android:gravity			="center_vertical"
-			android:layout_marginLeft	="5dip"
-			android:layout_marginRight	="3dip"
-			android:layout_width	="wrap_content"
-			android:layout_height	="wrap_content"
-			android:layout_alignParentTop	="true"
-			android:textAppearance	="?android:attr/textAppearanceLarge"
-			android:singleLine		="true"
-			android:text			="25.4"
-			android:textColor		="@color/neutral_amount"/>
-		
-		<TextView android:id		="@+id/fuelUOM"
-			android:gravity			="center_vertical"
-			android:layout_width	="wrap_content"
-			android:layout_height	="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentTop="true"
-			android:textAppearance	="?android:attr/textAppearanceLarge"
-			android:textColor		="#ccc"
-			android:text			="L"/>
-	</LinearLayout>
-
-	<ProgressBar
-		android:id						="@+id/fuelGauge"
-		android:max						="60"
-		android:layout_alignParentRight	="true"
-		android:layout_width			="fill_parent"
-		android:progress				="40"
-		android:paddingBottom			="4dp"
-		android:layout_height			="12dp"
-		style							="@style/ProgressBarFuel"
-		android:layout_below			="@id/layout"
-		android:layout_alignLeft		="@id/layout" />
+		android:layout_toRightOf="@id/indicator"
+		android:layout_marginRight	="3dip"
+		android:layout_height	="wrap_content"
+		android:layout_width	="wrap_content"/>
 	
+	<TextView android:id		="@+id/fuelUOM"
+		android:gravity			="center_vertical"
+		android:layout_width	="wrap_content"
+		android:layout_height	="wrap_content"
+		android:layout_alignParentRight="true"
+		android:layout_above	="@id/fuelGauge"
+		android:textAppearance	="?android:attr/textAppearanceLarge"
+		android:textColor		="#ccc"
+		android:text			="L"/>
+	
+	<TextView android:id		="@+id/fuelAmt"
+		android:gravity			="center_vertical"
+		android:layout_marginLeft	="5dip"
+		android:layout_marginRight	="3dip"
+		android:layout_width	="wrap_content"
+		android:layout_height	="wrap_content"
+		android:layout_above	="@id/fuelGauge"
+		android:layout_toLeftOf	="@id/fuelUOM"
+		android:textAppearance	="?android:attr/textAppearanceLarge"
+		android:singleLine		="true"
+		android:text			="25.4"
+		android:textColor		="@color/neutral_amount"/>
+	
+	<TextView android:id="@+id/place"
+		style				="@style/LocationText"
+		android:gravity			="bottom"
+		android:layout_above	="@id/fuelGauge"
+		android:layout_toLeftOf	="@id/fuelAmt"
+		android:layout_toRightOf="@id/odometer" />
 </RelativeLayout>
