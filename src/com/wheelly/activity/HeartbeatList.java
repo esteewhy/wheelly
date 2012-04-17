@@ -45,15 +45,15 @@ public class HeartbeatList extends FragmentActivity {
 			ListConfiguration cfg = new ListConfiguration() {
 				
 				@Override
-				public SimpleCursorAdapter createListAdapter(Context context) {
+				public SimpleCursorAdapter createListAdapter(final Context context) {
 					final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60);
 					return
 						new SimpleCursorAdapter(getActivity(), R.layout.heartbeat_list_item, null,
 							new String[] {
-								"odometer", "_created", "fuel", "fuel", "place", "icons"
+								"odometer", "_created", "fuel", "fuel", "place", "icons", "status"
 							},
 							new int[] {
-								R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icons
+								R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icon_refuel, R.id.indicator
 							},
 							0
 						) {{
@@ -69,11 +69,22 @@ public class HeartbeatList extends FragmentActivity {
 										pb.setProgress(cursor.getInt(columnIndex));
 										pb.setMax(fuelCapacity);
 										return true;
-									case R.id.icons:
+									case R.id.icon_refuel:
 										int mask = cursor.getInt(columnIndex);
-										view.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
-										view.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
-										view.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
+										final View v = (View)view.getParent();
+										v.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
+										v.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
+										v.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
+										return true;
+									case R.id.indicator:
+										final int status = cursor.getInt(columnIndex);
+										view.setBackgroundColor(context.getResources().getColor(
+											status > 0
+												? R.color.sync_succeeded
+												: status < 0
+													? R.color.sync_failed
+													: R.color.sync_unknown)
+										);
 										return true;
 									}
 									return false;

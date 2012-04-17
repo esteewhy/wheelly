@@ -84,7 +84,9 @@
 		<item name="android:layout_width">11dp</item>
 		<item name="android:layout_height">11dp</item>
 		<item name="android:layout_marginRight">3dp</item>
+		<item name="android:layout_marginTop">2dp</item>
 		<item name="android:layout_gravity">center_vertical</item>
+		<item name="android:layout_alignParentRight">true</item>
 	</style>
 	
 	<style name="LocationString">
@@ -96,7 +98,7 @@
 	
 	<style name="LocationText" parent="@style/LocationString">
 		<item name="android:layout_weight">.5</item>
-		<item name="android:text">Kaniv</item>
+		<item name="android:text">Суми, Червоногвардійська</item>
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:textAppearance">?android:attr/textAppearanceSmall</item>

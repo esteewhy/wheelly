@@ -34,6 +34,7 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -169,30 +170,35 @@ public class SendDocsUtils {
   public static void addTrackInfo(
       Cursor track, String spreadsheetId, String worksheetId, String authToken, Context context)
       throws IOException {
-    String worksheetUri = String.format(GET_WORKSHEET_URI, spreadsheetId, worksheetId);
-    SharedPreferences prefs = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
-    boolean metricUnits = prefs.getBoolean(context.getString(R.string.metric_units_key), true);
-    
-    String rowId = track.getString(track.getColumnIndex("sync_id"));
-    if(null != rowId) {
-    	worksheetUri += "/" + rowId;
-    }
-    	
-    
-    Entry entry = addRow(worksheetUri, DocsHelper.getRowContent(track, metricUnits, context, worksheetUri), authToken);
+    Entry entry = postRow(String.format(GET_WORKSHEET_URI, spreadsheetId, worksheetId), track, authToken, context);
     
     if(parseOdometer(entry.getContent()) == track.getLong(track.getColumnIndex("odometer"))) {
-    	String[] parts = entry.getId().split("/");
-    	String syncId = parts[parts.length - 1];
+    	String[] parts = entry.getEditUri().split("/");
+    	String syncId = parts[parts.length - 2];
+    	String newEtag = parts[parts.length - 1];
     	final ContentValues values = new ContentValues();
     	
     	values.put(BaseColumns._ID, track.getLong(track.getColumnIndex(BaseColumns._ID)));
     	values.put("sync_id", syncId);
+    	values.put("sync_etag", newEtag);
     	values.put("sync_date", entry.getUpdateDate());
     	new HeartbeatBroker(context).updateOrInsert(values);
     }
   }
+  
+	private static Entry postRow(String worksheetUri, Cursor track, String authToken, Context context) throws IOException {
+		SharedPreferences prefs = context.getSharedPreferences(
+			Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+		boolean metricUnits = prefs.getBoolean(context.getString(R.string.metric_units_key), true);
+		
+		String rowId = track.getString(track.getColumnIndex("sync_id"));
+		String etag = track.getString(track.getColumnIndex("sync_etag"));
+		if(null != rowId && null != etag) {
+			worksheetUri += "/" + rowId + "/" + etag;
+		}
+		
+		return addRow(worksheetUri, DocsHelper.getRowContent(track, metricUnits, context, worksheetUri), authToken);
+	}
   
   private static long parseOdometer(String content) {
     int start = content.indexOf("odometer: ");
@@ -218,6 +224,7 @@ public class SendDocsUtils {
     
     if(rowContent.contains("<id>")) {
     	((HttpURLConnection)conn).setRequestMethod("PUT");
+    	conn.setDoInput(true);
     }
     
     
@@ -227,7 +234,7 @@ public class SendDocsUtils {
     Entry entry = null;
     try {
 		GDataParser parser = new XmlDocsGDataParserFactory(new AndroidXmlParserFactory())
-			.createParser(SpreadsheetEntry.class, conn.getInputStream());
+			.createParser(SpreadsheetEntry.class, new BufferedInputStream(conn.getInputStream()));
 	
 		while(parser.hasMoreData()) {
 			entry = parser.parseStandaloneEntry();
