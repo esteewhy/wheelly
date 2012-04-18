@@ -15,24 +15,6 @@
  */
 package com.wheelly.io.docs;
 
-import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
-import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
-import com.google.android.apps.mytracks.util.ResourceUtils;
-import com.google.android.common.gdata.AndroidXmlParserFactory;
-import com.google.android.maps.mytracks.R;
-import com.google.wireless.gdata.data.Entry;
-import com.google.wireless.gdata.parser.GDataParser;
-import com.google.wireless.gdata.parser.ParseException;
-import com.google.wireless.gdata.client.QueryParams;
-import com.wheelly.db.HeartbeatBroker;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.provider.BaseColumns;
-import android.util.Log;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,6 +28,27 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.provider.BaseColumns;
+import android.util.Log;
+import api.wireless.gdata.spreadsheets.data.ListEntry;
+import api.wireless.gdata.spreadsheets.parser.xml.XmlSpreadsheetsGDataParserFactory;
+
+import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
+import com.google.android.apps.mytracks.util.ResourceUtils;
+import com.google.android.common.gdata.AndroidXmlParserFactory;
+import com.google.android.maps.mytracks.R;
+import com.google.wireless.gdata.client.QueryParams;
+import com.google.wireless.gdata.data.Entry;
+import com.google.wireless.gdata.parser.GDataParser;
+import com.google.wireless.gdata.parser.ParseException;
+import com.wheelly.db.HeartbeatBroker;
 
 /**
  * Utilities for sending a track to Google Docs.
@@ -253,8 +256,8 @@ public class SendDocsUtils {
   	private static Entry parseEntity(InputStream is) throws IOException {
   		if(null != is) {
   		    try {
-  				GDataParser parser = new XmlDocsGDataParserFactory(new AndroidXmlParserFactory())
-  					.createParser(SpreadsheetEntry	.class, is);
+  				GDataParser parser = new XmlSpreadsheetsGDataParserFactory(new AndroidXmlParserFactory())
+  					.createParser(ListEntry.class, is);
   			
   				while(parser.hasMoreData()) {
   					return parser.parseStandaloneEntry();
