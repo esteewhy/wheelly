@@ -18,9 +18,8 @@ package api.wireless.gdata.spreadsheets.parser.xml;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlSerializer;
-
 import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
+import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
 import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
@@ -32,16 +31,13 @@ import java.io.InputStream;
 /**
  * A GDataParserFactory capable of handling Spreadsheets.
  */
-public class XmlSpreadsheetsGDataParserFactory implements XmlParserFactory {
+public class XmlSpreadsheetsGDataParserFactory extends XmlDocsGDataParserFactory {
     /*
      * @see GDataParserFactory
      */
     public XmlSpreadsheetsGDataParserFactory(XmlParserFactory xmlFactory) {
+    	super(xmlFactory);
         this.xmlFactory = xmlFactory;
-    }
-
-    /** Intentionally private. */
-    private XmlSpreadsheetsGDataParserFactory() {
     }
 
     /*
@@ -67,15 +63,15 @@ public class XmlSpreadsheetsGDataParserFactory implements XmlParserFactory {
      */
     public GDataParser createParser(Class entryClass, InputStream is)
             throws ParseException {
-        try {
-            XmlPullParser xmlParser = xmlFactory.createParser();
-            if (entryClass == ListEntry.class) {
-                return new XmlListGDataParser(is, xmlParser);
-            } else {
-                throw new ParseException("Unrecognized feed requested.");
-            }
-        } catch (XmlPullParserException e) {
-            throw new ParseException("Failed to create parser", e);
+    	if (entryClass == ListEntry.class) {
+	    	try {
+	            XmlPullParser xmlParser = xmlFactory.createParser();
+	            return new XmlListGDataParser(is, xmlParser);
+	        } catch (XmlPullParserException e) {
+	            throw new ParseException("Failed to create parser", e);
+	        }
+        } else {
+            return super.createParser(entryClass, is);
         }
     }
 
@@ -88,21 +84,9 @@ public class XmlSpreadsheetsGDataParserFactory implements XmlParserFactory {
      *         currently includes only {@link ListEntry} and {@link CellEntry}.)
      */
     public GDataSerializer createSerializer(Entry entry) {
-
+    	return super.createSerializer(entry);
     }
 
     /** The XmlParserFactory to use to actually process XML streams. */
     private XmlParserFactory xmlFactory;
-
-	@Override
-	public XmlPullParser createParser() throws XmlPullParserException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public XmlSerializer createSerializer() throws XmlPullParserException {
-        throw new IllegalArgumentException(
-                "Expected a ListEntry or CellEntry");
-    }
 }

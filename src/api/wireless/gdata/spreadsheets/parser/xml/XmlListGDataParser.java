@@ -19,6 +19,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import api.wireless.gdata.spreadsheets.data.ListEntry;
+import api.wireless.gdata.spreadsheets.data.ListFeed;
 
 import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.data.Feed;
