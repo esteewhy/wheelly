@@ -418,7 +418,7 @@ public final class R {
         public static int preferred_units_imperial=0x7f07012b;
         public static int preferred_units_metric=0x7f07012c;
         public static int preferred_units_title=0x7f07012d;
-        public static int recording_track_key=0x7f07003e;
+        public static int recording_track_id_key=0x7f07003e;
         public static int report_speed_key=0x7f07002f;
         public static int reset_key=0x7f070042;
         public static int restore_from_sd_key=0x7f070043;
@@ -439,7 +439,7 @@ public final class R {
         public static int search_no_results=0x7f070138;
         public static int search_track_location=0x7f070139;
         public static int search_voice_prompt=0x7f07013a;
-        public static int selected_track_key=0x7f07003f;
+        public static int selected_track_id_key=0x7f07003f;
         /**  Send Google 
          */
         public static int send_google_by_my_tracks=0x7f07013b;

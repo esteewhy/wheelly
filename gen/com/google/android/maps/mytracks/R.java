@@ -1034,7 +1034,7 @@ containing a value of this type.
         public static final int rate=0x7f090296;
         public static final int read_track_data_permission=0x7f09025c;
         public static final int record=0x7f090355;
-        public static final int recording_track_key=0x7f09003e;
+        public static final int recording_track_id_key=0x7f09003e;
         public static final int refuel_amount_input_label=0x7f090364;
         public static final int refuel_cost_input_label=0x7f090366;
         public static final int refuel_price_input_label=0x7f090365;
@@ -1089,7 +1089,7 @@ containing a value of this type.
         public static final int search_track_location=0x7f090139;
         public static final int search_voice_prompt=0x7f09013a;
         public static final int select_location=0x7f0902a8;
-        public static final int selected_track_key=0x7f09003f;
+        public static final int selected_track_id_key=0x7f09003f;
         /**  Send Google 
          */
         public static final int send_google_by_my_tracks=0x7f09013b;
