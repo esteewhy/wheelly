@@ -50,8 +50,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
-		<activity android:name=".activity.HeartbeatList" />
+		
 		<activity android:name=".activity.Heartbeat"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
@@ -60,13 +59,13 @@
 		<activity android:name=".activity.HeartbeatDialog"
 			android:theme="@android:style/Theme.Dialog"
 			android:launchMode="singleTop" />
-		<activity android:name=".activity.MileageList"></activity>
+		
 		<activity android:name=".activity.Mileage"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
 			android:taskAffinity=".activity.Mileage"
 			android:launchMode="singleTop" />
-		<activity android:name=".activity.RefuelList"></activity>
+		
 		<activity android:name=".activity.Refuel"
 			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"

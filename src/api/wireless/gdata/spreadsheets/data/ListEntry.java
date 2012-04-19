@@ -13,22 +13,22 @@ import com.google.wireless.gdata.data.StringUtils;
  */
 public class ListEntry extends Entry {
     /** Map containing the values in the row. */
-    private Hashtable values = new Hashtable();
+    private Hashtable<String, String> values = new Hashtable<String, String>();
     
     /** Caches the list of names, so they don't need to be recomputed. */
-    private Vector names = null;
+    private Vector<String> names = null;
 
     /**
      * Retrieves the column names present in this row.
      * 
      * @return a Set of Strings, one per column where data exists
      */
-    public Vector getNames() {
+    public Vector<String> getNames() {
         if (names != null) {
             return names;
         }
-        names = new Vector();
-        Enumeration e = values.keys();
+        names = new Vector<String>();
+        Enumeration<String> e = values.keys();
         while (e.hasMoreElements()) {
             names.add(e.nextElement());
         }

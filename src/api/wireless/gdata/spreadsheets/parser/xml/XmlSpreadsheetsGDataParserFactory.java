@@ -61,7 +61,8 @@ public class XmlSpreadsheetsGDataParserFactory extends XmlDocsGDataParserFactory
      * @return A parser capable of parsing the feed as the indicated type.
      * @throws ParseException if the feed could not be parsed for any reason
      */
-    public GDataParser createParser(Class entryClass, InputStream is)
+    @SuppressWarnings("rawtypes")
+	public GDataParser createParser(Class entryClass, InputStream is)
             throws ParseException {
     	if (entryClass == ListEntry.class) {
 	    	try {
