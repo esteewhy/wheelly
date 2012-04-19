@@ -30,8 +30,7 @@
 		android:layout_height	="wrap_content"
 		android:id				="@+id/bTemplate"
 		android:src				="@drawable/ic_input_templates"/>
-	<fragment
-		class					="com.wheelly.app.FilterButton"
+	<com.wheelly.app.FilterButton
 		android:layout_width	="wrap_content"
 		android:layout_height	="wrap_content"
 		android:id				="@+id/bFilter" />

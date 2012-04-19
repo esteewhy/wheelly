@@ -2,78 +2,85 @@ package com.wheelly.app;
 
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
-import com.wheelly.activity.Filter;
-import com.wheelly.util.FilterUtils;
+import com.wheelly.activity.FilterDialog;
 import com.wheelly.util.FilterUtils.F;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
+import android.os.Parcelable;
+import android.support.v4.app.FragmentActivity;
+import android.util.AttributeSet;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
 
 /**
  * Self-contained control which presents filter dialog and notifies underlying activity when filter values change.
  */
-public class FilterButton extends Fragment implements IFilterHolder {
-	private static final int FILTER_REQUEST = 6;
+public class FilterButton extends ImageButton implements IFilterHolder {
+	
+	public FilterButton(Context context) {
+		super(context);
+		initialize();
+	}
+	
+	public FilterButton(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initialize();
+	}
+
+	public FilterButton(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		initialize();
+	}
+	
+	private void initialize() {
+		setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		setImageResource(R.drawable.ic_menu_filter_off);
+		setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				setEnabled(false);
+				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
+				new FilterDialog(new ContentValues(filter), new OnFilterChangedListener() {
+					
+					@Override
+					public void onFilterChanged(ContentValues value) {
+						if (null == value) {
+							setFilter(null);
+						} else {
+							filter.remove(F.LOCATION_CONSTRAINT);
+							setFilter(value);
+						}
+						
+						setEnabled(true);
+					}
+				})
+					.show(((FragmentActivity)getContext()).getSupportFragmentManager(), "filter");
+			}
+		});
+	}
+	
 	private final ContentValues filter = new ContentValues();
-	ImageButton btn;
 	public String locationConstraint = null; 
 	
 	@Override
-	public View onCreateView(
-			LayoutInflater inflater,
-			ViewGroup container,
-			Bundle savedInstanceState) {
-		
-		if(null != savedInstanceState && savedInstanceState.containsKey(F.LOCATION_CONSTRAINT)) {
-			locationConstraint = savedInstanceState.getString(F.LOCATION_CONSTRAINT);
-		}
-		
-		btn = new ImageButton(this.getActivity());
-		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		btn.setImageResource(R.drawable.ic_menu_filter_off);
-		btn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				btn.setEnabled(false);
-				Intent intent = new Intent(getActivity(), Filter.class);
-				FilterUtils.filterToIntent(filter, intent);
-				intent.putExtra(F.LOCATION_CONSTRAINT, locationConstraint);
-				startActivityForResult(intent, FILTER_REQUEST);
-			}
-		});
-		return btn;
-	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public Parcelable onSaveInstanceState() {
+		Bundle outState = new Bundle();
 		outState.putString(F.LOCATION_CONSTRAINT, locationConstraint);
-		super.onSaveInstanceState(outState);
+		outState.putParcelable("instanceState", super.onSaveInstanceState());
+		return outState;
 	}
 	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case FILTER_REQUEST:
-			if (resultCode == Activity.RESULT_FIRST_USER) {
-				setFilter(null);
-			} else if (resultCode == Activity.RESULT_OK) {
-				data.removeExtra(F.LOCATION_CONSTRAINT);
-				ContentValues newFilter = new ContentValues();
-				FilterUtils.intentToFilter(data, newFilter);
-				setFilter(newFilter);
-			}
-			
-			btn.setEnabled(true);
-			break;
+	protected void onRestoreInstanceState(Parcelable state) {
+		if(state instanceof Bundle) {
+			final Bundle savedInstanceState = (Bundle)state;
+			locationConstraint = savedInstanceState.getString(F.LOCATION_CONSTRAINT);
+			super.onRestoreInstanceState(savedInstanceState.getParcelable("instanceState"));
+		} else {
+			super.onRestoreInstanceState(state);
 		}
 	}
 	
@@ -92,7 +99,7 @@ public class FilterButton extends Fragment implements IFilterHolder {
 				this.filter.putAll(filter);
 			}
 			
-			btn.setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
+			setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 			
 			if(null != listener) {
 				listener.onFilterChanged(this.filter);

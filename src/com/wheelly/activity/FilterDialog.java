@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.wheelly.R;
+import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 import com.wheelly.util.FilterUtils;
@@ -29,6 +30,8 @@ import ru.orangesoftware.financisto.utils.Utils;
 import ru.orangesoftware.financisto.utils.DateUtils.PeriodType;
 import ru.orangesoftware.financisto.view.NodeInflater;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -36,10 +39,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,9 +51,10 @@ import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-
-public class Filter extends FragmentActivity {	
-	private final ContentValues filter = new ContentValues();
+public class FilterDialog extends DialogFragment {	
+	private LayoutInflater layoutInflater;
+	private OnFilterChangedListener listener;
+	private ContentValues filter;
 	
 	private DateFormat df;
 	private static final int PERIOD_REQUEST = 1;
@@ -63,19 +66,26 @@ public class Filter extends FragmentActivity {
 	
 	private Cursor locationCursor;
 	
+	public FilterDialog(ContentValues filter, OnFilterChangedListener listener) {
+		this.filter = filter;
+		this.listener = listener;
+	}
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.blotter_filter);
-		
-		final Intent intent = getIntent();
-		final Activity ctx = this;
+		layoutInflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+	
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		View v = layoutInflater.inflate(R.layout.blotter_filter, null);
+		final Activity ctx = this.getActivity();
 		
 		this.locationCursor = new LocationRepository(
 			db = new DatabaseHelper(ctx).getReadableDatabase())
-				.list(intent != null && intent.hasExtra(F.LOCATION_CONSTRAINT)
-					? intent.getStringExtra(F.LOCATION_CONSTRAINT)
+				.list(filter.containsKey(F.LOCATION_CONSTRAINT)
+					? filter.getAsString(F.LOCATION_CONSTRAINT)
 					: "");
 		
 		ctx.startManagingCursor(locationCursor);
@@ -88,13 +98,13 @@ public class Filter extends FragmentActivity {
 					new int[] { android.R.id.text1 }
 			);
 		
-		x = new ActivityLayout(new NodeInflater((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE)),
+		x = new ActivityLayout(new NodeInflater(layoutInflater),
 			new ActivityLayoutListener() {
 				@Override
 				public void onClick(View v) {
 					switch (v.getId()) {
 					case R.id.period:
-						Intent intent = new Intent(Filter.this, DateFilterActivity.class);
+						Intent intent = new Intent(ctx, DateFilterActivity.class);
 						FilterUtils.filterToIntent(filter, intent);
 						startActivityForResult(intent, PERIOD_REQUEST);
 						break;
@@ -106,7 +116,7 @@ public class Filter extends FragmentActivity {
 						long locationId = filter.containsKey(F.LOCATION) ? filter.getAsLong(F.LOCATION) : -1;
 						long selectedId = c != null ? locationId : -1;
 						
-						x.select(Filter.this,
+						x.select(ctx,
 							R.id.location,
 							R.string.location,
 							locationCursor,
@@ -121,13 +131,13 @@ public class Filter extends FragmentActivity {
 					case R.id.sort_order: {
 						
 						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							Filter.this,
+							ctx,
 							android.R.layout.simple_spinner_dropdown_item,
 							c.sortOrders);
 						
 						int selectedId = Math.min(1, filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0);
 						x.selectPosition(
-							Filter.this,
+							ctx,
 							R.id.sort_order,
 							R.string.sort_order,
 							adapter,
@@ -172,47 +182,50 @@ public class Filter extends FragmentActivity {
 				}
 		});
 		
-		c = new Controls(x, this);
+		c = new Controls(x, v);
 		
-		df = DateUtils.getShortDateFormat(this);
+		df = DateUtils.getShortDateFormat(ctx);
 		filterValueNotFound = getString(R.string.filter_value_not_found);
+
+		final Dialog d = new AlertDialog.Builder(getActivity())
+			.setView(v)
+		//.set
+			.create();
 		
 		c.bOk.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Intent data = new Intent();
-				FilterUtils.filterToIntent(filter, data);
-				setResult(RESULT_OK, data);
-				finish();
+				dismiss();
+				listener.onFilterChanged(filter);
 			}
 		});
 		
 		c.bCancel.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				setResult(RESULT_CANCELED);
-				finish();
+				d.cancel();
 			}
 		});
 		
 		c.bNoFilter.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				setResult(RESULT_FIRST_USER);
-				finish();
+				dismiss();
+				listener.onFilterChanged(null);
 			}
 		});		
 		
-		if (intent != null) {
-			FilterUtils.intentToFilter(intent, filter);
+		if(null != filter) {
 			updatePeriodFromFilter(filter);
 			updateLocationFromFilter(filter);
 			updateSortOrderFromFilter(filter);
 		}
+		
+		return d;
 	}
 	
 	@Override
-	protected void onDestroy() {
+	public void onDestroy() {
 		db.close();
 		super.onDestroy();
 	}
@@ -252,12 +265,12 @@ public class Filter extends FragmentActivity {
 	}
 	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == PERIOD_REQUEST) {
-			if (resultCode == RESULT_FIRST_USER) {
+			if (resultCode == Activity.RESULT_FIRST_USER) {
 				filter.remove(F.PERIOD);
 				c.period.setText(R.string.no_filter);
-			} else if (resultCode == RESULT_OK) {
+			} else if (resultCode == Activity.RESULT_OK) {
 				filter.put(F.PERIOD, data.getStringExtra(F.PERIOD));
 				updatePeriodFromFilter(filter);
 			}
@@ -275,7 +288,7 @@ public class Filter extends FragmentActivity {
 		final Button bCancel;
 		final ImageButton bNoFilter;
 		
-		public Controls(ActivityLayout x, Activity v) {
+		public Controls(ActivityLayout x, View v) {
 			sortOrders = v.getResources().getStringArray(R.array.sort_blotter_entries);
 			
 			LinearLayout layout = (LinearLayout)v.findViewById(R.id.layout);
