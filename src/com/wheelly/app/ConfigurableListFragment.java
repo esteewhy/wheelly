@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
-import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
@@ -91,7 +90,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		c.TemplateButton.setVisibility(View.GONE);
 		
 		c.FilterButton.setLocationConstraint(cfg.LocationFacetTable);
-		c.FilterButton.SetOnFilterChangedListener(new OnFilterChangedListener() {
+		c.FilterButton.SetOnFilterChangedListener(new com.wheelly.app.FilterButton.OnFilterChangedListener() {
 			@Override
 			public void onFilterChanged(ContentValues value) {
 				final Bundle args = new Bundle();

@@ -84,13 +84,6 @@
 			android:launchMode="singleTop" />
 		
 		<activity
-			android:name	=".activity.Filter"
-			android:label	="@string/filter"
-			android:theme	="@android:style/Theme.Dialog"
-			android:configChanges="orientation|keyboardHidden"
-			android:launchMode="singleTop" />
-		
-		<activity
 			android:name	=".activity.Preferences"
 			android:label	="@string/preferences" />
 		
