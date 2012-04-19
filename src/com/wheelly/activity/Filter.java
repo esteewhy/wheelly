@@ -11,8 +11,8 @@
 package com.wheelly.activity;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
@@ -21,7 +21,7 @@ import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
 
 import ru.orangesoftware.financisto.activity.ActivityLayout;
-import ru.orangesoftware.financisto.activity.ActivityLayout.ActivityLayoutListener;
+import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.activity.DateFilterActivity;
 import ru.orangesoftware.financisto.model.*;
 import ru.orangesoftware.financisto.utils.DateUtils;
@@ -165,8 +165,10 @@ public class Filter extends FragmentActivity {
 				}
 				
 				@Override
-				public void onSelected(int id, ArrayList<? extends MultiChoiceItem> items) {
+				public void onSelected(int arg0,
+						List<? extends MultiChoiceItem> arg1) {
 					// TODO Auto-generated method stub
+					
 				}
 		});
 		
@@ -277,9 +279,9 @@ public class Filter extends FragmentActivity {
 			sortOrders = v.getResources().getStringArray(R.array.sort_blotter_entries);
 			
 			LinearLayout layout = (LinearLayout)v.findViewById(R.id.layout);
-			period = x.addListNodeMinus(layout, R.id.period, R.id.period_clear, R.string.period, R.string.no_filter);
-			location = x.addListNodeMinus(layout, R.id.location, R.id.location_clear, R.string.location, R.string.no_filter);
-			sortOrder = x.addListNodeMinus(layout, R.id.sort_order, R.id.sort_order_clear, R.string.sort_order, sortOrders[0]);
+			period = x.addFilterNodeMinus(layout, R.id.period, R.id.period_clear, R.string.period, R.string.no_filter);
+			location = x.addFilterNodeMinus(layout, R.id.location, R.id.location_clear, R.string.location, R.string.no_filter);
+			sortOrder = x.addFilterNodeMinus(layout, R.id.sort_order, R.id.sort_order_clear, R.string.sort_order, sortOrders[0]);
 			
 			bOk = (Button)v.findViewById(R.id.bOK);
 			bCancel = (Button)v.findViewById(R.id.bCancel);

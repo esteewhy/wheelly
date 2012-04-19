@@ -3,7 +3,7 @@ package com.wheelly.util;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 public final class DateUtils {
 	public static final String DateFormat = "yyyy-MM-dd";
@@ -16,20 +16,21 @@ public final class DateUtils {
 	final static Format yearFormat = new SimpleDateFormat("d MMM");
 	final static Format otherFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
-	final static Date today = new Date();
+	final static Calendar today = Calendar.getInstance();
 	
 	public static String formatVarying(String date) {
 		try {
-			final Date d = dbFormat.parse(date);
+			final Calendar c = Calendar.getInstance();
+			c.setTime(dbFormat.parse(date));
 			final Format f =
-				d.getYear() == today.getYear()
-					? d.getMonth() == today.getMonth()
-						&& d.getDate() == today.getDate()
+				c.get(Calendar.YEAR) == today.get(Calendar.YEAR)
+					? c.get(Calendar.MONTH) == today.get(Calendar.MONTH)
+						&& c.get(Calendar.DATE) == today.get(Calendar.DATE)
 						? todayFormat
 						: yearFormat
 					: otherFormat;
 			
-			return f.format(d);
+			return f.format(c.getTime());
 		} catch (ParseException e) {
 			return date;
 		}
