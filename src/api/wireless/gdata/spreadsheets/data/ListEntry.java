@@ -58,7 +58,7 @@ public class ListEntry extends Entry {
         if (StringUtils.isEmpty(name)) {
             return defaultValue;
         }
-        String val = (String) values.get(name);
+        String val = values.get(name);
         if (val == null) {
             return defaultValue;
         }

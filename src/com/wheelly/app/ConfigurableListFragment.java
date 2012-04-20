@@ -84,7 +84,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		c.TemplateButton.setVisibility(View.GONE);
 		
 		c.FilterButton.setLocationConstraint(cfg.LocationFacetTable);
-		c.FilterButton.SetOnFilterChangedListener(new com.wheelly.app.FilterButton.OnFilterChangedListener() {
+		c.FilterButton.SetOnFilterChangedListener(new com.wheelly.widget.FilterButton.OnFilterChangedListener() {
 			@Override
 			public void onFilterChanged(ContentValues value) {
 				final Bundle args = new Bundle();

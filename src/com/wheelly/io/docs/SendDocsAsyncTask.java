@@ -22,18 +22,21 @@ public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
 	
 	@Override
 	protected boolean addTrackInfo(Cursor track) {
-	  if (isCancelled() || !track.moveToFirst()) {
-	    return false;
-	  }
-	  try {
-	    do {
-	    	SendDocsUtils.addTrackInfo(track, spreadsheetId, worksheetId, spreadsheetsAuthToken, context);
-	    } while(track.moveToNext());
-	  } catch (IOException e) {
-	    Log.d(TAG, "Unable to add track info", e);
-	    return false;
-	  }
-	  return true;
+		if (isCancelled() || !track.moveToFirst()) {
+			return false;
+		}
+		
+		final String worksheetUri = String.format(SendDocsUtils.GET_WORKSHEET_URI, spreadsheetId, worksheetId);
+		final SpreadsheetPoster poster = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken);
+		try {
+			do {
+				poster.addTrackInfo(track);
+			} while(track.moveToNext());
+		} catch (IOException e) {
+			Log.d(TAG, "Unable to add track info", e);
+			return false;
+		}
+		return true;
 	}
 
 	@Override

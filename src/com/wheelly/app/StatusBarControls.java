@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.wheelly.R;
+import com.wheelly.widget.FilterButton;
 
 /**
  * Reusable holder of references to status_bar layout controls.
