@@ -16,7 +16,6 @@
 package com.wheelly.io.docs;
 
 import com.google.android.apps.mytracks.util.StringUtils;
-import android.content.Context;
 import android.database.Cursor;
 
 /**
@@ -29,19 +28,13 @@ import android.database.Cursor;
 public class DocsHelper {
   /**
    * Gets the row content containing the track's info.
-   *
-   * @param track the track
-   * @param metricUnits true to use metric
-   * @param context the context
    */
-  static String getRowContent(Cursor track, boolean metricUnits, Context context, String worksheetUri) {
+  static String getRowContent(Cursor track, String entityId) {
     StringBuilder builder = new StringBuilder().append("<entry xmlns='http://www.w3.org/2005/Atom' "
         + "xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>");
     
-    String syncEtag = track.getString(track.getColumnIndex("sync_etag"));
-    
-    if(null != syncEtag) {
-    	appendGenericTag(builder, "id", worksheetUri);
+    if(null != entityId) {
+    	appendGenericTag(builder, "id", entityId);
     }
     
     appendTag(builder, "type", iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons"))));

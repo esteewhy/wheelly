@@ -15,11 +15,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.wheelly.R;
-import com.wheelly.app.FilterButton.OnFilterChangedListener;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
+import com.wheelly.widget.FilterButton.OnFilterChangedListener;
 
 import ru.orangesoftware.financisto.activity.ActivityLayout;
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
@@ -188,7 +188,6 @@ public class FilterDialog extends DialogFragment {
 
 		final Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(v)
-			.setInverseBackgroundForced(true)
 			.create();
 		
 		c.bOk.setOnClickListener(new OnClickListener(){
