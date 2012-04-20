@@ -178,7 +178,6 @@ public class FilterDialog extends DialogFragment {
 				public void onSelected(int arg0,
 						List<? extends MultiChoiceItem> arg1) {
 					// TODO Auto-generated method stub
-					
 				}
 		});
 		
@@ -189,7 +188,7 @@ public class FilterDialog extends DialogFragment {
 
 		final Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(v)
-		//.set
+			.setInverseBackgroundForced(true)
 			.create();
 		
 		c.bOk.setOnClickListener(new OnClickListener(){

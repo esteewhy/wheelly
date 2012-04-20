@@ -13,7 +13,6 @@ import com.wheelly.util.FilterUtils.FilterResult;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,7 +54,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	private static final int EDIT_REQUEST = 2;
 	private static final int DELETE_REQUEST = 3;
 	
-	private ProgressDialog progressDialog;
+	//private ProgressDialog progressDialog;
 	private StatusBarControls c;
 	
 	@Override
@@ -63,11 +62,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		super.onActivityCreated(savedInstanceState);
 		final FragmentActivity ctx = getActivity();
 		final ListConfiguration cfg = getConfiguration();
-		
-		progressDialog = new ProgressDialog(ctx);
-		progressDialog.setTitle(R.string.loading);
-		progressDialog.setMessage(getString(R.string.loading_message));
-		progressDialog.setCancelable(false);
 		
 		setEmptyText(getString(cfg.EmptyTextResourceId));
 		setListAdapter(cfg.createListAdapter(ctx));
@@ -251,7 +245,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				progressDialog.show();
+				setListShown(false);
 			}
 		});
 		
@@ -280,7 +274,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				progressDialog.dismiss();
+				setListShown(true);
 			}
 		});
 	}
