@@ -1,10 +1,14 @@
 package com.wheelly.io.docs;
 
+import java.io.IOException;
+
 import android.accounts.Account;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
+import api.wireless.gdata.spreadsheets.data.ListEntry;
+
 import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
+import com.wheelly.content.WheellyProviderUtils;
 
 /**
  * @author tstrypko
@@ -29,13 +33,19 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 	
 	@Override
 	protected boolean addTrackInfo(Cursor track) {
-		
-		if(MatrixCursor.class == track.getClass()) {
-			SpreadsheetEntry entry = SendDocsUtils.getLatestRow(spreadsheetId, worksheetId, spreadsheetsClient, spreadsheetsAuthToken);
-			track.toString();
+		try {
+			return super.addTrackInfo(MatrixCursor.class == track.getClass() ? resolveRealEntity() : track);
+		} catch (IOException e) {
 			return false;
 		}
-		
-		return super.addTrackInfo(track);
+	}
+	
+	private Cursor resolveRealEntity() throws IOException {
+		final String worksheetUri = String.format(SendDocsUtils.GET_WORKSHEET_URI, spreadsheetId, worksheetId);
+		ListEntry entry = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken).getLatestRow();
+		final long lastOdometer = Long.parseLong(entry.getValue("odometer"));
+		Cursor cursor = new WheellyProviderUtils(this.context).getLatestRecords(lastOdometer);
+		int cnt = cursor.getCount();
+		return cursor;
 	}
 }
