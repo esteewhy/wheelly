@@ -253,7 +253,7 @@ public abstract class AbstractSendDocsAsyncTask<EntityType> extends AbstractSend
       return false;
     }
     try {
-      spreadsheetId = SendDocsUtils.createSpreadsheet(spreadsheetTitle, documentsAuthToken, context);
+      spreadsheetId = com.wheelly.io.docs.SendDocsUtils.createSpreadsheet(spreadsheetTitle, documentsAuthToken, context);
     } catch (IOException e) {
       Log.d(TAG, "Unable to create spreadsheet", e);
       return false;

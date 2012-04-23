@@ -43,8 +43,11 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 	private Cursor resolveRealEntity() throws IOException {
 		final String worksheetUri = String.format(SendDocsUtils.GET_WORKSHEET_URI, spreadsheetId, worksheetId);
 		ListEntry entry = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken).getLatestRow();
-		final long lastOdometer = Long.parseLong(entry.getValue("odometer"));
-		Cursor cursor = new WheellyProviderUtils(this.context).getLatestRecords(lastOdometer);
+		
+		WheellyProviderUtils provider = new WheellyProviderUtils(this.context); 
+		Cursor cursor = null != entry
+			? provider.getLatestRecords(Long.parseLong(entry.getValue("odometer")))
+			: provider.getSyncCursor(-1);
 		int cnt = cursor.getCount();
 		return cursor;
 	}
