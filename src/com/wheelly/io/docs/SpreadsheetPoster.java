@@ -10,6 +10,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.util.Pair;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 import api.wireless.gdata.spreadsheets.parser.xml.XmlSpreadsheetsGDataParserFactory;
 
@@ -18,6 +19,7 @@ import com.google.android.apps.mytracks.io.gdata.QueryParamsImpl;
 import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.wireless.gdata.client.HttpException;
 import com.google.wireless.gdata.client.QueryParams;
+import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
 import com.wheelly.db.HeartbeatBroker;
@@ -42,7 +44,7 @@ public class SpreadsheetPoster {
 	}
 	
 	public void addTrackInfo(Cursor track)
-			throws IOException {
+			throws IOException, HttpException {
 		final EntryPostResult result = postRow(track, authToken);
 		
 		if(isEntryValid(track, result.Entry)) {
@@ -59,22 +61,19 @@ public class SpreadsheetPoster {
 	}
 	
 	private static ContentValues prepareLocalValues(Cursor local, EntryPostResult result) {
-		String[] parts = result.Entry.getEditUri().split("/");
-		
+		final Pair<String, String> idAndVersion = getIdAndVersion(result.Entry);
 		final long id = local.getLong(local.getColumnIndex(BaseColumns._ID));
 		final ContentValues values = new ContentValues();
 		values.put(BaseColumns._ID, id);
 		
-		final String syncId = parts[parts.length - 2];
 		final String localSyncId = local.getString(local.getColumnIndex("sync_id")); 
-		if(!syncId.equals(localSyncId)) {
-			values.put("sync_id", syncId);
+		if(!idAndVersion.first.equals(localSyncId)) {
+			values.put("sync_id", idAndVersion.first);
 		}
 		
-		final String etag = parts[parts.length - 1];
 		final String localEtag = local.getString(local.getColumnIndex("sync_etag")); 
-		if(!etag.equals(localEtag)) {
-			values.put("sync_etag", result.Status == EntryPostStatus.CONFLICT ? null : etag);
+		if(!idAndVersion.second.equals(localEtag)) {
+			values.put("sync_etag", result.Status == EntryPostStatus.CONFLICT ? null : idAndVersion.second);
 		}
 		
 		if(result.Status != EntryPostStatus.CONFLICT) {
@@ -91,14 +90,35 @@ public class SpreadsheetPoster {
 		return values;
 	}
 	
-	private EntryPostResult postRow(Cursor track, String authToken) throws IOException {
-		String rowId = track.getString(track.getColumnIndex("sync_id"));
-		String etag = track.getString(track.getColumnIndex("sync_etag"));
+	private static Pair<String, String> getIdAndVersion(Entry entry) {
+		String[] parts = entry.getEditUri().split("/");
+		return new Pair<String, String>(parts[parts.length - 2], parts[parts.length - 1]);
+	}
+	
+	private static Pair<String, String> getIdAndVersion(Cursor track) {
+		return
+			new Pair<String, String>(
+				track.getString(track.getColumnIndex("sync_id")),
+				track.getString(track.getColumnIndex("sync_etag"))
+			);
+	}
+	
+	private EntryPostResult postRow(Cursor track, String authToken) throws IOException, HttpException {
+		Pair<String, String> idAndVersion = getIdAndVersion(track);
 		String entityUri = null;
 		String editUri = worksheetUri;
-		if(null != rowId && null != etag) {
-			entityUri = worksheetUri + "/" + rowId;
-			editUri += "/" + rowId + "/" + etag;
+		
+		if(null == idAndVersion.first) {
+			ListEntry existing = resolveRow(track);
+			
+			if(null != existing) {
+				idAndVersion = getIdAndVersion(existing);
+			}
+		}
+		
+		if(null != idAndVersion.first && null != idAndVersion.second) {
+			entityUri = worksheetUri + "/" + idAndVersion.first;
+			editUri += "/" + idAndVersion.first + "/" + idAndVersion.second;
 		}
 		
 		return addOrUpdateRow(editUri, DocsHelper.getRowContent(track, entityUri));
@@ -191,5 +211,21 @@ public class SpreadsheetPoster {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * Attempts to locate remote record by non-key values.
+	 * @throws IOException 
+	 * @throws HttpException 
+	 */
+	private ListEntry resolveRow(Cursor local) throws IOException, HttpException {
+		QueryParams query = new QueryParamsImpl();
+		query.setMaxResults("1");
+		query.setParamValue("odometer", Long.toString(local.getLong(local.getColumnIndex("odometer"))));
+		query.setParamValue("fuel", Integer.toString(local.getInt(local.getColumnIndex("fuel"))));
+		query.setParamValue("location", local.getString(local.getColumnIndex("place")));
+		final String feedUri = query.generateQueryUrl(worksheetUri);
+		
+		return parseEntity(GDataClientFactory.getGDataClient(context).getFeedAsStream(feedUri, authToken));
 	}
 }

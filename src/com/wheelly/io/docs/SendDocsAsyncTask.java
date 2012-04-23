@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
+import com.google.wireless.gdata.client.HttpException;
 import com.wheelly.content.WheellyProviderUtils;
 
 public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
@@ -34,6 +35,10 @@ public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
 			} while(track.moveToNext());
 		} catch (IOException e) {
 			Log.d(TAG, "Unable to add track info", e);
+			return false;
+		} catch (HttpException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return false;
 		}
 		return true;
