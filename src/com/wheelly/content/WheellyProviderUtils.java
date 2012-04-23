@@ -23,4 +23,10 @@ public class WheellyProviderUtils {
 				: cr.query(Timeline.CONTENT_URI, Timeline.ListProjection, null, null,
 						"odometer ASC");
 	}
+	
+	public Cursor getLatestRecords(long lastOdometer) {
+		final ContentResolver cr = context.getContentResolver();
+		return cr.query(Timeline.CONTENT_URI, Timeline.ListProjection, "h.odometer > ?",
+				new String[] { Long.toString(lastOdometer) }, "odometer ASC");
+	}
 }

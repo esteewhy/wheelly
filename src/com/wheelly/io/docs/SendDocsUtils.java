@@ -27,12 +27,7 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.util.Log;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
 import com.google.android.apps.mytracks.util.ResourceUtils;
-import com.google.wireless.gdata.client.QueryParams;
-import com.google.wireless.gdata.parser.GDataParser;
-import com.google.wireless.gdata.parser.ParseException;
 
 /**
  * Utilities for sending a track to Google Docs.
@@ -143,30 +138,4 @@ public class SendDocsUtils {
 
     return result.substring(idStringStart + SPREADSHEET_ID_PREFIX.length(), idTagCloseIndex);
   }
-  	
-	public static SpreadsheetEntry getLatestRow(
-		  String spreadsheetId, String worksheetId, SpreadsheetsClient spreadsheetClient, String authToken) {
-		String worksheetUri = String.format(GET_WORKSHEET_URI, spreadsheetId, worksheetId);
-		try {
-			QueryParams query = spreadsheetClient.createQueryParams();
-			query.setQuery(worksheetUri);
-			query.setMaxResults("1");
-			query.setParamValue("reverse", "true");
-//			String tmp = query.generateQueryUrl(null);
-			GDataParser parser = spreadsheetClient.getParserForFeed(null, query.getQuery(), authToken);
-			
-			parser.init();
-			
-			return parser.hasMoreData()
-					? (SpreadsheetEntry)parser.readNextEntry(new SpreadsheetEntry())
-					: null;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
 }
