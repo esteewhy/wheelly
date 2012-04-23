@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.widget;
 
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
