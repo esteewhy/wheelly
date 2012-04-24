@@ -72,7 +72,7 @@ public class DocsHelper {
 	  	.append(">");
   }
   
-  private static String iconFlagsToTypeString(int flags) {
+  public static String iconFlagsToTypeString(int flags) {
     return
       (flags & 1) != 0
         ? "STOP"
