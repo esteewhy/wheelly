@@ -303,8 +303,10 @@ public final class DatabaseSchema {
 			"h.fuel",
 			"l.name place",
 			"m2.mileage distance",
+			"ls.name destination",
 			"r.cost",
 			"r.amount",
+			"r.transaction_id",
 			IconColumnExpression + " icons",
 			"h.sync_id",
 			"h.sync_etag",
@@ -315,6 +317,7 @@ public final class DatabaseSchema {
 			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID
 			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + BaseColumns._ID
 			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN locations ls ON m2.location_id = ls." + BaseColumns._ID
 			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + BaseColumns._ID;
 		
 		public static final Uri CONTENT_URI =
