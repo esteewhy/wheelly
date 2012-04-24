@@ -1,5 +1,6 @@
 package com.wheelly.io.docs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -45,16 +46,27 @@ public class SpreadsheetPoster {
 	
 	public void addTrackInfo(Cursor track)
 			throws IOException, HttpException {
-		final EntryPostResult result = postRow(track, authToken);
+		syncRow(track, getIdAndVersion(track));
+	}
+
+	private void syncRow(Cursor track, Pair<String, String> idAndEtag) throws HttpException, IOException {
+		final EntryPostResult result = postRow(track, idAndEtag);
 		
 		if(isEntryValid(track, result.Entry)) {
 			new HeartbeatBroker(context).updateOrInsert(
 				prepareLocalValues(track, result)
 			);
+		} else {
+			// id+etag matched some row but that appears to be a wrong one,
+			// so re-iterating..
+			syncRow(track, new Pair<String, String>(null, null));
 		}
 	}
 	
 	private static boolean isEntryValid(Cursor local, ListEntry remote) {
+		if(null == remote) {
+			return false;
+		}
 		final long localOdo = Long.parseLong(remote.getValue("odometer", "-1"));
 		final long remoteOdo = local.getLong(local.getColumnIndex("odometer")); 
 		return localOdo == remoteOdo;
@@ -103,8 +115,7 @@ public class SpreadsheetPoster {
 			);
 	}
 	
-	private EntryPostResult postRow(Cursor track, String authToken) throws IOException, HttpException {
-		Pair<String, String> idAndVersion = getIdAndVersion(track);
+	private EntryPostResult postRow(Cursor track, Pair<String, String> idAndVersion) throws HttpException, IOException {
 		String entityUri = null;
 		String editUri = worksheetUri;
 		
@@ -121,11 +132,28 @@ public class SpreadsheetPoster {
 			editUri += "/" + idAndVersion.first + "/" + idAndVersion.second;
 		}
 		
-		return addOrUpdateRow(editUri, DocsHelper.getRowContent(track, entityUri));
+		try {
+			return addOrUpdateRow(editUri, DocsHelper.getRowContent(track, entityUri));
+		} catch (FileNotFoundException e) {
+			return forceAddRow(track);
+		} catch (ParseException ex1) {
+			ex1.printStackTrace();
+			return forceAddRow(track);
+		}
+	}
+	
+	private EntryPostResult forceAddRow(Cursor track) throws IOException {
+		// Probably, our stored id+etag are totally incorrect (i.e.: Spreadsheet was re-created),
+		// so try from the scratch..
+		try {
+			return addOrUpdateRow(worksheetUri, DocsHelper.getRowContent(track, null));
+		} catch (ParseException e1) {
+			return new EntryPostResult(null, EntryPostStatus.CONFLICT);
+		}
 	}
 	
 	private final EntryPostResult addOrUpdateRow(String editUri, String rowContent)
-			throws IOException {
+			throws IOException, ParseException {
 		URL url = new URL(editUri);
 		URLConnection conn = url.openConnection();
 		
@@ -162,22 +190,17 @@ public class SpreadsheetPoster {
 				&& HttpException.SC_CONFLICT == ((HttpURLConnection)conn).getResponseCode();
 	}
 	
-	private static ListEntry parseEntity(InputStream is) throws IOException {
+	private static ListEntry parseEntity(InputStream is) throws IOException, ParseException {
 		if(null != is) {
-		    try {
-				GDataParser parser = new XmlSpreadsheetsGDataParserFactory(new AndroidXmlParserFactory())
-					.createParser(ListEntry.class, is);
+			GDataParser parser = new XmlSpreadsheetsGDataParserFactory(new AndroidXmlParserFactory())
+				.createParser(ListEntry.class, is);
 			
-				try {
-					while(parser.hasMoreData()) {
-						return (ListEntry) parser.parseStandaloneEntry();
-					}
-				} finally {
-					parser.close();
+			try {
+				while(parser.hasMoreData()) {
+					return (ListEntry) parser.parseStandaloneEntry();
 				}
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} finally {
+				parser.close();
 			}
 		}
 		
@@ -209,23 +232,40 @@ public class SpreadsheetPoster {
 		} catch (HttpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return null;
 	}
 	
 	/**
 	 * Attempts to locate remote record by non-key values.
-	 * @throws IOException 
-	 * @throws HttpException 
+	 * @throws ParseException 
 	 */
 	private ListEntry resolveRow(Cursor local) throws IOException, HttpException {
 		QueryParams query = new QueryParamsImpl();
 		query.setMaxResults("1");
-		query.setParamValue("odometer", Long.toString(local.getLong(local.getColumnIndex("odometer"))));
-		query.setParamValue("fuel", Integer.toString(local.getInt(local.getColumnIndex("fuel"))));
-		query.setParamValue("location", local.getString(local.getColumnIndex("place")));
+		
+		String sq = "odometer="
+			+ Long.toString(local.getLong(local.getColumnIndex("odometer")))
+			+ " and "
+			+ "fuel="
+			+ Integer.toString(local.getInt(local.getColumnIndex("fuel")));
+		
+		final String location = local.getString(local.getColumnIndex("place"));
+		if(null != location) {
+			sq += " and location=\"" + location + "\"";
+		}
+		query.setParamValue("sq", sq); 
 		final String feedUri = query.generateQueryUrl(worksheetUri);
 		
-		return parseEntity(GDataClientFactory.getGDataClient(context).getFeedAsStream(feedUri, authToken));
+		try {
+			return parseEntity(GDataClientFactory.getGDataClient(context).getFeedAsStream(feedUri, authToken));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

@@ -28,6 +28,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.util.Log;
 import com.google.android.apps.mytracks.util.ResourceUtils;
+import com.wheelly.content.WheellyProviderUtils;
 
 /**
  * Utilities for sending a track to Google Docs.
@@ -75,6 +76,7 @@ public class SendDocsUtils {
    */
   public static String createSpreadsheet(String title, String authToken, Context context)
       throws IOException {
+	  new WheellyProviderUtils(context).resetSync(-1);
 	  return createSpreadsheet(title, authToken, context, com.wheelly.R.raw.wheelly_empty_spreadsheet);
   }
   

@@ -39,7 +39,10 @@ public class DocsHelper {
     
     appendTag(builder, "type", iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons"))));
     appendTag(builder, "date", track.getString(track.getColumnIndexOrThrow("_created")));
-    appendTag(builder, "location", track.getString(track.getColumnIndexOrThrow("place")));
+    final String location = track.getString(track.getColumnIndexOrThrow("place"));
+    if(null != location) {
+    	appendTag(builder, "location", location);
+    }
     appendTag(builder, "fuel", Long.toString(track.getLong(track.getColumnIndexOrThrow("fuel"))));
     appendTag(builder, "odometer", Float.toString(track.getFloat(track.getColumnIndexOrThrow("odometer"))));
     
