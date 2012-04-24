@@ -37,7 +37,8 @@ public class DocsHelper {
     	appendGenericTag(builder, "id", entityId);
     }
     
-    appendTag(builder, "type", iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons"))));
+    final String type = iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons")));
+    appendTag(builder, "type", type);
     appendTag(builder, "date", track.getString(track.getColumnIndexOrThrow("_created")));
     final String location = track.getString(track.getColumnIndexOrThrow("place"));
     if(null != location) {
@@ -45,6 +46,18 @@ public class DocsHelper {
     }
     appendTag(builder, "fuel", Long.toString(track.getLong(track.getColumnIndexOrThrow("fuel"))));
     appendTag(builder, "odometer", Float.toString(track.getFloat(track.getColumnIndexOrThrow("odometer"))));
+    
+    if("STOP".equals(type)) {
+    	appendTag(builder, "distance", Float.toString(track.getFloat(track.getColumnIndex("distance"))));
+    	appendTag(builder, "destination", track.getString(track.getColumnIndex("destination")));
+    }
+    
+    if("REFUEL".equals(type)) {
+    	appendTag(builder, "fuel", Float.toString(track.getFloat(track.getColumnIndex("fuel"))));
+    	appendTag(builder, "amount", Float.toString(track.getFloat(track.getColumnIndex("amount"))));
+    	appendTag(builder, "cost", Float.toString(track.getFloat(track.getColumnIndex("cost"))));
+    	appendTag(builder, "transaction", Float.toString(track.getFloat(track.getColumnIndex("transaction_id"))));
+    }
     
     builder.append("</entry>");
     return builder.toString();
