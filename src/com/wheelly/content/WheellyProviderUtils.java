@@ -22,15 +22,20 @@ public class WheellyProviderUtils {
 		// Get the track from the provider:
 		return
 			heartbeatId > 0
-				? cr.query(Timeline.CONTENT_URI, Timeline.ListProjection, "h._id = ?",
+				? cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
+						"h._id = ?",
 						new String[] { Long.toString(heartbeatId) }, null)
-				: cr.query(Timeline.CONTENT_URI, Timeline.ListProjection, null, null,
+				: cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
+						"icons > 0",
+						null,
 						"odometer ASC");
 	}
 	
 	public Cursor getLatestRecords(long lastOdometer) {
-		return cr.query(Timeline.CONTENT_URI, Timeline.ListProjection, "h.odometer > ?",
-				new String[] { Long.toString(lastOdometer) }, "odometer ASC");
+		return cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
+				"h.odometer > ? AND icons > 0",
+				new String[] { Long.toString(lastOdometer) },
+				"odometer ASC");
 	}
 	
 	public void resetSync(long id) {

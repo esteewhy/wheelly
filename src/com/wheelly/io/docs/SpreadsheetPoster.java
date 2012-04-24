@@ -21,6 +21,7 @@ import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.wireless.gdata.client.HttpException;
 import com.google.wireless.gdata.client.QueryParams;
 import com.google.wireless.gdata.data.Entry;
+import com.google.wireless.gdata.data.StringUtils;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
 import com.wheelly.db.HeartbeatBroker;
@@ -67,9 +68,20 @@ public class SpreadsheetPoster {
 		if(null == remote) {
 			return false;
 		}
-		final long localOdo = Long.parseLong(remote.getValue("odometer", "-1"));
-		final long remoteOdo = local.getLong(local.getColumnIndex("odometer")); 
-		return localOdo == remoteOdo;
+		
+		final Pair<Long, Long> odo = new Pair<Long, Long>(
+				local.getLong(local.getColumnIndex("odometer")),
+				Long.parseLong(remote.getValue("odometer", "-1"))
+		);
+		
+		final Pair<String, String> type = new Pair<String, String>(
+			DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndex("icons"))),
+			remote.getValue("type")
+		);
+		
+		return odo.first.equals(odo.second)
+				&& !StringUtils.isEmptyOrWhitespace(type.second)
+				&& type.second.equals(type.first);
 	}
 	
 	private static ContentValues prepareLocalValues(Cursor local, EntryPostResult result) {
@@ -251,7 +263,10 @@ public class SpreadsheetPoster {
 			+ Long.toString(local.getLong(local.getColumnIndex("odometer")))
 			+ " and "
 			+ "fuel="
-			+ Integer.toString(local.getInt(local.getColumnIndex("fuel")));
+			+ Integer.toString(local.getInt(local.getColumnIndex("fuel")))
+			+ " and "
+			+ "type="
+			+ DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndex("icons")));
 		
 		final String location = local.getString(local.getColumnIndex("place"));
 		if(null != location) {
