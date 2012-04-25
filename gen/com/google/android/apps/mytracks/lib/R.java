@@ -76,9 +76,9 @@ containing a value of this type.
          */
         public static final int cadence_border=0x7f0c000e;
         public static final int cadence_fill=0x7f0c000f;
-        public static final int category_type_expense=0x7f0c0026;
-        public static final int category_type_income=0x7f0c0025;
-        public static final int cleared_transaction_color=0x7f0c0024;
+        public static final int category_type_expense=0x7f0c0027;
+        public static final int category_type_income=0x7f0c0026;
+        public static final int cleared_transaction_color=0x7f0c0025;
         /**  Chart colors by series. 
  Green and a transparent green 
          */
@@ -87,7 +87,8 @@ containing a value of this type.
         /**  Red 
          */
         public static final int fast_path=0x7f0c0016;
-        public static final int future_color=0x7f0c001f;
+        public static final int fuel=0x7f0c001e;
+        public static final int future_color=0x7f0c0020;
         public static final int gray=0x7f0c0003;
         public static final int green=0x7f0c0002;
         /**  Red and a transparent red 
@@ -99,15 +100,15 @@ containing a value of this type.
         /**  Blue 
          */
         public static final int normal_path=0x7f0c0015;
-        public static final int pending_transaction_color=0x7f0c0021;
+        public static final int pending_transaction_color=0x7f0c0022;
         public static final int positive_amount=0x7f0c001b;
         /**  Purple and a transparent purple 
          */
         public static final int power_border=0x7f0c0010;
         public static final int power_fill=0x7f0c0011;
-        public static final int reconciled_transaction_color=0x7f0c0023;
+        public static final int reconciled_transaction_color=0x7f0c0024;
         public static final int red=0x7f0c0004;
-        public static final int restored_transaction_color=0x7f0c0020;
+        public static final int restored_transaction_color=0x7f0c0021;
         public static final int scheduled=0x7f0c0017;
         /**  Colors for dynamic track drawing 
  Green 
@@ -124,8 +125,8 @@ containing a value of this type.
          */
         public static final int sync_succeeded=0x7f0c0018;
         public static final int sync_unknown=0x7f0c001a;
-        public static final int transfer_color=0x7f0c001e;
-        public static final int unreconciled_transaction_color=0x7f0c0022;
+        public static final int transfer_color=0x7f0c001f;
+        public static final int unreconciled_transaction_color=0x7f0c0023;
         public static final int white=0x7f0c0007;
     }
     public static final class dimen {
@@ -304,12 +305,12 @@ containing a value of this type.
         public static final int bAdd=0x7f090052;
         public static final int bCancel=0x7f09004c;
         public static final int bClear=0x7f090053;
-        public static final int bClose=0x7f090084;
+        public static final int bClose=0x7f090083;
         public static final int bDelete=0x7f090058;
         public static final int bDivide=0x7f090061;
         public static final int bDot=0x7f090060;
-        public static final int bEdit=0x7f090083;
-        public static final int bFilter=0x7f0900ad;
+        public static final int bEdit=0x7f090082;
+        public static final int bFilter=0x7f0900ac;
         public static final int bMultiply=0x7f09005c;
         public static final int bNoFilter=0x7f09004b;
         public static final int bOK=0x7f09004a;
@@ -318,13 +319,13 @@ containing a value of this type.
         public static final int bPeriodTo=0x7f090064;
         public static final int bPlusMinus=0x7f09005f;
         public static final int bResult=0x7f090062;
-        public static final int bSave=0x7f09009a;
-        public static final int bSaveAndNew=0x7f09009b;
-        public static final int bStart=0x7f0900a9;
-        public static final int bStop=0x7f0900aa;
+        public static final int bSave=0x7f090099;
+        public static final int bSaveAndNew=0x7f09009a;
+        public static final int bStart=0x7f0900a8;
+        public static final int bStop=0x7f0900a9;
         public static final int bSubtract=0x7f090057;
-        public static final int bTemplate=0x7f0900ac;
-        public static final int bTransfer=0x7f0900ab;
+        public static final int bTemplate=0x7f0900ab;
+        public static final int bTransfer=0x7f0900aa;
         public static final int bottom=0x7f090071;
         public static final int btn_financisto=0x7f090068;
         public static final int budget_mode=0x7f090029;
@@ -336,34 +337,33 @@ containing a value of this type.
         public static final int category_clear=0x7f090005;
         public static final int category_split=0x7f09003d;
         public static final int center=0x7f09006e;
-        public static final int checkbox=0x7f0900a1;
+        public static final int checkbox=0x7f0900a0;
         public static final int click_attribute=0x7f090022;
-        public static final int cost=0x7f09008f;
-        public static final int ctx_menu_delete=0x7f0900bb;
-        public static final int ctx_menu_edit=0x7f0900ba;
+        public static final int cost=0x7f09008e;
+        public static final int ctx_menu_delete=0x7f0900ba;
+        public static final int ctx_menu_edit=0x7f0900b9;
         public static final int ctx_menu_sync=0x7f090043;
-        public static final int ctx_menu_view=0x7f0900b9;
+        public static final int ctx_menu_view=0x7f0900b8;
         public static final int currency=0x7f09000d;
         public static final int currency_add=0x7f09000f;
         public static final int currency_clear=0x7f09000e;
-        public static final int data=0x7f090086;
+        public static final int data=0x7f090085;
         public static final int date=0x7f090066;
         public static final int datetimebar=0x7f090076;
-        public static final int decrement=0x7f090096;
+        public static final int decrement=0x7f090095;
         public static final int delete_picture=0x7f090035;
         public static final int delete_split=0x7f09003a;
-        public static final int destination=0x7f090090;
+        public static final int destination=0x7f09008f;
         public static final int divider=0x7f09006c;
         public static final int edit_aplit=0x7f090039;
         public static final int edit_attribute=0x7f09001f;
-        public static final int entry_ringtone=0x7f09009c;
-        public static final int financisto=0x7f090097;
-        public static final int flipperTotal=0x7f0900af;
+        public static final int entry_ringtone=0x7f09009b;
+        public static final int financisto=0x7f090096;
+        public static final int flipperTotal=0x7f0900ae;
         public static final int fuel=0x7f090078;
-        public static final int fuelAmt=0x7f090081;
+        public static final int fuelAmt=0x7f090080;
         public static final int fuelGauge=0x7f09007f;
-        public static final int fuelUOM=0x7f090080;
-        public static final int fuel_uom=0x7f090091;
+        public static final int fuel_uom=0x7f090090;
         public static final int heartbeat=0x7f090075;
         public static final int heartbeats=0x7f09007a;
         public static final int icon=0x7f09006a;
@@ -372,25 +372,25 @@ containing a value of this type.
         public static final int icon_stop=0x7f09007d;
         public static final int include_credit=0x7f090032;
         public static final int include_subcategories=0x7f090018;
-        public static final int increment=0x7f090094;
+        public static final int increment=0x7f090093;
         public static final int indicator=0x7f09007b;
         public static final int is_ccard_payment=0x7f090037;
         public static final int is_included_into_totals=0x7f090026;
-        public static final int label=0x7f090085;
+        public static final int label=0x7f090084;
         public static final int layout=0x7f090049;
         public static final int layout1=0x7f090070;
-        public static final int line1=0x7f09008b;
-        public static final int list=0x7f090082;
+        public static final int line1=0x7f09008a;
+        public static final int list=0x7f090081;
         public static final int location=0x7f090019;
         public static final int location_add=0x7f09001b;
         public static final int location_clear=0x7f09001a;
-        public static final int mainlayout=0x7f090087;
-        public static final int mapview=0x7f090088;
-        public static final int mileage=0x7f09008d;
-        public static final int mileages=0x7f09008e;
-        public static final int more=0x7f09009e;
-        public static final int more_button=0x7f0900a4;
-        public static final int name=0x7f09008a;
+        public static final int mainlayout=0x7f090086;
+        public static final int mapview=0x7f090087;
+        public static final int mileage=0x7f09008c;
+        public static final int mileages=0x7f09008d;
+        public static final int more=0x7f09009d;
+        public static final int more_button=0x7f0900a3;
+        public static final int name=0x7f090089;
         public static final int negative_opening_amount=0x7f090036;
         public static final int new_attribute=0x7f090021;
         public static final int notification=0x7f09002e;
@@ -398,11 +398,11 @@ containing a value of this type.
         public static final int notification_sound=0x7f09002f;
         public static final int notification_vibra=0x7f090030;
         public static final int odometer=0x7f090077;
-        public static final int okButton=0x7f090089;
+        public static final int okButton=0x7f090088;
         public static final int op=0x7f09004e;
-        public static final int opt_menu_add=0x7f0900bc;
-        public static final int opt_menu_install_financisto=0x7f0900be;
-        public static final int opt_menu_install_mytracks=0x7f0900bd;
+        public static final int opt_menu_add=0x7f0900bb;
+        public static final int opt_menu_install_financisto=0x7f0900bd;
+        public static final int opt_menu_install_mytracks=0x7f0900bc;
         public static final int parent_attributes=0x7f09001d;
         public static final int payee=0x7f09000a;
         public static final int payee_add=0x7f09000c;
@@ -415,23 +415,23 @@ containing a value of this type.
         public static final int period_recur_clear=0x7f090017;
         public static final int period_to=0x7f090014;
         public static final int period_to_clear=0x7f090015;
-        public static final int picture=0x7f0900a5;
+        public static final int picture=0x7f0900a4;
         public static final int place=0x7f090079;
-        public static final int plus_minus=0x7f0900a0;
-        public static final int price=0x7f090098;
+        public static final int plus_minus=0x7f09009f;
+        public static final int price=0x7f090097;
         public static final int primary=0x7f090045;
         public static final int progress=0x7f090073;
         public static final int progress_text=0x7f090074;
         public static final int project=0x7f090007;
         public static final int project_add=0x7f090009;
         public static final int project_clear=0x7f090008;
-        public static final int rate=0x7f0900a7;
-        public static final int rateCalculator=0x7f0900a6;
-        public static final int rateDownload=0x7f0900a3;
+        public static final int rate=0x7f0900a6;
+        public static final int rateCalculator=0x7f0900a5;
+        public static final int rateDownload=0x7f0900a2;
         public static final int realtabcontent=0x01010000;
         public static final int recurrence_pattern=0x7f09002a;
         public static final int recurrence_period=0x7f09002b;
-        public static final int refuels=0x7f090099;
+        public static final int refuels=0x7f090098;
         public static final int remove_attribute=0x7f090020;
         public static final int result=0x7f09004d;
         public static final int right=0x7f090072;
@@ -439,37 +439,37 @@ containing a value of this type.
         public static final int secondary=0x7f090046;
         public static final int sort_order=0x7f090027;
         public static final int sort_order_clear=0x7f090028;
-        public static final int split=0x7f09009f;
+        public static final int split=0x7f09009e;
         public static final int start_date=0x7f09002c;
-        public static final int start_place=0x7f090092;
+        public static final int start_place=0x7f090091;
         public static final int start_time=0x7f09002d;
         public static final int status=0x7f090065;
         public static final int status_clear=0x7f090033;
-        public static final int stop_place=0x7f090093;
+        public static final int stop_place=0x7f090092;
         public static final int tag_id=0x7f09003f;
         public static final int tag_request_code=0x7f09003e;
         public static final int tag_track_id=0x7f090042;
         public static final int tag_transaction_id=0x7f090041;
         public static final int tag_values=0x7f090040;
         public static final int time=0x7f090067;
-        public static final int timepicker_input=0x7f090095;
+        public static final int timepicker_input=0x7f090094;
         public static final int toggle=0x7f090044;
         public static final int top=0x7f09006d;
-        public static final int top_layout=0x7f09009d;
-        public static final int total=0x7f0900b0;
-        public static final int totalLayout=0x7f0900ae;
-        public static final int track=0x7f09008c;
-        public static final int transfer=0x7f0900a8;
+        public static final int top_layout=0x7f09009c;
+        public static final int total=0x7f0900af;
+        public static final int totalLayout=0x7f0900ad;
+        public static final int track=0x7f09008b;
+        public static final int transfer=0x7f0900a7;
         public static final int unsplit_action=0x7f09003c;
-        public static final int upload_result_docs_result=0x7f0900b5;
-        public static final int upload_result_docs_result_icon=0x7f0900b6;
-        public static final int upload_result_error_footer=0x7f0900b8;
-        public static final int upload_result_fusion_tables_result=0x7f0900b3;
-        public static final int upload_result_fusion_tables_result_icon=0x7f0900b4;
-        public static final int upload_result_maps_result=0x7f0900b1;
-        public static final int upload_result_maps_result_icon=0x7f0900b2;
-        public static final int upload_result_success_footer=0x7f0900b7;
-        public static final int value=0x7f0900a2;
+        public static final int upload_result_docs_result=0x7f0900b4;
+        public static final int upload_result_docs_result_icon=0x7f0900b5;
+        public static final int upload_result_error_footer=0x7f0900b7;
+        public static final int upload_result_fusion_tables_result=0x7f0900b2;
+        public static final int upload_result_fusion_tables_result_icon=0x7f0900b3;
+        public static final int upload_result_maps_result=0x7f0900b0;
+        public static final int upload_result_maps_result_icon=0x7f0900b1;
+        public static final int upload_result_success_footer=0x7f0900b6;
+        public static final int value=0x7f0900a1;
     }
     public static final class layout {
         public static final int amount_input=0x7f030000;

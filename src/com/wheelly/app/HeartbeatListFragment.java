@@ -1,12 +1,18 @@
 package com.wheelly.app;
 
+import java.util.GregorianCalendar;
+
+import org.openintents.calendarpicker.contract.CalendarPickerConstants;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -163,7 +169,36 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 					return true;
 				}
 			});
+		
+		menu.add(Menu.NONE, 7, Menu.NONE, "Calendar")
+			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem paramMenuItem) {
+					long calendar_id = 1;
+					Uri u = com.wheelly.content.EventContentProvider.constructUri(calendar_id);
+					Intent i = new Intent(Intent.ACTION_PICK, u);
+					downloadLaunchCheck(i, REQUEST_CODE_DATE_SELECTION);
+
+					return true;
+				}
+			});
 	}
+	
+	private static final int DIALOG_CALENDARPICKER_DOWNLOAD = 1;
+	private static final int REQUEST_CODE_DATE_SELECTION = 1;
+
+	// ========================================================================
+	void downloadLaunchCheck(Intent intent, int request_code) {
+		if (CalendarPickerConstants.DownloadInfo.isIntentAvailable(this.getActivity(), intent))
+			if (request_code >= 0)
+				startActivityForResult(intent, request_code);
+			else
+				startActivity(intent);
+//		else
+//			getActivity().showDialog(DIALOG_CALENDARPICKER_DOWNLOAD);
+	}
+	
+	
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {

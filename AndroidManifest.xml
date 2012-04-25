@@ -119,7 +119,10 @@
 		<provider
 			android:authorities="com.wheelly"
 			android:multiprocess="true"
-			android:name=".content.ChronologyProvider">
-		</provider>
+			android:name=".content.ChronologyProvider" />
+		
+		<provider android:label="Unified event stream"
+			android:name=".content.EventContentProvider"
+			android:authorities="com.wheelly.provider.events" />
 	</application>
 </manifest> 
