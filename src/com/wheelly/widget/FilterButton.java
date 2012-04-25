@@ -7,6 +7,8 @@ import com.wheelly.util.FilterUtils.F;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
@@ -43,7 +45,7 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 			public void onClick(View v) {
 				setEnabled(false);
 				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
-				new FilterDialog(new ContentValues(filter), new OnFilterChangedListener() {
+				final FilterDialog fd = new FilterDialog(new ContentValues(filter), new OnFilterChangedListener() {
 					
 					@Override
 					public void onFilterChanged(ContentValues value) {
@@ -56,8 +58,14 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 						
 						setEnabled(true);
 					}
-				})
-					.show(((FragmentActivity)getContext()).getSupportFragmentManager(), "filter");
+				});
+				fd.setOnCancelListener(new OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface paramDialogInterface) {
+						setEnabled(true);
+					}
+				});
+				fd.show(((FragmentActivity)getContext()).getSupportFragmentManager(), "filter");
 			}
 		});
 	}
@@ -69,6 +77,7 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 	public Parcelable onSaveInstanceState() {
 		Bundle outState = new Bundle();
 		outState.putString(F.LOCATION_CONSTRAINT, locationConstraint);
+		outState.putParcelable("filter", filter);
 		outState.putParcelable("instanceState", super.onSaveInstanceState());
 		return outState;
 	}
@@ -78,6 +87,7 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 		if(state instanceof Bundle) {
 			final Bundle savedInstanceState = (Bundle)state;
 			locationConstraint = savedInstanceState.getString(F.LOCATION_CONSTRAINT);
+			setFilterUnchecked((ContentValues)savedInstanceState.getParcelable("filter"));
 			super.onRestoreInstanceState(savedInstanceState.getParcelable("instanceState"));
 		} else {
 			super.onRestoreInstanceState(state);
@@ -91,20 +101,25 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 	public void setFilter(ContentValues filter) {
 		if(!this.filter.equals(filter)
 				&& (this.filter.size() > 0 || null != filter)) {
-			boolean reset = null == filter || 0 == filter.size();
 			
-			this.filter.clear();
-			
-			if(!reset) {
-				this.filter.putAll(filter);
-			}
-			
-			setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
+			setFilterUnchecked(filter);
 			
 			if(null != listener) {
 				listener.onFilterChanged(this.filter);
 			}
 		}
+	}
+	
+	private void setFilterUnchecked(ContentValues filter) {
+		boolean reset = null == filter || 0 == filter.size();
+		
+		this.filter.clear();
+		
+		if(!reset) {
+			this.filter.putAll(filter);
+		}
+		
+		setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 	}
 	
 	public String getLocationConstraint() {

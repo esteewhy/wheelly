@@ -34,6 +34,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,7 +45,6 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -128,39 +129,6 @@ public class FilterDialog extends DialogFragment {
 						filter.remove(F.LOCATION);
 						c.location.setText(R.string.no_filter);
 						break;
-					case R.id.sort_order: {
-						
-						ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-							ctx,
-							android.R.layout.simple_spinner_dropdown_item,
-							c.sortOrders);
-						
-						int selectedId = Math.min(1, filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0);
-						x.selectPosition(
-							ctx,
-							R.id.sort_order,
-							R.string.sort_order,
-							adapter,
-							selectedId);
-					} break;
-					case R.id.sort_order_clear:
-						filter.remove(F.SORT_ORDER);
-						updateSortOrderFromFilter(filter);
-						break;
-					}
-				}
-				
-				@Override
-				public void onSelectedPos(int id, int selectedPos) {
-					switch (id) {
-					case R.id.sort_order:
-						if(Math.min(selectedPos, 1) > 0) {
-							filter.put(F.SORT_ORDER, 1);
-						} else {
-							filter.remove(F.SORT_ORDER);
-						}
-						updateSortOrderFromFilter(filter);
-						break;
 					}
 				}
 				
@@ -179,6 +147,11 @@ public class FilterDialog extends DialogFragment {
 						List<? extends MultiChoiceItem> arg1) {
 					// TODO Auto-generated method stub
 				}
+
+				@Override
+				public void onSelectedPos(int arg0, int arg1) {
+					// TODO Auto-generated method stub
+				}
 		});
 		
 		c = new Controls(x, v);
@@ -188,6 +161,7 @@ public class FilterDialog extends DialogFragment {
 
 		final Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(v)
+			.setCancelable(true)
 			.create();
 		
 		c.bOk.setOnClickListener(new OnClickListener(){
@@ -216,7 +190,6 @@ public class FilterDialog extends DialogFragment {
 		if(null != filter) {
 			updatePeriodFromFilter(filter);
 			updateLocationFromFilter(filter);
-			updateSortOrderFromFilter(filter);
 		}
 		
 		return d;
@@ -226,11 +199,6 @@ public class FilterDialog extends DialogFragment {
 	public void onDestroy() {
 		db.close();
 		super.onDestroy();
-	}
-	
-	private void updateSortOrderFromFilter(ContentValues filter) {
-		int sortOrder = filter.containsKey(F.SORT_ORDER) ? filter.getAsInteger(F.SORT_ORDER) : 0;
-		c.sortOrder.setText(c.sortOrders[sortOrder == 1 ? 1 : 0]);
 	}
 
 	private void updateLocationFromFilter(ContentValues filter) {
@@ -276,27 +244,36 @@ public class FilterDialog extends DialogFragment {
 	}
 	
 	private static class Controls {
-		final String[] sortOrders;
-		
 		final TextView period;
 		final TextView location;
-		final TextView sortOrder;
 		
 		final Button bOk;
 		final Button bCancel;
 		final ImageButton bNoFilter;
 		
 		public Controls(ActivityLayout x, View v) {
-			sortOrders = v.getResources().getStringArray(R.array.sort_blotter_entries);
-			
 			LinearLayout layout = (LinearLayout)v.findViewById(R.id.layout);
 			period = x.addFilterNodeMinus(layout, R.id.period, R.id.period_clear, R.string.period, R.string.no_filter);
 			location = x.addFilterNodeMinus(layout, R.id.location, R.id.location_clear, R.string.location, R.string.no_filter);
-			sortOrder = x.addFilterNodeMinus(layout, R.id.sort_order, R.id.sort_order_clear, R.string.sort_order, sortOrders[0]);
 			
 			bOk = (Button)v.findViewById(R.id.bOK);
 			bCancel = (Button)v.findViewById(R.id.bCancel);
 			bNoFilter = (ImageButton)v.findViewById(R.id.bNoFilter);
+		}
+	}
+	
+	private OnCancelListener cancelListener;
+	
+	public void setOnCancelListener(OnCancelListener listener) {
+		this.cancelListener = listener;
+	}
+	
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+		
+		if(null != this.cancelListener) {
+			this.cancelListener.onCancel(dialog);
 		}
 	}
 }
