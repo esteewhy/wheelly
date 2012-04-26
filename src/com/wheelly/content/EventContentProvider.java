@@ -16,13 +16,15 @@
 
 package com.wheelly.content;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openintents.calendarpicker.contract.CalendarPickerConstants;
 import org.openintents.calendarpicker.contract.CalendarPickerConstants.CalendarEventPicker.ContentProviderColumns;
 
-import com.google.common.collect.ObjectArrays;
 import com.wheelly.db.DatabaseHelper;
 
 import android.content.ContentProvider;
@@ -71,11 +73,18 @@ public class EventContentProvider extends ContentProvider {
 		
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
 		builder.setTables(Tables);
-		builder.appendWhere(ContentProviderColumns.CALENDAR_ID + " =" + calendar_id);
+		builder.appendWhere(ContentProviderColumns.CALENDAR_ID + " > 0");
+		List<String> pr = new ArrayList<String>(Arrays.asList(projection));
+		pr.add(ContentProviderColumns.CALENDAR_ID);
+		projection = pr.toArray(new String[] {});
+		
 		builder.setProjectionMap(ListProjection);
-		return builder.query(db,
-				ObjectArrays.concat(ContentProviderColumns.CALENDAR_ID, projection),
-				selection, selectionArgs, null, null, sortOrder);
+		
+		Cursor c = builder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+		
+		String[] names = c.getColumnNames();
+		
+		return c;
 	}
 	
 	@Override
@@ -98,14 +107,21 @@ public class EventContentProvider extends ContentProvider {
 		+ "	| (m1._id IS NOT NULL) * 2"
 		+ "	| (m2._id IS NOT NULL))";
 	
+	private static final String TypeColumnExpression =
+			"CASE " + IconColumnExpression
+			+ " WHEN 1 THEN 'STOP'"
+			+ " WHEN 2 THEN 'START'"
+			+ " WHEN 4 THEN 'REFUEL'"
+			+ " END";
+	
 	private static final Map<String, String> ListProjection = new HashMap<String, String>();
 	
 	static {
 		ListProjection.put(BaseColumns._ID, "h." + BaseColumns._ID);
 		ListProjection.put(ContentProviderColumns.TITLE,
-				IconColumnExpression + " + ' ' + h.odometer + ' ' + h.fuel + ' ' + l.name + ' ' + h._created "
+				TypeColumnExpression + " ||': '|| h.odometer ||'/'|| h.fuel ||'@'|| l.name "
 					+ ContentProviderColumns.TITLE);
-		ListProjection.put(ContentProviderColumns.TIMESTAMP, "h._created "
+		ListProjection.put(ContentProviderColumns.TIMESTAMP, "STRFTIME('%s', DATETIME(h._created)) "
 					+ ContentProviderColumns.TIMESTAMP);
 		ListProjection.put(ContentProviderColumns.CALENDAR_ID, IconColumnExpression
 					+ " " + ContentProviderColumns.CALENDAR_ID);

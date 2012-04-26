@@ -2,8 +2,6 @@ package com.wheelly.activity;
 
 import java.util.HashMap;
 
-import ru.orangesoftware.financisto.activity.LocationsListActivity;
-
 import com.wheelly.R;
 import com.wheelly.app.AndiCarImporter;
 import com.wheelly.app.HeartbeatListFragment;
@@ -11,13 +9,11 @@ import com.wheelly.app.MileageListFragment;
 import com.wheelly.app.RefuelListFragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.TabHost;
@@ -61,21 +57,6 @@ public class Main extends FragmentActivity {
 		}
 		
 		new AndiCarImporter(this).attemptImporting();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		
-		menu.add(Menu.NONE, 1, Menu.NONE, R.string.locations)
-			.setIcon(R.drawable.menu_entities_locations)
-			.setIntent(new Intent(this, LocationsListActivity.class));
-		
-		menu.add(Menu.NONE, 2, Menu.NONE, R.string.preferences)
-			.setIcon(android.R.drawable.ic_menu_preferences)
-			.setIntent(new Intent(this, Preferences.class));
-		
-		return true;
 	}
 	
 	@Override
