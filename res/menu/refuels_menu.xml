@@ -4,8 +4,4 @@
 		android:icon	="@drawable/financisto"
 		android:title	="@string/item_install_financisto"
 		android:visible ="false" />
-	<item
-		android:id		="@+id/opt_menu_add"
-		android:icon	="@android:drawable/ic_menu_add"
-		android:title	="@string/item_add" />
 </menu>

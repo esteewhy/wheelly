@@ -1,5 +1,6 @@
 package com.wheelly.content;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Refuels;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Timeline;
+import com.wheelly.util.DateUtils;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -231,12 +233,33 @@ public class ChronologyProvider extends ContentProvider {
 		final int uriCode = uriMatcher.match(uri);
 		
 		if(DataSchemaLookup.containsKey(uriCode)) {
-			
-			final int count = dbHelper.getWritableDatabase()
-				.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
+			int count = 0;
+			final SQLiteDatabase db = dbHelper.getWritableDatabase();
+			try {
+				final long id = getIdFromUriOrValues(uri, values);
+				
+				if(uriCode == MILEAGES_ID && !values.containsKey("_updated")) {
+					values.put("_updated", DateUtils.dbFormat.format(new Date()));
+				}
+				
+				db.beginTransaction();
+				count = db.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 					values,
 					BaseColumns._ID + " = ?",
-					new String[] { Long.toString(getIdFromUriOrValues(uri, values)) });
+					new String[] { Long.toString(id) });
+				
+				// Update timestamps of associated records..
+				if(count == 1 && uriCode == HEARTBEATS_ID) {
+					db.execSQL("UPDATE mileages SET _updated = datetime('now','localtime') WHERE start_heartbeat_id = ?1 OR stop_heartbeat_id = ?1",
+						new Object[] { id });
+					db.execSQL("UPDATE refuels SET _updated = datetime('now','localtime') WHERE heartbeat_id = ?1",
+						new Object[] { id });
+				}
+				
+				db.setTransactionSuccessful();
+			} finally {
+				db.endTransaction();
+			}
 			
 			if(count > 0) {
 				final ContentResolver cr = getContext().getContentResolver();

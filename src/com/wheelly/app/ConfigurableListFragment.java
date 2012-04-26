@@ -2,8 +2,13 @@ package com.wheelly.app;
 
 import java.io.File;
 
+import org.openintents.calendarpicker.contract.CalendarPickerConstants;
+
+import ru.orangesoftware.financisto.activity.LocationsListActivity;
+
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
+import com.wheelly.activity.Preferences;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
@@ -17,6 +22,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
@@ -31,7 +37,6 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
@@ -153,49 +158,62 @@ public abstract class ConfigurableListFragment extends ListFragment
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		
-		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			
-			final String backupPath= Environment.getExternalStorageDirectory().getPath() + File.separator + "wheelly.db";
-			
-			menu.add(Menu.NONE, 3, 13, "Backup to SD card")
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						return BackupUtils.backupDatabase(
-							new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-								.getReadableDatabase()
-								.getPath(),
-								backupPath);
-					}
-				});
-			
-			menu.add(Menu.NONE, 4, 15, "Restore from SD card")
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						return BackupUtils.backupDatabase(
-								backupPath,
-							new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-								.getReadableDatabase()
-								.getPath()
-							);
-					}
-				});
-		}
+		inflater.inflate(R.menu.common_menu, menu);
+		
+		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
+		menu.findItem(R.id.opt_menu_restore).setVisible(backupEnabled);
+		menu.findItem(R.id.opt_menu_locations).setIntent(new Intent(this.getActivity(), LocationsListActivity.class));
+		menu.findItem(R.id.opt_menu_preferences).setIntent(new Intent(this.getActivity(), Preferences.class));
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		final ListConfiguration cfg = getConfiguration();
 		
+		final String backupPath= Environment.getExternalStorageDirectory().getPath() + File.separator + "wheelly.db";
+		
 		switch (item.getItemId()) {
 			case R.id.opt_menu_add:
 				Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
 				startActivityForResult(intent, NEW_REQUEST);
 				return true;
+			case R.id.opt_menu_backup:
+				return BackupUtils.backupDatabase(
+					new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+						.getReadableDatabase()
+						.getPath(),
+					backupPath);
+			case R.id.opt_menu_restore:
+				return BackupUtils.backupDatabase(
+						backupPath,
+					new DatabaseHelper(ConfigurableListFragment.this.getActivity())
+						.getReadableDatabase()
+						.getPath()
+					);
+			case R.id.opt_menu_calendar:
+				long calendar_id = 1;
+				Uri u = com.wheelly.content.EventContentProvider.constructUri(calendar_id);
+				Intent i = new Intent(Intent.ACTION_PICK, u);
+				downloadLaunchCheck(i, REQUEST_CODE_DATE_SELECTION);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	private static final int DIALOG_CALENDARPICKER_DOWNLOAD = 1;
+	private static final int REQUEST_CODE_DATE_SELECTION = 1;
+
+	// ========================================================================
+	void downloadLaunchCheck(Intent intent, int request_code) {
+		if (CalendarPickerConstants.DownloadInfo.isIntentAvailable(this.getActivity(), intent))
+			if (request_code >= 0)
+				startActivityForResult(intent, request_code);
+			else
+				startActivity(intent);
+//		else
+//			getActivity().showDialog(DIALOG_CALENDARPICKER_DOWNLOAD);
 	}
 	
 	@Override
