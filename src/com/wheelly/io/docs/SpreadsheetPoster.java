@@ -7,10 +7,13 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.text.format.Time;
 import android.util.Pair;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 import api.wireless.gdata.spreadsheets.parser.xml.XmlSpreadsheetsGDataParserFactory;
@@ -25,6 +28,7 @@ import com.google.wireless.gdata.data.StringUtils;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
 import com.wheelly.db.HeartbeatBroker;
+import com.wheelly.util.DateUtils;
 
 /**
  * Reusable worker to send and persist single row at a time.
@@ -101,10 +105,10 @@ public class SpreadsheetPoster {
 		}
 		
 		if(result.Status != EntryPostStatus.CONFLICT) {
-			final String syncDate = result.Entry.getUpdateDate();
-			final String localSyncDate = local.getString(local.getColumnIndex("sync_date"));
-			if(!syncDate.equals(localSyncDate)) {
-				values.put("sync_date", syncDate);
+			final Time t = new Time();
+			
+			if(t.parse3339(result.Entry.getUpdateDate())) {
+				values.put("sync_date", DateUtils.dbFormat.format(new Date(t.toMillis(false))));
 			}
 			
 			values.put("odometer", Long.parseLong(result.Entry.getValue("odometer")));
@@ -137,11 +141,20 @@ public class SpreadsheetPoster {
 			if(null != existing) {
 				idAndVersion = getIdAndVersion(existing);
 			}
+		} else if(null == idAndVersion.second) {
+			ListEntry existing = load(idAndVersion.first);
+			
+			if(null != existing) {
+				idAndVersion = getIdAndVersion(existing);
+			}
 		}
-		
-		if(null != idAndVersion.first && null != idAndVersion.second) {
+	
+		if(null != idAndVersion.first) {
 			entityUri = worksheetUri + "/" + idAndVersion.first;
-			editUri += "/" + idAndVersion.first + "/" + idAndVersion.second;
+			
+			if(null != idAndVersion.second) {
+				editUri += "/" + idAndVersion.first + "/" + idAndVersion.second;
+			}
 		}
 		
 		try {
@@ -277,6 +290,16 @@ public class SpreadsheetPoster {
 		
 		try {
 			return parseEntity(GDataClientFactory.getGDataClient(context).getFeedAsStream(feedUri, authToken));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private ListEntry load(String id) throws IOException, HttpException {
+		try {
+			return parseEntity(GDataClientFactory.getGDataClient(context).getFeedAsStream(worksheetUri + "/" + id, authToken));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
