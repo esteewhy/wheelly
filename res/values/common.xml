@@ -16,7 +16,7 @@
 	<color name="scheduled">#7cc623</color>
 	<!-- GDocs sync status -->
 	<color name="sync_succeeded">#39b54a</color>
-	<color name="sync_failed">#f26522</color>
+	<color name="sync_conflict">#f26522</color>
 	<color name="sync_outdated">#FFD800</color>
 	<color name="sync_unknown">#444</color>
 	
