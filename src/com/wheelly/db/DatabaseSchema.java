@@ -241,14 +241,18 @@ public final class DatabaseSchema {
 		
 		// reverse links detection
 		public static final String IconColumnExpression =
-			"(EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
-			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
-			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id))";
+				"((r._id IS NOT NULL) * 4"
+				+ "	| (m1._id IS NOT NULL) * 2"
+				+ "	| (m2._id IS NOT NULL))";
 		
 		public static final String StatusColumnExpression =
 			"CASE"
+			+ " WHEN DATETIME(COALESCE(m1._modified, m2._modified, r._modified)) >"
+				+" DATETIME(sync_date)"
+			+ "		AND sync_id IS NOT NULL"
+			+ "		AND sync_etag IS NOT NULL THEN 2"
 			+ " WHEN sync_etag IS NOT NULL THEN 1"
-			+ " WHEN sync_id IS NOT NULL THEN -1"
+			+ " WHEN sync_id IS NOT NULL THEN 3"
 			+ " ELSE 0"
 			+ " END";
 		
@@ -263,7 +267,10 @@ public final class DatabaseSchema {
 		};
 		
 		public static final String Tables = "heartbeats h"
-			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID;
+			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID
+			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + BaseColumns._ID;
 		
 		public static final String ReferenceCount =
 			"SELECT SUM(cnt) FROM ("
@@ -290,11 +297,6 @@ public final class DatabaseSchema {
 	}
 
 	public static final class Timeline {
-		// reverse links detection
-		public static final String IconColumnExpression =
-			"((r._id IS NOT NULL) * 4"
-			+ "	| (m1._id IS NOT NULL) * 2"
-			+ "	| (m2._id IS NOT NULL))";
 		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID + " " + BaseColumns._ID,
@@ -307,7 +309,7 @@ public final class DatabaseSchema {
 			"r.cost",
 			"r.amount",
 			"r.transaction_id",
-			IconColumnExpression + " icons",
+			Heartbeats.IconColumnExpression + " icons",
 			"h.sync_id",
 			"h.sync_etag",
 			"h.sync_date"

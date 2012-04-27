@@ -75,19 +75,25 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 									return true;
 								case R.id.indicator:
 									final int status = cursor.getInt(columnIndex);
-									view.setBackgroundColor(context.getResources().getColor(
-										status > 0
-											? R.color.sync_succeeded
-											: status < 0
-												? R.color.sync_failed
-												: R.color.sync_unknown)
-									);
+									view.setBackgroundColor(context.getResources().getColor(getStatusColor(status)));
 									return true;
 								}
 								return false;
 							}
 						});
 					}};
+			}
+			
+			private int getStatusColor(int status) {
+				switch(status) {
+				case 1:
+					return R.color.sync_succeeded;
+				case 2:
+					return R.color.sync_outdated;
+				case 3:
+					return R.color.sync_failed;
+				}
+				return R.color.sync_unknown;
 			}
 			
 			@Override
