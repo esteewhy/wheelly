@@ -1,5 +1,6 @@
 package com.wheelly.app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +29,7 @@ import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.InfoDialogFragment.Options;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
 
 public class HeartbeatListFragment extends ConfigurableListFragment {
@@ -47,7 +49,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 				return
 					new SimpleCursorAdapter(getActivity(), R.layout.heartbeat_list_item, null,
 						new String[] {
-							"odometer", "_created", "fuel", "fuel", "place", "icons", "status"
+							"odometer", "_created", "fuel", "fuel", "place", "icons", "sync_state"
 						},
 						new int[] {
 							R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icon_refuel, R.id.indicator
@@ -91,7 +93,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 				case 2:
 					return R.color.sync_outdated;
 				case 3:
-					return R.color.sync_failed;
+					return R.color.sync_conflict;
 				}
 				return R.color.sync_unknown;
 			}
@@ -138,7 +140,8 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if(!super.onContextItemSelected(item)) {
-			if(item.getItemId() == R.id.ctx_menu_sync) {
+			switch(item.getItemId()) {
+			case R.id.ctx_menu_sync:
 				final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
 				Intent intent = new Intent(getActivity(), AccountChooserActivity.class);
 				SendRequest req = new SendRequest(mi.id, false, false, true);
@@ -146,6 +149,20 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 				intent.putExtra(SendRequest.SEND_REQUEST_KEY, req);
 				startActivity(intent);
 				return true;
+			case R.id.ctx_menu_sync_pull: {
+				final ContentValues values = new ContentValues();
+				values.put(BaseColumns._ID, item.getItemId());
+				values.put("sync_state", Timeline.SYNC_STATE_OK);
+				new HeartbeatBroker(getActivity()).updateOrInsert(values);
+				return true;
+			}
+			case R.id.ctx_menu_sync_push: {
+				final ContentValues values = new ContentValues();
+				values.put(BaseColumns._ID, item.getItemId());
+				values.put("sync_state", Timeline.SYNC_STATE_CHANGED);
+				new HeartbeatBroker(getActivity()).updateOrInsert(values);
+				return true;
+			}
 			}
 			return false;
 		}
@@ -181,7 +198,14 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 		if(0 < new HeartbeatBroker(getActivity()).referenceCount(mi.id)) {
 			menu.removeItem(R.id.ctx_menu_delete);
 		}
+		final Cursor c = (Cursor) ((SimpleCursorAdapter)getListAdapter()).getItem(mi.position);
+		final long syncState = c.getLong(c.getColumnIndexOrThrow("sync_state"));
 		
-		menu.add(Menu.NONE, R.id.ctx_menu_sync, Menu.NONE, "Sync");
+		if(syncState != Timeline.SYNC_STATE_CONFLICT) {
+			menu.add(Menu.NONE, R.id.ctx_menu_sync, Menu.NONE, "Sync");
+		} else {
+			menu.add(Menu.NONE, R.id.ctx_menu_sync_pull, Menu.NONE, "Pull");
+			menu.add(Menu.NONE, R.id.ctx_menu_sync_push, Menu.NONE, "Push");
+		}
 	}
 }

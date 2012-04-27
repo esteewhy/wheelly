@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 5);
+		super(context, "wheelly.db", null, 6);
 		
 	}
 
@@ -40,6 +40,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		case 4:
 			db.execSQL("ALTER TABLE heartbeats ADD sync_etag TEXT;");
 			break;
+		case 5:
+			db.execSQL("ALTER TABLE heartbeats ADD sync_state LONG NOT NULL DEFAULT 0;");
+			db.execSQL("update heartbeats SET sync_state=(SELECT CASE"
++" WHEN DATETIME(COALESCE(m1._modified, m2._modified, r._modified)) >"
++" DATETIME(sync_date) AND sync_id IS NOT NULL AND sync_etag IS NOT NULL THEN 2"
++" WHEN sync_etag IS NOT NULL THEN 1"
++" WHEN sync_id IS NOT NULL THEN 3"
++" ELSE 0"
++" END FROM heartbeats h"
++" LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h._id"
++" LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h._id"
++" LEFT JOIN refuels r ON r.heartbeat_id = h._id"
++" WHERE heartbeats._id == h._id)");
 		}
 	}
 }

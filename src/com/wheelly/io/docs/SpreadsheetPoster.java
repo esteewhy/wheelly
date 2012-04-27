@@ -27,6 +27,7 @@ import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.data.StringUtils;
 import com.google.wireless.gdata.parser.GDataParser;
 import com.google.wireless.gdata.parser.ParseException;
+import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.util.DateUtils;
 
@@ -55,6 +56,15 @@ public class SpreadsheetPoster {
 	}
 
 	private void syncRow(Cursor track, Pair<String, String> idAndEtag) throws HttpException, IOException {
+		final long syncState = track.getLong(track.getColumnIndexOrThrow("sync_state"));
+		
+		if(Timeline.SYNC_STATE_OK == syncState) {
+			new HeartbeatBroker(context).updateOrInsert(
+				prepareLocalValues(track, new EntryPostResult(load(idAndEtag.first), EntryPostStatus.READ))
+			);
+			return;
+		}
+		
 		final EntryPostResult result = postRow(track, idAndEtag);
 		
 		if(isEntryValid(track, result.Entry)) {
@@ -101,7 +111,7 @@ public class SpreadsheetPoster {
 		
 		final String localEtag = local.getString(local.getColumnIndex("sync_etag")); 
 		if(!idAndVersion.second.equals(localEtag)) {
-			values.put("sync_etag", result.Status == EntryPostStatus.CONFLICT ? null : idAndVersion.second);
+			values.put("sync_etag", idAndVersion.second);
 		}
 		
 		if(result.Status != EntryPostStatus.CONFLICT) {
@@ -113,6 +123,9 @@ public class SpreadsheetPoster {
 			
 			values.put("odometer", Long.parseLong(result.Entry.getValue("odometer")));
 			values.put("fuel", Integer.parseInt(result.Entry.getValue("fuel")));
+			values.put("sync_state", Timeline.SYNC_STATE_OK);
+		} else {
+			values.put("sync_state", Timeline.SYNC_STATE_CONFLICT);
 		}
 		
 		return values;
@@ -233,7 +246,7 @@ public class SpreadsheetPoster {
 	}
 	
 	private static enum EntryPostStatus {
-		ADD, UPDATE, CONFLICT
+		READ, ADD, UPDATE, CONFLICT
 	}
 	
 	private static class EntryPostResult {

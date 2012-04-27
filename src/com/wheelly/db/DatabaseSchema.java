@@ -237,6 +237,7 @@ public final class DatabaseSchema {
 			+ "place_id		LONG,"
 			+ "sync_id		TEXT,"
 			+ "sync_etag	TEXT,"
+			+ "sync_state	LONG NOT NULL DEFAULT 0,"
 			+ "sync_date	TIMESTAMP)";
 		
 		// reverse links detection
@@ -245,25 +246,14 @@ public final class DatabaseSchema {
 				+ "	| (m1._id IS NOT NULL) * 2"
 				+ "	| (m2._id IS NOT NULL))";
 		
-		public static final String StatusColumnExpression =
-			"CASE"
-			+ " WHEN DATETIME(COALESCE(m1._modified, m2._modified, r._modified)) >"
-				+" DATETIME(sync_date)"
-			+ "		AND sync_id IS NOT NULL"
-			+ "		AND sync_etag IS NOT NULL THEN 2"
-			+ " WHEN sync_etag IS NOT NULL THEN 1"
-			+ " WHEN sync_id IS NOT NULL THEN 3"
-			+ " ELSE 0"
-			+ " END";
-		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID,
 			"h._created",
 			"h.odometer",
 			"h.fuel",
 			"l.name place",
-			IconColumnExpression + " icons",
-			StatusColumnExpression + " status"
+			"h.sync_state",
+			IconColumnExpression + " icons"
 		};
 		
 		public static final String Tables = "heartbeats h"
@@ -298,6 +288,11 @@ public final class DatabaseSchema {
 
 	public static final class Timeline {
 		
+		public static final long SYNC_STATE_NONE = 0;
+		public static final long SYNC_STATE_OK = 1;
+		public static final long SYNC_STATE_CHANGED = 2;
+		public static final long SYNC_STATE_CONFLICT = 3;
+		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID + " " + BaseColumns._ID,
 			"h._created",
@@ -312,7 +307,8 @@ public final class DatabaseSchema {
 			Heartbeats.IconColumnExpression + " icons",
 			"h.sync_id",
 			"h.sync_etag",
-			"h.sync_date"
+			"h.sync_date",
+			"h.sync_state"
 		};
 		
 		public static final String Tables = "heartbeats h"

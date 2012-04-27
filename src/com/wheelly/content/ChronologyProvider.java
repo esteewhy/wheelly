@@ -238,8 +238,16 @@ public class ChronologyProvider extends ContentProvider {
 			try {
 				final long id = getIdFromUriOrValues(uri, values);
 				
-				if(uriCode == MILEAGES_ID && !values.containsKey("_modified")) {
+				if((uriCode == MILEAGES_ID || uriCode == REFUELS_ID) && !values.containsKey("_modified")) {
 					values.put("_modified", DateUtils.dbFormat.format(new Date()));
+				}
+				
+				if(uriCode == HEARTBEATS_ID) {
+					final boolean isUpdatedFromSync = values.containsKey("sync_state");
+					
+					if(!isUpdatedFromSync) {
+						values.put("sync_state", 2);
+					}
 				}
 				
 				db.beginTransaction();
@@ -249,8 +257,15 @@ public class ChronologyProvider extends ContentProvider {
 					new String[] { Long.toString(id) });
 				
 				// Update timestamps of associated records..
-				if(count == 1 && uriCode == HEARTBEATS_ID) {
-					updateRelatedRecords(id, values, db);
+				if(count == 1) {
+					switch(uriCode) {
+					case REFUELS_ID:
+						updateRelatedRecordsOfRefuel(id, db);
+						break;
+					case MILEAGES_ID:
+						updateRelatedRecordsOfMileage(id, db);
+						break;
+					}
 				}
 				
 				db.setTransactionSuccessful();
@@ -290,31 +305,13 @@ public class ChronologyProvider extends ContentProvider {
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
 	}
 	
-	private static void updateRelatedRecords(long id, ContentValues values, SQLiteDatabase db) {
-		final boolean isUpdateFromSync = values.containsKey("sync_date");
-		
-		final String[] stmts = isUpdateFromSync
-			? new String[] {
-				"UPDATE mileages SET _modified = ?2 WHERE start_heartbeat_id = ?1 OR stop_heartbeat_id = ?1",
-				"UPDATE refuels SET _modified = ?2 WHERE heartbeat_id = ?1",
-				"UPDATE heartbeats SET sync_date = ?2"
-						+" WHERE _id IN ("
-						+"	SELECT stop_heartbeat_id FROM mileages WHERE start_heartbeat_id = ?1"
-						+"	UNION"
-						+"	SELECT start_heartbeat_id FROM mileages WHERE stop_heartbeat_id = ?1"
-						+")"
-			}
-			: new String[] {
-					"UPDATE mileages SET _modified = datetime('now','localtime') WHERE start_heartbeat_id = ?1 OR stop_heartbeat_id = ?1",
-					"UPDATE refuels SET _modified = datetime('now','localtime') WHERE heartbeat_id = ?1"
-			};
-		
-		final Object[] bindArgs = isUpdateFromSync
-			? new Object[] { id, values.getAsString("sync_date") }
-			: new Object[] { id };
-		
-		for(String sql : stmts) {
-			db.execSQL(sql, bindArgs);
-		}
+	private static void updateRelatedRecordsOfMileage(long id, SQLiteDatabase db) {
+		db.execSQL("UPDATE heartbeats SET sync_state = 2 WHERE sync_state < 2 AND _id IN "
+			+"(SELECT m.stop_heartbeat_id FROM mileages m WHERE m._id == ?)", new Object[] { id });
+	}
+	
+	private static void updateRelatedRecordsOfRefuel(long id, SQLiteDatabase db) {
+		db.execSQL("UPDATE heartbeats SET sync_state = 2 WHERE sync_state < 2 AND _id IN "
+			+"(SELECT r.heartbeat_id FROM refuels r WHERE r._id == ?)", new Object[] { id });
 	}
 }

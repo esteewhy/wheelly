@@ -73,4 +73,6 @@
 	<item type="id" name="tag_track_id"/>
 	
 	<item type="id" name="ctx_menu_sync"/>
+	<item type="id" name="ctx_menu_sync_pull"/>
+	<item type="id" name="ctx_menu_sync_push"/>
 </resources>
