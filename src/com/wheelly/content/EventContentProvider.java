@@ -66,7 +66,7 @@ public class EventContentProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
-		long calendar_id = ContentUris.parseId(uri);
+//		long calendar_id = ContentUris.parseId(uri);
 		
 		DatabaseHelper dbHelper = new DatabaseHelper(getContext());
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -82,7 +82,7 @@ public class EventContentProvider extends ContentProvider {
 		
 		Cursor c = builder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
 		
-		String[] names = c.getColumnNames();
+//		String[] names = c.getColumnNames();
 		
 		return c;
 	}

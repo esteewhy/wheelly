@@ -2,7 +2,6 @@ package com.wheelly.activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
@@ -70,9 +69,14 @@ public class Mileage extends FragmentActivity {
 						&& value.StartHeartbeat.containsKey("odometer")
 						&& value.StopHeartbeat != null
 						&& value.StopHeartbeat.containsKey("odometer")) {
-					c.Mileage.setAmount(
-						value.StopHeartbeat.getAsLong("odometer")
-						- value.StartHeartbeat.getAsLong("odometer"));
+					
+					final long distance =
+							value.StopHeartbeat.getAsLong("odometer")
+							- value.StartHeartbeat.getAsLong("odometer");
+					
+					if(distance > 0) {
+						c.Mileage.setAmount(distance);
+					}
 				}
 				
 				if(c.Track.getValue() == 0
@@ -128,14 +132,6 @@ public class Mileage extends FragmentActivity {
 					}
 				});
 	}
-	
-	@Override  
-	public void startManagingCursor(Cursor c) {  
-	 if (c == null) {  
-	  throw new IllegalStateException("cannot manage cursor: cursor == null");  
-	 }  
-	 super.startManagingCursor(c);  
-	}  
 	
 	/**
 	 * Encapsulates UI objects.

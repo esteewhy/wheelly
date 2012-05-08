@@ -202,7 +202,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		}
 	}
 	
-	private static final int DIALOG_CALENDARPICKER_DOWNLOAD = 1;
+//	private static final int DIALOG_CALENDARPICKER_DOWNLOAD = 1;
 	private static final int REQUEST_CODE_DATE_SELECTION = 1;
 
 	// ========================================================================

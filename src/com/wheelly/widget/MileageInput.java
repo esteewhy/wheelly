@@ -147,7 +147,7 @@ public class MileageInput extends LinearLayout {
 							}
 						});
 					}}, lpWrapWrap);
-				}}, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				}}, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 				
 				d.setCanceledOnTouchOutside(true);
 				d.show();
