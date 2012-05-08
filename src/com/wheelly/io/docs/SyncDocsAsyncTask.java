@@ -48,7 +48,7 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 		Cursor cursor = null != entry
 			? provider.getLatestRecords(Long.parseLong(entry.getValue("odometer")))
 			: provider.getSyncCursor(-1);
-		int cnt = cursor.getCount();
+//		int cnt = cursor.getCount();
 		return cursor;
 	}
 }

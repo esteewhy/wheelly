@@ -306,12 +306,18 @@ public class ChronologyProvider extends ContentProvider {
 	}
 	
 	private static void updateRelatedRecordsOfMileage(long id, SQLiteDatabase db) {
-		db.execSQL("UPDATE heartbeats SET sync_state = 2 WHERE sync_state < 2 AND _id IN "
-			+"(SELECT m.stop_heartbeat_id FROM mileages m WHERE m._id == ?)", new Object[] { id });
+		db.execSQL("UPDATE heartbeats SET sync_state = 2"
+				+" WHERE sync_state == 1"
+				+" AND _id IN "
+				+"(SELECT m.stop_heartbeat_id FROM mileages m WHERE m._id == ?)",
+			new Object[] { id });
 	}
 	
 	private static void updateRelatedRecordsOfRefuel(long id, SQLiteDatabase db) {
-		db.execSQL("UPDATE heartbeats SET sync_state = 2 WHERE sync_state < 2 AND _id IN "
-			+"(SELECT r.heartbeat_id FROM refuels r WHERE r._id == ?)", new Object[] { id });
+		db.execSQL("UPDATE heartbeats SET sync_state = 2"
+				+" WHERE sync_state == 1"
+				+" AND _id IN "
+				+"(SELECT r.heartbeat_id FROM refuels r WHERE r._id == ?)",
+			new Object[] { id });
 	}
 }
