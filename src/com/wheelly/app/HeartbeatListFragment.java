@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -78,6 +79,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 								case R.id.indicator:
 									final int status = cursor.getInt(columnIndex);
 									view.setBackgroundColor(context.getResources().getColor(getStatusColor(status)));
+									//((RelativeLayout)view.getParent()).setb;
 									return true;
 								}
 								return false;
@@ -108,7 +110,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 						
 						titleField = "place";
 						dataField = "_created";
-						iconResId = R.drawable.heartbeat;
+						iconResId = R.drawable.ic_tab_cam_selected;
 					}};
 			}
 			

@@ -53,6 +53,12 @@ public final class DatabaseSchema {
 			//not strictly necessary, but to reassure order
 			;//+ "  AND rh.odometer BETWEEN start.odometer AND stop.odometer";
 		
+		private static final String StateColumnExpression =
+			"(CASE WHEN m.track_id < 0 THEN 2"
+			+" WHEN stop." + BaseColumns._ID + " IS NULL THEN 1"
+			+" ELSE 0"
+			+" END)";
+		
 		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
@@ -62,7 +68,8 @@ public final class DatabaseSchema {
 			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount) fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
-			"dest.name destination"
+			"dest.name destination",
+			StateColumnExpression + " state"
 		};
 		
 		public static final String Tables = "mileages m"
@@ -131,6 +138,10 @@ public final class DatabaseSchema {
 			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.mileage";
 		public static final String CONTENT_TYPE =
 			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.mileages";
+		
+		public static final int STATE_NONE = 0;
+		public static final int STATE_ACTIVE = 1;
+		public static final int STATE_TRACKING = 2;
 	}
 	
 	public static final class Refuels {
