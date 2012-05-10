@@ -2,6 +2,7 @@ package com.wheelly.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,14 +33,14 @@ public class MileageListFragment extends ConfigurableListFragment {
 	protected ListConfiguration configure() {
 		ListConfiguration cfg = new ListConfiguration() {
 			@Override
-			public SimpleCursorAdapter createListAdapter(Context context) {
+			public SimpleCursorAdapter createListAdapter(final Context context) {
 				return
 					new SimpleCursorAdapter(context, R.layout.mileage_list_item, null,
 						new String[] {
-							"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination"
+							"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination", "state"
 						},
 						new int[] {
-							R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination
+							R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination, R.id.indicator
 						},
 						0//CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
 					) {
@@ -50,6 +52,10 @@ public class MileageListFragment extends ConfigurableListFragment {
 								break;
 							case R.id.mileage:
 								v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
+								break;
+							case R.id.indicator:
+								final int status = Integer.parseInt(text);
+								v.setBackgroundColor(context.getResources().getColor(getStatusColor(status)));
 								break;
 							default: super.setViewText(v, text);
 							}
@@ -70,7 +76,7 @@ public class MileageListFragment extends ConfigurableListFragment {
 						
 						titleField = "destination";
 						dataField = "_created";
-						iconResId = R.drawable.mileage;
+						iconResId = R.drawable.ic_tab_jet_selected;
 					}};
 			}
 
@@ -98,6 +104,16 @@ public class MileageListFragment extends ConfigurableListFragment {
 		cfg.FilterExpr = Mileages.FilterExpr;
 		
 		return cfg;
+	}
+	
+	private int getStatusColor(int status) {
+		switch(status) {
+		case Mileages.STATE_ACTIVE:
+			return R.color.sync_succeeded;
+		case Mileages.STATE_TRACKING:
+			return R.color.sync_conflict;
+		}
+		return R.color.sync_unknown;
 	}
 	
 	@Override
@@ -153,6 +169,28 @@ public class MileageListFragment extends ConfigurableListFragment {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	public void onListItemClick(ListView listView, View view, int position,
+			long id) {
+		
+		final Cursor c = (Cursor) ((SimpleCursorAdapter)getListAdapter()).getItem(position);
+		final int state = c.getInt(c.getColumnIndexOrThrow("state"));
+		
+		switch(state) {
+		case Mileages.STATE_ACTIVE:
+			Intent intent = new Intent(getActivity(), Mileage.class);
+			intent.putExtra(BaseColumns._ID, id);
+			intent.putExtra("ui_command", TripControlBar.UI_STOP);
+			startActivityForResult(intent, EDIT_REQUEST);
+			break;
+		case Mileages.STATE_TRACKING:
+			editItem(id);
+			break;
+		default:
+			super.onListItemClick(listView, view, position, id);
 		}
 	}
 }

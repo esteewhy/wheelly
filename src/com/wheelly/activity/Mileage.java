@@ -131,6 +131,11 @@ public class Mileage extends FragmentActivity {
 						finish();
 					}
 				});
+		
+		if(intent.hasExtra("ui_command")) {
+			final int uiCommand = intent.getIntExtra("ui_command", 0);
+			c.Heartbeats.performUICommand(uiCommand);
+		}
 	}
 	
 	/**

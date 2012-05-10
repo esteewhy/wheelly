@@ -74,7 +74,7 @@ public class RefuelListFragment extends ConfigurableListFragment {
 						
 						titleField = "place";
 						dataField = "_created";
-						iconResId = R.drawable.refuel;
+						iconResId = R.drawable.ic_tab_utensils_selected;
 					}};
 			}
 			

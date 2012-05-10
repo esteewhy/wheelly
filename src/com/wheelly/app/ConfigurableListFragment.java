@@ -56,7 +56,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	
 	private static final int LIST_LOADER = 0x01;
 	private static final int NEW_REQUEST = 1;
-	private static final int EDIT_REQUEST = 2;
+	protected static final int EDIT_REQUEST = 2;
 	private static final int DELETE_REQUEST = 3;
 	
 	//private ProgressDialog progressDialog;
@@ -114,7 +114,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		super.onResume();
 	}
 	
-	private void viewItem(final long id) {
+	protected void viewItem(final long id) {
 		final ListConfiguration cfg = getConfiguration();
 		final InfoDialogFragment.Options dialogCfg = cfg.configureViewItemDialog();
 		
@@ -132,7 +132,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		new InfoDialogFragment(dialogCfg).show(getFragmentManager(), "dialog");
 	}
 	
-	private void editItem(final long id) {
+	protected void editItem(final long id) {
 		Intent intent = new Intent(getActivity(), getConfiguration().ItemActivityClass);
 		intent.putExtra(BaseColumns._ID, id);
 		startActivityForResult(intent, EDIT_REQUEST);

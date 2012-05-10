@@ -2,43 +2,15 @@
 <RelativeLayout
 	xmlns:android			="http://schemas.android.com/apk/res/android"
 	android:layout_width	="wrap_content"
-	
-	android:layout_height="64dp"
+	android:layout_height	="64dp"
 	android:paddingRight	="12dp">
 	
-	<TextView
-		android:id="@+id/indicator"
-		android:background="@color/sync_unknown"
-		android:layout_alignParentLeft="true"
-		android:layout_height="fill_parent"
-		android:layout_width="3dp"
-		android:layout_marginBottom="3dp"
-		android:layout_marginTop="3dp"/>
+	<TextView android:id="@+id/indicator" style="@style/Indicator" />
+	<TextView android:id="@+id/date" style="@style/Date" />
 	
-	<TextView android:id		="@+id/date"
-		android:layout_width	="wrap_content"
-		android:layout_height	="wrap_content"
-		android:layout_alignParentTop="true"
-		android:singleLine		="true"
-		android:layout_toRightOf="@id/indicator"
-		android:paddingLeft		="10dp"
-		android:text			="2011-03-21 09:01"
-		android:paddingTop		="2dp" />
-	
-	<ImageView android:id	="@+id/icon_refuel"
-		style="@style/HeartbeatTypeIcon"
-		android:contentDescription="@string/refuels"
-		android:src	="@drawable/hb_refuel" />
-	
-	<ImageView android:id	="@+id/icon_stop"
-		style="@style/HeartbeatTypeIcon"
-		android:contentDescription="@string/stop"
-		android:src	="@drawable/hb_stop" />
-	
-	<ImageView android:id	="@+id/icon_start"
-		style="@style/HeartbeatTypeIcon"
-		android:contentDescription="@string/start"
-		android:src	="@drawable/hb_start" />
+	<ImageView android:id="@+id/icon_refuel" style="@style/HeartbeatTypeIcon.Refuel" />
+	<ImageView android:id="@+id/icon_stop" style="@style/HeartbeatTypeIcon.Stop" />
+	<ImageView android:id="@+id/icon_start" style="@style/HeartbeatTypeIcon.Start" />
 	
 	<ProgressBar android:id		="@+id/fuelGauge"
 		android:max				="60"
@@ -54,11 +26,10 @@
 	<TextView android:id		="@+id/odometer"
 		android:text			="39881"
 		android:textAppearance	="?android:attr/textAppearanceLarge"
-		android:paddingLeft		="10dp"
 		android:gravity			="bottom"
 		android:layout_above	="@id/fuelGauge"
 		android:layout_below	="@id/date"
-		android:layout_toRightOf="@id/indicator"
+		android:layout_alignLeft="@id/date"
 		android:layout_marginRight	="3dip"
 		android:layout_height	="wrap_content"
 		android:layout_width	="wrap_content"/>

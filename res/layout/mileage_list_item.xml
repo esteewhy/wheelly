@@ -14,18 +14,11 @@
 <RelativeLayout
 	xmlns:android			="http://schemas.android.com/apk/res/android"
 	android:layout_width	="wrap_content"
-	android:layout_height	="wrap_content"
-	android:paddingTop		="3dp"
-	android:paddingLeft		="10dp"
+	android:layout_height	="56dp"
 	android:paddingRight	="12dp">
 	
-	<TextView
-		android:layout_width	="wrap_content"
-		android:layout_height	="wrap_content"
-		android:singleLine		="true"
-		android:id				="@+id/date"
-		android:text			="2011-03-21 09:01"
-		android:paddingTop		="2dp" />
+	<TextView android:id="@+id/indicator" style="@style/Indicator" />
+	<TextView android:id="@+id/date" style="@style/Date" />
 	
 	<TextView android:id		="@+id/cost"
 		android:layout_width	="wrap_content"
@@ -40,19 +33,17 @@
 		android:layout_toRightOf="@id/date"
 		android:layout_toLeftOf	="@id/cost"
 		android:layout_marginLeft="5dip"
-		
 		android:singleLine		="true"
-		android:layout_weight	="1"
 		android:textStyle		="bold"/>
 	
 	<TextView
 		android:id				="@+id/mileage"
 		android:text			="14.88"
 		android:textAppearance	="?android:attr/textAppearanceLarge"
-		android:layout_alignParentLeft		="true"
 		android:layout_alignParentBottom	="true"
 		android:layout_marginRight	="3dip"
-		android:layout_below="@id/date"
+		android:layout_below	="@id/date"
+		android:layout_alignLeft="@id/date"
 		android:layout_height	="wrap_content"
 		android:layout_width	="wrap_content"/>
 		

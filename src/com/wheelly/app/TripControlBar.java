@@ -33,6 +33,8 @@ import android.widget.Button;
  */
 public class TripControlBar extends Fragment {
 	
+	public static final int UI_STOP = 1;
+	
 	private Controls c;
 	private static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
 	
@@ -367,6 +369,12 @@ public class TripControlBar extends Fragment {
 		// Revert "record" button caption to default.
 		if(canStartTracking) {
 			c.StartButton.setText(R.string.record);
+		}
+	}
+	
+	public void performUICommand(int command) {
+		if(UI_STOP == command) {
+			c.StopButton.performClick();
 		}
 	}
 	
