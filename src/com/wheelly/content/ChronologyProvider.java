@@ -1,5 +1,6 @@
 package com.wheelly.content;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -233,76 +234,76 @@ public class ChronologyProvider extends ContentProvider {
 		final int uriCode = uriMatcher.match(uri);
 		
 		if(DataSchemaLookup.containsKey(uriCode)) {
-			int count = 0;
-			final SQLiteDatabase db = dbHelper.getWritableDatabase();
-			try {
-				final long id = getIdFromUriOrValues(uri, values);
-				
-				if((uriCode == MILEAGES_ID || uriCode == REFUELS_ID) && !values.containsKey("_modified")) {
-					values.put("_modified", DateUtils.dbFormat.format(new Date()));
-				}
-				
-				if(uriCode == HEARTBEATS_ID) {
-					final boolean isUpdatedFromSync = values.containsKey("sync_state");
-					
-					if(!isUpdatedFromSync) {
-						values.put("sync_state", 2);
-					}
-				}
-				
-				db.beginTransaction();
-				count = db.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
-					values,
-					BaseColumns._ID + " = ?",
-					new String[] { Long.toString(id) });
-				
-				// Update timestamps of associated records..
-				if(count == 1) {
-					switch(uriCode) {
-					case REFUELS_ID:
-						updateRelatedRecordsOfRefuel(id, db);
-						break;
-					case MILEAGES_ID:
-						updateRelatedRecordsOfMileage(id, db);
-						break;
-					}
-				}
-				
-				db.setTransactionSuccessful();
-			} finally {
-				db.endTransaction();
+			if((uriCode == MILEAGES_ID || uriCode == REFUELS_ID) && !values.containsKey("_modified")) {
+				values.put("_modified", DateUtils.dbFormat.format(new Date()));
 			}
 			
-			if(count > 0) {
-				final ContentResolver cr = getContext().getContentResolver();
-				cr.notifyChange(uri, null);
+			if(uriCode == HEARTBEATS_ID) {
+				final boolean isUpdatedFromSync = values.containsKey("sync_state");
 				
-				switch(uriCode) {
-				case MILEAGES_ID:
-				case MILEAGES:
-					cr.notifyChange(Mileages.CONTENT_URI, null);
-					cr.notifyChange(Timeline.CONTENT_URI, null);
-					break;
-				case REFUELS_ID:
-				case REFUELS:
-					cr.notifyChange(Refuels.CONTENT_URI, null);
-					cr.notifyChange(Mileages.CONTENT_URI, null);
-					cr.notifyChange(Timeline.CONTENT_URI, null);
-					break;
-				case HEARTBEATS_ID:
-				case HEARTBEATS:
-					cr.notifyChange(Heartbeats.CONTENT_URI, null);
-					cr.notifyChange(Timeline.CONTENT_URI, null);
-					cr.notifyChange(Mileages.CONTENT_URI, null);
-					cr.notifyChange(Refuels.CONTENT_URI, null);
-					break;
+				if(!isUpdatedFromSync) {
+					values.put("sync_state", 2);
 				}
+			}
+			
+			final SQLiteDatabase db = dbHelper.getWritableDatabase();
+			final boolean isSingleRecord = Arrays.asList(MILEAGES_ID, REFUELS_ID, HEARTBEATS_ID, LOCATIONS_ID)
+					.contains(uriCode); 
+			final int count = isSingleRecord
+					? updateSingleRecord(getIdFromUriOrValues(uri, values), values, uriCode, db)
+					: db.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
+							values,
+							selection,
+							selectionArgs);
+			
+			if(count > 0) {
+				notify(uri, uriCode);
 			}
 			
 			return count;
 		}
 		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
+	}
+	
+	private static int updateSingleRecord(long id, ContentValues values, int uriCode, SQLiteDatabase db) {
+		try {
+			db.beginTransaction();
+			final int count = db.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
+				values,
+				BaseColumns._ID + " = ?",
+				new String[] { Long.toString(id) });
+			
+			// Update timestamps of associated records..
+			if(count == 1) {
+				switch(uriCode) {
+				case HEARTBEATS_ID:
+					removeSyncInfoDuplicates(id, db);
+					break;
+				case REFUELS_ID:
+					updateRelatedRecordsOfRefuel(id, db);
+					break;
+				case MILEAGES_ID:
+					updateRelatedRecordsOfMileage(id, db);
+					break;
+				}
+			}
+			
+			db.setTransactionSuccessful();
+			return count;
+		} finally {
+			db.endTransaction();
+		}
+	}
+	
+	private static void removeSyncInfoDuplicates(long id, SQLiteDatabase db) {
+		db.execSQL("UPDATE heartbeats SET"
+			+" sync_id=NULL, sync_state=0, sync_etag=NULL, sync_date=NULL"
+		+" WHERE _id IN ("
+		+"	SELECT hdup._id FROM heartbeats href"
+		+"	INNER JOIN heartbeats hdup"
+		+"		ON hdup.sync_id = href.sync_id AND hdup._id != href._id"
+		+"	WHERE href._id = ?)", new Object[] { id });
 	}
 	
 	private static void updateRelatedRecordsOfMileage(long id, SQLiteDatabase db) {
@@ -319,5 +320,31 @@ public class ChronologyProvider extends ContentProvider {
 				+" AND _id IN "
 				+"(SELECT r.heartbeat_id FROM refuels r WHERE r._id == ?)",
 			new Object[] { id });
+	}
+	
+	private void notify(Uri uri, int uriCode) {
+		final ContentResolver cr = getContext().getContentResolver();
+		cr.notifyChange(uri, null);
+		
+		switch(uriCode) {
+		case MILEAGES_ID:
+		case MILEAGES:
+			cr.notifyChange(Mileages.CONTENT_URI, null);
+			cr.notifyChange(Timeline.CONTENT_URI, null);
+			break;
+		case REFUELS_ID:
+		case REFUELS:
+			cr.notifyChange(Refuels.CONTENT_URI, null);
+			cr.notifyChange(Mileages.CONTENT_URI, null);
+			cr.notifyChange(Timeline.CONTENT_URI, null);
+			break;
+		case HEARTBEATS_ID:
+		case HEARTBEATS:
+			cr.notifyChange(Heartbeats.CONTENT_URI, null);
+			cr.notifyChange(Timeline.CONTENT_URI, null);
+			cr.notifyChange(Mileages.CONTENT_URI, null);
+			cr.notifyChange(Refuels.CONTENT_URI, null);
+			break;
+		}
 	}
 }
