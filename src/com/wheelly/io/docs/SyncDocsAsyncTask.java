@@ -9,6 +9,7 @@ import api.wireless.gdata.spreadsheets.data.ListEntry;
 
 import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
 import com.wheelly.content.WheellyProviderUtils;
+import com.wheelly.util.DateUtils;
 
 /**
  * @author tstrypko
@@ -45,10 +46,8 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 		ListEntry entry = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken).getLatestRow();
 		
 		WheellyProviderUtils provider = new WheellyProviderUtils(this.context); 
-		Cursor cursor = null != entry
-			? provider.getLatestRecords(Long.parseLong(entry.getValue("odometer")))
+		return null != entry
+			? provider.getLatestRecords(entry.getValue("date"))
 			: provider.getSyncCursor(-1);
-//		int cnt = cursor.getCount();
-		return cursor;
 	}
 }

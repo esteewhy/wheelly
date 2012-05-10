@@ -1,7 +1,11 @@
 package com.wheelly.content;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Timeline;
+import com.wheelly.util.DateUtils;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -28,14 +32,15 @@ public class WheellyProviderUtils {
 				: cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
 						"icons > 0 AND sync_state != 3",
 						null,
-						"odometer ASC");
+						"odometer ASC, h._created ASC");
 	}
 	
-	public Cursor getLatestRecords(long lastOdometer) {
+	public Cursor getLatestRecords(String lastDate) {
+		lastDate = DateUtils.dbFormat.format(new Date(lastDate));
 		return cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
-				"h.odometer > ? AND icons > 0",
-				new String[] { Long.toString(lastOdometer) },
-				"odometer ASC");
+				"h._created > DATETIME(?) AND icons > 0",
+				new String[] { lastDate },
+				"odometer ASC, h._created ASC");
 	}
 	
 	public void resetSync(long id) {

@@ -300,7 +300,7 @@ public final class DatabaseSchema {
 	public static final class Timeline {
 		
 		public static final long SYNC_STATE_NONE = 0;
-		public static final long SYNC_STATE_OK = 1;
+		public static final long SYNC_STATE_READY = 1;
 		public static final long SYNC_STATE_CHANGED = 2;
 		public static final long SYNC_STATE_CONFLICT = 3;
 		

@@ -7,13 +7,10 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Date;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.text.format.Time;
 import android.util.Pair;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 import api.wireless.gdata.spreadsheets.parser.xml.XmlSpreadsheetsGDataParserFactory;
@@ -58,39 +55,59 @@ public class SpreadsheetPoster {
 	private void syncRow(Cursor track, Pair<String, String> idAndEtag) throws HttpException, IOException {
 		final long syncState = track.getLong(track.getColumnIndexOrThrow("sync_state"));
 		
-		if(Timeline.SYNC_STATE_OK == syncState) {
-			new HeartbeatBroker(context).updateOrInsert(
-				prepareLocalValues(track, new EntryPostResult(load(idAndEtag.first), EntryPostStatus.READ))
-			);
-			return;
+		EntryPostResult result = null;
+		
+		if(Timeline.SYNC_STATE_READY == syncState && null != idAndEtag.first) {
+			try {
+				result = new EntryPostResult(load(idAndEtag.first), EntryPostStatus.READ);
+			} catch(HttpException ex) {
+				if(HttpException.SC_NOT_FOUND != ex.getStatusCode()) {
+					return;
+				}
+			}
 		}
 		
-		final EntryPostResult result = postRow(track, idAndEtag);
+		if(null == result) {
+			result = postRow(track, idAndEtag);
+		}
 		
-		if(isEntryValid(track, result.Entry)) {
+		if(canAcceptResult(track, result)) {
 			new HeartbeatBroker(context).updateOrInsert(
 				prepareLocalValues(track, result)
 			);
-		} else {
+		} else if(idAndEtag.first != null || idAndEtag.second != null) {
 			// id+etag matched some row but that appears to be a wrong one,
 			// so re-iterating..
 			syncRow(track, new Pair<String, String>(null, null));
+		} else {
+			throw new IOException("Something bad..");
 		}
 	}
 	
-	private static boolean isEntryValid(Cursor local, ListEntry remote) {
-		if(null == remote) {
+	private static boolean canAcceptResult(Cursor local, EntryPostResult result) {
+		if(result.Status == EntryPostStatus.READ) {
+			final Pair<String, String> type = new Pair<String, String>(
+				DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndexOrThrow("icons"))),
+				result.Entry.getValue("type")
+			);
+		
+			if(type.first.equals(type.second)) {
+				return true;
+			}
+		}
+		
+		if(null == result.Entry) {
 			return false;
 		}
 		
 		final Pair<Long, Long> odo = new Pair<Long, Long>(
 				local.getLong(local.getColumnIndex("odometer")),
-				Long.parseLong(remote.getValue("odometer", "-1"))
+				Long.parseLong(result.Entry.getValue("odometer", "-1"))
 		);
 		
 		final Pair<String, String> type = new Pair<String, String>(
 			DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndex("icons"))),
-			remote.getValue("type")
+			result.Entry.getValue("type")
 		);
 		
 		return odo.first.equals(odo.second)
@@ -114,16 +131,13 @@ public class SpreadsheetPoster {
 			values.put("sync_etag", idAndVersion.second);
 		}
 		
+		values.put("sync_date", DateUtils.atomToDbFormat(result.Entry.getUpdateDate()));
+		
 		if(result.Status != EntryPostStatus.CONFLICT) {
-			final Time t = new Time();
-			
-			if(t.parse3339(result.Entry.getUpdateDate())) {
-				values.put("sync_date", DateUtils.dbFormat.format(new Date(t.toMillis(false))));
-			}
 			
 			values.put("odometer", Long.parseLong(result.Entry.getValue("odometer")));
 			values.put("fuel", Integer.parseInt(result.Entry.getValue("fuel")));
-			values.put("sync_state", Timeline.SYNC_STATE_OK);
+			values.put("sync_state", Timeline.SYNC_STATE_READY);
 		} else {
 			values.put("sync_state", Timeline.SYNC_STATE_CONFLICT);
 		}
@@ -212,13 +226,18 @@ public class SpreadsheetPoster {
 		writer.flush();
 		writer.close();
 		
+		int code = ((HttpURLConnection)conn).getResponseCode();
+		String msg = ((HttpURLConnection)conn).getResponseMessage();
+		
 		final boolean success = !isConflict(conn);
 		
+		final ListEntry entry = parseEntity(success
+			? conn.getInputStream()
+			: ((HttpURLConnection)conn).getErrorStream()
+		);
+		
 		return new EntryPostResult(
-			parseEntity(success
-				? conn.getInputStream()
-				: ((HttpURLConnection)conn).getErrorStream()
-			),
+			entry,
 			success ? status : EntryPostStatus.CONFLICT
 		);
 	}

@@ -151,17 +151,12 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 				intent.putExtra(SendRequest.SEND_REQUEST_KEY, req);
 				startActivity(intent);
 				return true;
-			case R.id.ctx_menu_sync_pull: {
-				final ContentValues values = new ContentValues();
-				values.put(BaseColumns._ID, item.getItemId());
-				values.put("sync_state", Timeline.SYNC_STATE_OK);
-				new HeartbeatBroker(getActivity()).updateOrInsert(values);
-				return true;
-			}
+			case R.id.ctx_menu_sync_pull:
 			case R.id.ctx_menu_sync_push: {
 				final ContentValues values = new ContentValues();
-				values.put(BaseColumns._ID, item.getItemId());
-				values.put("sync_state", Timeline.SYNC_STATE_CHANGED);
+				values.put(BaseColumns._ID, ((AdapterContextMenuInfo)item.getMenuInfo()).id);
+				values.put("sync_state", item.getItemId() == R.id.ctx_menu_sync_pull
+					? Timeline.SYNC_STATE_READY : Timeline.SYNC_STATE_CHANGED);
 				new HeartbeatBroker(getActivity()).updateOrInsert(values);
 				return true;
 			}
