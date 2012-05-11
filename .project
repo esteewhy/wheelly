@@ -40,7 +40,7 @@
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1333997046723</id>
+			<id>1336741192147</id>
 			<name>MyTracks_src</name>
 			<type>30</type>
 			<matcher>
@@ -49,7 +49,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333997046737</id>
+			<id>1336741192158</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
@@ -58,7 +58,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333997046752</id>
+			<id>1336741192187</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
@@ -67,12 +67,21 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1333997046765</id>
+			<id>1336741192199</id>
 			<name>MyTracks_src</name>
 			<type>22</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-MyTracks.java</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1336741192212</id>
+			<name>MyTracks_src</name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-settings</arguments>
 			</matcher>
 		</filter>
 		<filter>

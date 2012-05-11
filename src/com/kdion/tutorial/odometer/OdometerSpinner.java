@@ -106,6 +106,15 @@ public class OdometerSpinner extends View
 		mDigitPaint.setTextAlign(Align.CENTER);
 		
 		setCurrentDigit(rnd.nextInt(9));
+		
+		setLongClickable(true);
+		setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View paramView) {
+				setCurrentDigit((mCurrentDigit + 1) % 10);
+				return true;
+			}
+		});
 	}
 	static final Random rnd = new Random();
 	
@@ -129,16 +138,9 @@ public class OdometerSpinner extends View
 		if(mCurrentDigit != old && mDigitChangeListener != null)
 			mDigitChangeListener.onDigitChange(this, mCurrentDigit);
 		
-		mDigitAbove = mCurrentDigit + 1;
+		mDigitAbove = (mCurrentDigit + 1) % 10;
+		mDigitBelow = (mCurrentDigit + 9) % 10;
 		
-		if(mDigitAbove > 9)
-			mDigitAbove = 0;
-		
-		mDigitBelow = mCurrentDigit - 1;
-		
-		if(mDigitBelow < 0)
-			mDigitBelow = 9;
-
 		mDigitString = String.valueOf(mCurrentDigit);
 		mDigitAboveString = String.valueOf(mDigitAbove);
 		mDigitBelowString = String.valueOf(mDigitBelow);
@@ -241,22 +243,21 @@ public class OdometerSpinner extends View
 		
 		setDigitYValues();
 	}
-
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
 		// Pull out the Action value from the event for processing
 		int action = event.getAction();
 		
-		if(action == MotionEvent.ACTION_DOWN)
-		{
+		switch(action) {
+		case MotionEvent.ACTION_DOWN:
 			mTouchStartY = event.getY();
 			mTouchLastY = mTouchStartY;
 			
 			return true;
-		}
-		else if(action == MotionEvent.ACTION_MOVE)
-		{
+		case MotionEvent.ACTION_MOVE: {
+			getParent().requestDisallowInterceptTouchEvent(true);
 			float currentY = event.getY();
 			
 			float delta = mTouchLastY - currentY;
@@ -275,37 +276,26 @@ public class OdometerSpinner extends View
 			{
 				// need to either increase or decrease value
 				float postDelta = Math.abs(totalDelta) - mHeight;
+				final boolean up = totalDelta > 0;
+				postDelta = up ? -postDelta : postDelta;
 				
-				if(totalDelta > 0)
-				{
-					// go DOWN a number
-					setCurrentDigit(mDigitBelow);
-					mTouchStartY -= mHeight;
-					
-					mDigitY -= postDelta;
-					mDigitBelowY -= postDelta;
-					mDigitAboveY -= postDelta;
-					performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-				}
-				else
-				{
-					// go UP a number
-					setCurrentDigit(mDigitAbove);
-					mTouchStartY += mHeight;
-					
-					mDigitY += postDelta;
-					mDigitBelowY += postDelta;
-					mDigitAboveY += postDelta;
-					performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-				}
+				setCurrentDigit(up ? mDigitBelow : mDigitAbove);
+				mTouchStartY += up ? -mHeight : mHeight;
+				
+				mDigitY += postDelta;
+				mDigitBelowY += postDelta;
+				mDigitAboveY += postDelta;
+				performHapticFeedback(up
+						? HapticFeedbackConstants.KEYBOARD_TAP
+						: HapticFeedbackConstants.LONG_PRESS,
+					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 			}
 			
 			invalidate();
 			
 			return true;
 		}
-		else if(action == MotionEvent.ACTION_UP)
-		{
+		case MotionEvent.ACTION_UP: {
 			float currentY = event.getY();
 			
 			// delta: negative means a down 'scroll'
@@ -317,19 +307,13 @@ public class OdometerSpinner extends View
 			{
 				// higher numbers are 'above' the current, so a scroll down 
 				// _increases_ the value
-				if(deltaY < 0)
-				{
-					newValue = mDigitAbove;
-				}
-				else
-				{
-					newValue = mDigitBelow;
-				}
+				newValue = deltaY < 0 ? mDigitAbove : mDigitBelow;
 			}
 			
 			setCurrentDigit(newValue);
-			
+			getParent().requestDisallowInterceptTouchEvent(false);
 			return true;
+		}
 		}
 		return false;
 	}
