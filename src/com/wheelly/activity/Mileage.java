@@ -137,7 +137,7 @@ public class Mileage extends FragmentActivity {
 			c.Heartbeats.performUICommand(uiCommand);
 		}
 	}
-	
+		
 	/**
 	 * Encapsulates UI objects.
 	 */
