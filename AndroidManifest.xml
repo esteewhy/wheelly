@@ -124,5 +124,15 @@
 		<provider android:label="Unified event stream"
 			android:name=".content.EventContentProvider"
 			android:authorities="com.wheelly.provider.events" />
+		
+		<receiver android:name=".activity.Widget"
+			 android:label="Wheelly Car Status" >
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+				<action android:name="com.wheelly.UPDATE_WIDGET" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider"
+				android:resource="@xml/widget_2x1" />
+		</receiver>
 	</application>
 </manifest> 

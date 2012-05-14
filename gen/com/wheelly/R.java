@@ -276,7 +276,8 @@ containing a value of this type.
         public static final int transaction_status_restored_2=0x7f020082;
         public static final int transaction_status_unreconciled_2=0x7f020083;
         public static final int wallet_open=0x7f020084;
-        public static final int widget_background_gray=0x7f020085;
+        public static final int wheelly_widget=0x7f020085;
+        public static final int widget_background_gray=0x7f020086;
     }
     public static final class id {
         public static final int account=0x7f0a0000;
@@ -340,12 +341,12 @@ containing a value of this type.
         public static final int checkbox=0x7f0a00a3;
         public static final int click_attribute=0x7f0a0022;
         public static final int cost=0x7f0a0091;
-        public static final int ctx_menu_delete=0x7f0a00c9;
-        public static final int ctx_menu_edit=0x7f0a00c8;
+        public static final int ctx_menu_delete=0x7f0a00cb;
+        public static final int ctx_menu_edit=0x7f0a00ca;
         public static final int ctx_menu_sync=0x7f0a0043;
         public static final int ctx_menu_sync_pull=0x7f0a0044;
         public static final int ctx_menu_sync_push=0x7f0a0045;
-        public static final int ctx_menu_view=0x7f0a00c7;
+        public static final int ctx_menu_view=0x7f0a00c9;
         public static final int currency=0x7f0a000d;
         public static final int currency_add=0x7f0a000f;
         public static final int currency_clear=0x7f0a000e;
@@ -365,6 +366,7 @@ containing a value of this type.
         public static final int fuel=0x7f0a007a;
         public static final int fuelAmt=0x7f0a0082;
         public static final int fuelGauge=0x7f0a0081;
+        public static final int fuel_gauge=0x7f0a00bc;
         public static final int fuel_uom=0x7f0a0093;
         public static final int heartbeat=0x7f0a0077;
         public static final int heartbeats=0x7f0a007c;
@@ -403,14 +405,14 @@ containing a value of this type.
         public static final int odometer=0x7f0a0079;
         public static final int okButton=0x7f0a008a;
         public static final int op=0x7f0a0050;
-        public static final int opt_menu_add=0x7f0a00c1;
-        public static final int opt_menu_backup=0x7f0a00c4;
-        public static final int opt_menu_calendar=0x7f0a00c6;
-        public static final int opt_menu_install_financisto=0x7f0a00cb;
-        public static final int opt_menu_install_mytracks=0x7f0a00ca;
-        public static final int opt_menu_locations=0x7f0a00c2;
-        public static final int opt_menu_preferences=0x7f0a00c3;
-        public static final int opt_menu_restore=0x7f0a00c5;
+        public static final int opt_menu_add=0x7f0a00c3;
+        public static final int opt_menu_backup=0x7f0a00c6;
+        public static final int opt_menu_calendar=0x7f0a00c8;
+        public static final int opt_menu_install_financisto=0x7f0a00cd;
+        public static final int opt_menu_install_mytracks=0x7f0a00cc;
+        public static final int opt_menu_locations=0x7f0a00c4;
+        public static final int opt_menu_preferences=0x7f0a00c5;
+        public static final int opt_menu_restore=0x7f0a00c7;
         public static final int parent_attributes=0x7f0a001d;
         public static final int payee=0x7f0a000a;
         public static final int payee_add=0x7f0a000c;
@@ -478,12 +480,13 @@ containing a value of this type.
         public static final int upload_result_maps_result_icon=0x7f0a00b4;
         public static final int upload_result_success_footer=0x7f0a00b9;
         public static final int value=0x7f0a00a4;
-        public static final int widget_odometer_spinner_1=0x7f0a00c0;
-        public static final int widget_odometer_spinner_10=0x7f0a00bf;
-        public static final int widget_odometer_spinner_100=0x7f0a00be;
-        public static final int widget_odometer_spinner_100k=0x7f0a00bb;
-        public static final int widget_odometer_spinner_10k=0x7f0a00bc;
-        public static final int widget_odometer_spinner_1k=0x7f0a00bd;
+        public static final int wheelly_icon=0x7f0a00bb;
+        public static final int widget_odometer_spinner_1=0x7f0a00c2;
+        public static final int widget_odometer_spinner_10=0x7f0a00c1;
+        public static final int widget_odometer_spinner_100=0x7f0a00c0;
+        public static final int widget_odometer_spinner_100k=0x7f0a00bd;
+        public static final int widget_odometer_spinner_10k=0x7f0a00be;
+        public static final int widget_odometer_spinner_1k=0x7f0a00bf;
     }
     public static final class layout {
         public static final int amount_input=0x7f030000;
@@ -541,7 +544,8 @@ containing a value of this type.
         public static final int start_and_stop_buttons=0x7f030034;
         public static final int status_bar=0x7f030035;
         public static final int upload_result=0x7f030036;
-        public static final int widget_odometer=0x7f030037;
+        public static final int widget_2x1=0x7f030037;
+        public static final int widget_odometer=0x7f030038;
     }
     public static final class menu {
         public static final int common_menu=0x7f0e0000;
@@ -2083,6 +2087,7 @@ containing a value of this type.
     }
     public static final class xml {
         public static final int preferences=0x7f050000;
+        public static final int widget_2x1=0x7f050001;
     }
     public static final class styleable {
         /** Attributes that can be used with a LabeledLayout.
