@@ -25,7 +25,6 @@
 	<string name="tracks">Tracks</string>
 	<string name="no_track"><i>Select existing track</i></string>
 	<string name="no_locations">No locations</string>
-	<string name="select_location">Select location</string>
 	<string name="no_fix">Unknown location</string>
 	<string name="calculator">Calculator</string>
 	<string name="location_name">Location name</string>

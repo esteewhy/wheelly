@@ -66,6 +66,7 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "refuels/#", REFUELS_ID);
 			addURI(a, "heartbeats/#", HEARTBEATS_ID);
 			addURI(a, "timeline/#", TIMELINE_ID);
+			
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
@@ -81,8 +82,8 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels", "refuels" });
 		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
-		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, Timeline.Tables });
-		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, Timeline.Tables });
+		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
+		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
 		
 		UriMap.put(MILEAGES, Mileages.CONTENT_URI);
 		UriMap.put(REFUELS, Refuels.CONTENT_URI);
@@ -94,29 +95,31 @@ public class ChronologyProvider extends ContentProvider {
 	
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		final int uriCode = uriMatcher.match(uri);
 		
 		if(DataSchemaLookup.containsKey(uriCode)) {
+			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
-			final int count = db.delete(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
-				selection,
-				selectionArgs);
-			
-			if(count > 0) {
-				final ContentResolver cr = getContext().getContentResolver();
-				cr.notifyChange(uri, null);
+			if(null != tableName) {
+				final SQLiteDatabase db = dbHelper.getWritableDatabase();
+	
+				final int count = db.delete(tableName, selection, selectionArgs);
 				
-				switch(uriCode) {
-				case MILEAGES:
-				case REFUELS:
-					cr.notifyChange(Heartbeats.CONTENT_URI, null);
-					cr.notifyChange(Timeline.CONTENT_URI, null);
-					break;
+				if(count > 0) {
+					final ContentResolver cr = getContext().getContentResolver();
+					cr.notifyChange(uri, null);
+					
+					switch(uriCode) {
+					case MILEAGES:
+					case REFUELS:
+						cr.notifyChange(Heartbeats.CONTENT_URI, null);
+						cr.notifyChange(Timeline.CONTENT_URI, null);
+						break;
+					}
 				}
+				
+				return count;
 			}
-			
-			return count;
 		}
 		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -138,26 +141,29 @@ public class ChronologyProvider extends ContentProvider {
 		final int uriCode = uriMatcher.match(uri);
 		
 		if(DataSchemaLookup.containsKey(uriCode) && UriMap.containsKey(uriCode)) {
-			final SQLiteDatabase db = dbHelper.getWritableDatabase();
+			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
-			final long id = db.insert(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
-				BaseColumns._ID, values);
-			
-			Uri result = ContentUris.appendId(
-				UriMap.get(uriCode).buildUpon(), id).build();
-			
-			final ContentResolver cr = getContext().getContentResolver();
-			cr.notifyChange(uri, null);
-			
-			switch(uriCode) {
-			case MILEAGES:
-			case REFUELS:
-				cr.notifyChange(Heartbeats.CONTENT_URI, null);
-				cr.notifyChange(Timeline.CONTENT_URI, null);
-				break;
+			if(null != tableName) {
+				final SQLiteDatabase db = dbHelper.getWritableDatabase();
+				
+				final long id = db.insert(tableName, BaseColumns._ID, values);
+				
+				Uri result = ContentUris.appendId(
+					UriMap.get(uriCode).buildUpon(), id).build();
+				
+				final ContentResolver cr = getContext().getContentResolver();
+				cr.notifyChange(uri, null);
+				
+				switch(uriCode) {
+				case MILEAGES:
+				case REFUELS:
+					cr.notifyChange(Heartbeats.CONTENT_URI, null);
+					cr.notifyChange(Timeline.CONTENT_URI, null);
+					break;
+				}
+				
+				return result;
 			}
-			
-			return result;
 		}
 		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -234,33 +240,37 @@ public class ChronologyProvider extends ContentProvider {
 		final int uriCode = uriMatcher.match(uri);
 		
 		if(DataSchemaLookup.containsKey(uriCode)) {
-			if((uriCode == MILEAGES_ID || uriCode == REFUELS_ID) && !values.containsKey("_modified")) {
-				values.put("_modified", DateUtils.dbFormat.format(new Date()));
-			}
+			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
-			if(uriCode == HEARTBEATS_ID) {
-				final boolean isUpdatedFromSync = values.containsKey("sync_state");
-				
-				if(!isUpdatedFromSync) {
-					values.put("sync_state", 2);
+			if(null != tableName) {
+				if((uriCode == MILEAGES_ID || uriCode == REFUELS_ID) && !values.containsKey("_modified")) {
+					values.put("_modified", DateUtils.dbFormat.format(new Date()));
 				}
+				
+				if(uriCode == HEARTBEATS_ID) {
+					final boolean isUpdatedFromSync = values.containsKey("sync_state");
+					
+					if(!isUpdatedFromSync) {
+						values.put("sync_state", 2);
+					}
+				}
+				
+				final SQLiteDatabase db = dbHelper.getWritableDatabase();
+				final boolean isSingleRecord = Arrays.asList(MILEAGES_ID, REFUELS_ID, HEARTBEATS_ID, LOCATIONS_ID)
+						.contains(uriCode); 
+				final int count = isSingleRecord
+						? updateSingleRecord(getIdFromUriOrValues(uri, values), values, uriCode, db)
+						: db.update(tableName,
+								values,
+								selection,
+								selectionArgs);
+				
+				if(count > 0) {
+					notify(uri, uriCode);
+				}
+				
+				return count;
 			}
-			
-			final SQLiteDatabase db = dbHelper.getWritableDatabase();
-			final boolean isSingleRecord = Arrays.asList(MILEAGES_ID, REFUELS_ID, HEARTBEATS_ID, LOCATIONS_ID)
-					.contains(uriCode); 
-			final int count = isSingleRecord
-					? updateSingleRecord(getIdFromUriOrValues(uri, values), values, uriCode, db)
-					: db.update(DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
-							values,
-							selection,
-							selectionArgs);
-			
-			if(count > 0) {
-				notify(uri, uriCode);
-			}
-			
-			return count;
 		}
 		
 		throw new UnsupportedOperationException("Unknown uri: " + uri);
