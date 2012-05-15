@@ -14,7 +14,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.*;
-import android.util.Log;
 import android.widget.RemoteViews;
 import ru.orangesoftware.financisto.R;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ public class Widget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("FinancistoWidget", "onReceive intent "+intent);
         String action = intent.getAction();
         if (WIDGET_UPDATE_ACTION.equals(action)) {
             int widgetId = intent.getIntExtra(WIDGET_ID, INVALID_APPWIDGET_ID);
