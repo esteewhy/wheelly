@@ -106,7 +106,7 @@ public class MileageListFragment extends ConfigurableListFragment {
 		return cfg;
 	}
 	
-	private int getStatusColor(int status) {
+	private static int getStatusColor(int status) {
 		switch(status) {
 		case Mileages.STATE_ACTIVE:
 			return R.color.sync_succeeded;

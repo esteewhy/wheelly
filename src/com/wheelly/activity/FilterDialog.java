@@ -42,6 +42,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,7 +50,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class FilterDialog extends DialogFragment {	
@@ -64,7 +64,6 @@ public class FilterDialog extends DialogFragment {
 	private ActivityLayout x;
 	private Controls c;
 	private SQLiteDatabase db;
-	
 	private Cursor locationCursor;
 	
 	public FilterDialog(ContentValues filter, OnFilterChangedListener listener) {
@@ -79,24 +78,31 @@ public class FilterDialog extends DialogFragment {
 	}
 	
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		
+	}
+	
+	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		View v = layoutInflater.inflate(R.layout.blotter_filter, null);
 		final Activity ctx = this.getActivity();
 		
-		this.locationCursor = new LocationRepository(
+		locationCursor = new LocationRepository(
 			db = new DatabaseHelper(ctx).getReadableDatabase())
 				.list(filter.containsKey(F.LOCATION_CONSTRAINT)
 					? filter.getAsString(F.LOCATION_CONSTRAINT)
 					: "");
 		
-		ctx.startManagingCursor(locationCursor);
+		//ctx.startManagingCursor(locationCursor);
 		
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(ctx,
 					android.R.layout.simple_spinner_dropdown_item,
-					locationCursor, 
+					null, 
 					new String[] {"name"},
-					new int[] { android.R.id.text1 }
+					new int[] { android.R.id.text1 },
+					0
 			);
 		
 		x = new ActivityLayout(new NodeInflater(layoutInflater),
@@ -137,7 +143,7 @@ public class FilterDialog extends DialogFragment {
 					switch (id) {
 					case R.id.location:
 						filter.put(F.LOCATION, selectedId);
-						updateLocationFromFilter(filter);
+						updateLocationFromFilter(filter, locationCursor);
 						break;
 					}
 				}
@@ -189,7 +195,7 @@ public class FilterDialog extends DialogFragment {
 		
 		if(null != filter) {
 			updatePeriodFromFilter(filter);
-			updateLocationFromFilter(filter);
+			updateLocationFromFilter(filter, locationCursor);
 		}
 		
 		return d;
@@ -197,16 +203,20 @@ public class FilterDialog extends DialogFragment {
 	
 	@Override
 	public void onDestroy() {
+		if(!locationCursor.isClosed()) {
+			locationCursor.close();
+		}
+		
 		db.close();
 		super.onDestroy();
 	}
 
-	private void updateLocationFromFilter(ContentValues filter) {
+	private void updateLocationFromFilter(ContentValues filter, final Cursor locationCursor) {
 		long locationId = filter.containsKey(F.LOCATION)
 			? filter.getAsLong(F.LOCATION)
 			: 0;
 		if (locationId > 0 && Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
-			ContentValues location = LocationRepository.deserialize(locationCursor);
+			final ContentValues location = LocationRepository.deserialize(locationCursor);
 			c.location.setText(location != null ? location.getAsString("name") : filterValueNotFound);
 		} else {
 			c.location.setText(R.string.no_filter);
