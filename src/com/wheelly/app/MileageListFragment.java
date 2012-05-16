@@ -19,11 +19,13 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
 import com.wheelly.activity.Mileage;
 import com.wheelly.app.InfoDialogFragment.Options;
 import com.wheelly.db.DatabaseSchema.Mileages;
+import com.wheelly.service.Notifier;
 import com.wheelly.service.Tracker;
 
 public class MileageListFragment extends ConfigurableListFragment {
@@ -170,6 +172,12 @@ public class MileageListFragment extends ConfigurableListFragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	protected void deleteItem(long id) {
+		super.deleteItem(id);
+		new Notifier(getActivity()).canceNotificationForMileage(id);
 	}
 	
 	@Override

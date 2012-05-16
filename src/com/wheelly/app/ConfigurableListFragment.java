@@ -138,6 +138,14 @@ public abstract class ConfigurableListFragment extends ListFragment
 		startActivityForResult(intent, EDIT_REQUEST);
 	}
 	
+	protected void deleteItem(final long id) {
+		getActivity().getContentResolver().delete(
+			getConfiguration().ContentUri,
+			BaseColumns._ID + " = ?",
+			new String[] { Long.toString(id) }
+		);
+	}
+	
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, final long id) {
 		viewItem(id);
@@ -242,10 +250,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
-							getActivity().getContentResolver().delete(
-								getConfiguration().ContentUri,
-								BaseColumns._ID + " = ?",
-								new String[] { Long.toString(mi.id) });
+							deleteItem(mi.id);
 							onActivityResult(DELETE_REQUEST, Activity.RESULT_OK, null);
 						}
 					})
