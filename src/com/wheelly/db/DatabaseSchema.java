@@ -43,6 +43,14 @@ public final class DatabaseSchema {
 			//+ ",FOREIGN KEY stop_heartbeat_id REFERENCES heartbeats(_id)"
 			+ ")";
 		
+		public static final String LastPendingIdSql =
+			"SELECT m." + BaseColumns._ID + ""
+				+ " FROM mileages m"
+				+ " LEFT OUTER JOIN heartbeats stop"
+				+ "		ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+				+ " WHERE stop." + BaseColumns._ID + " IS NULL"
+				+ " LIMIT 1";
+		
 		//Calculates amount of refuels occurred in progress of a given trip.
 		private static final String EnRouteRefuelAmount =
 			"SELECT Sum(r.amount)"

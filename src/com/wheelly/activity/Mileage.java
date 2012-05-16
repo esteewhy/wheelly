@@ -19,6 +19,7 @@ import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
+import com.wheelly.service.Notifier;
 import com.wheelly.widget.MileageInput;
 import com.wheelly.content.TrackRepository;
 
@@ -103,21 +104,39 @@ public class Mileage extends FragmentActivity {
 					
 					final TripControlBar.Value heartbeats = c.Heartbeats.getValue();
 					
-					if(null != heartbeats.StartHeartbeat
-							&& heartbeats.StartHeartbeat.containsKey(BaseColumns._ID)) {
-						values.put("start_heartbeat_id",	heartbeats.StartHeartbeat.getAsLong(BaseColumns._ID));
+					final long startHeartbeatId =
+						null != heartbeats.StartHeartbeat
+							&& heartbeats.StartHeartbeat.containsKey(BaseColumns._ID)
+						? heartbeats.StartHeartbeat.getAsLong(BaseColumns._ID)
+						: -1;
+					
+					final long stopHeartbeatId =
+						null != heartbeats.StopHeartbeat
+							&& heartbeats.StopHeartbeat.containsKey(BaseColumns._ID)
+						? heartbeats.StopHeartbeat.getAsLong(BaseColumns._ID)
+						: -1;
+					
+					if(startHeartbeatId > 0) {
+						values.put("start_heartbeat_id", startHeartbeatId);
 					}
 					
-					if(null != heartbeats.StopHeartbeat
-							&& heartbeats.StopHeartbeat.containsKey(BaseColumns._ID)) {
-						values.put("stop_heartbeat_id",	heartbeats.StopHeartbeat.getAsLong(BaseColumns._ID));
+					if(stopHeartbeatId > 0) {
+						values.put("stop_heartbeat_id", stopHeartbeatId);
 					}
 					
 					final long trackId = c.Track.getValue();
 					values.put("track_id", trackId > 0 ? trackId : heartbeats.TrackId);
 					
-					intent.putExtra(BaseColumns._ID, new MileageBroker(Mileage.this).updateOrInsert(values));
+					final long id = new MileageBroker(Mileage.this).updateOrInsert(values);
+					intent.putExtra(BaseColumns._ID, id);
 					
+					final Notifier n = new Notifier(Mileage.this);
+					
+					if(startHeartbeatId < 0 || stopHeartbeatId < 0) {
+						n.notifyAboutPendingMileage(id);
+					} else {
+						n.canceNotificationForMileage(id);
+					}
 					setResult(RESULT_OK, intent);
 					finish();
 				}
