@@ -78,12 +78,6 @@ public class FilterDialog extends DialogFragment {
 	}
 	
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		
-	}
-	
-	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		View v = layoutInflater.inflate(R.layout.blotter_filter, null);
 		final Activity ctx = this.getActivity();

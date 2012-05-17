@@ -3,21 +3,20 @@ package com.wheelly.io.docs;
 import java.io.IOException;
 
 import android.accounts.Account;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 
-import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
 import com.wheelly.content.WheellyProviderUtils;
-import com.wheelly.util.DateUtils;
 
 /**
  * @author tstrypko
  */
 public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 	
-	public SyncDocsAsyncTask(AbstractSendActivity activity, long trackId, Account account) {
-		super(activity, trackId, account);
+	public SyncDocsAsyncTask(Context context, long trackId, Account account) {
+		super(context, trackId, account);
 	}
 	
 	@Override

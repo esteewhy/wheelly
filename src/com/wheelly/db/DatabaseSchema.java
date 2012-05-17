@@ -46,9 +46,12 @@ public final class DatabaseSchema {
 		public static final String LastPendingIdSql =
 			"SELECT m." + BaseColumns._ID + ""
 				+ " FROM mileages m"
+				+ " LEFT OUTER JOIN heartbeats start"
+				+ "		ON m.start_heartbeat_id = start." + BaseColumns._ID
 				+ " LEFT OUTER JOIN heartbeats stop"
 				+ "		ON m.stop_heartbeat_id = stop." + BaseColumns._ID
-				+ " WHERE stop." + BaseColumns._ID + " IS NULL"
+				+ " WHERE start." + BaseColumns._ID + " IS NULL"
+				+ "		OR stop." + BaseColumns._ID + " IS NULL"
 				+ " LIMIT 1";
 		
 		//Calculates amount of refuels occurred in progress of a given trip.
