@@ -2,7 +2,6 @@ package com.wheelly.app;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,20 +17,18 @@ import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
-import com.google.android.apps.mytracks.io.sendtogoogle.AccountChooserActivity;
-import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.InfoDialogFragment.Options;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
+import com.wheelly.service.Synchronizer;
 
 public class HeartbeatListFragment extends ConfigurableListFragment {
 	@Override
@@ -145,11 +142,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 			switch(item.getItemId()) {
 			case R.id.ctx_menu_sync:
 				final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-				Intent intent = new Intent(getActivity(), AccountChooserActivity.class);
-				SendRequest req = new SendRequest(mi.id, false, false, true);
-				req.setSendDocs(true);
-				intent.putExtra(SendRequest.SEND_REQUEST_KEY, req);
-				startActivity(intent);
+				new Synchronizer(getActivity()).execute(mi.id);
 				return true;
 			case R.id.ctx_menu_sync_pull:
 			case R.id.ctx_menu_sync_push: {
@@ -176,11 +169,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
-					Intent intent = new Intent(getActivity(), AccountChooserActivity.class);
-					SendRequest req = new SendRequest(-1, false, false, true);
-					req.setSendDocs(true);
-					intent.putExtra(SendRequest.SEND_REQUEST_KEY, req);
-					startActivity(intent);
+					new Synchronizer(getActivity()).execute(-1);
 					return true;
 				}
 			});

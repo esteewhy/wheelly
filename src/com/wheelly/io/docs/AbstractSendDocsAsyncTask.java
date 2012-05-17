@@ -21,8 +21,6 @@ import com.google.android.apps.mytracks.io.gdata.GDataClientFactory;
 import com.google.android.apps.mytracks.io.gdata.docs.DocumentsClient;
 import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
 import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
-import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendActivity;
-import com.google.android.apps.mytracks.io.sendtogoogle.AbstractSendAsyncTask;
 import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.wireless.gdata.client.GDataClient;
 import com.google.wireless.gdata.client.HttpException;
@@ -43,12 +41,12 @@ import java.io.IOException;
  *
  * @author Jimmy Shih
  */
-public abstract class AbstractSendDocsAsyncTask<EntityType> extends AbstractSendAsyncTask {
+public abstract class AbstractSendDocsAsyncTask<EntityType> extends ReportingSendAsyncTask {
   private static final int PROGRESS_GET_SPREADSHEET_ID = 0;
-  private static final int PROGRESS_CREATE_SPREADSHEET = 25;
-  private static final int PROGRESS_GET_WORKSHEET_ID = 50;
-  private static final int PROGRESS_ADD_TRACK_INFO = 75;
-  private static final int PROGRESS_COMPLETE = 100;
+  private static final int PROGRESS_CREATE_SPREADSHEET = 5;
+  private static final int PROGRESS_GET_WORKSHEET_ID = 10;
+  protected static final int PROGRESS_ADD_TRACK_INFO = 15;
+  protected static final int PROGRESS_COMPLETE = 100;
 
   private static final String TAG = AbstractSendDocsAsyncTask.class.getSimpleName();
 
@@ -65,12 +63,12 @@ public abstract class AbstractSendDocsAsyncTask<EntityType> extends AbstractSend
   protected String spreadsheetId;
   protected String worksheetId;
 
-  public AbstractSendDocsAsyncTask(AbstractSendActivity activity, long trackId, Account account) {
-    super(activity);
+  public AbstractSendDocsAsyncTask(Context context, long trackId, Account account) {
+    super(context);
     this.trackId = trackId;
     this.account = account;
 
-    context = activity.getApplicationContext();
+    this.context = context;
     gDataClient = GDataClientFactory.getGDataClient(context);
     documentsClient = new DocumentsClient(
         gDataClient, new XmlDocsGDataParserFactory(new AndroidXmlParserFactory()));
