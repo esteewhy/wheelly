@@ -7,7 +7,7 @@ import com.wheelly.app.AndiCarImporter;
 import com.wheelly.app.HeartbeatListFragment;
 import com.wheelly.app.MileageListFragment;
 import com.wheelly.app.RefuelListFragment;
-import com.wheelly.service.Notifier;
+import com.wheelly.service.WorkflowNotifier;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -58,7 +58,7 @@ public class Main extends FragmentActivity {
 		}
 		
 		new AndiCarImporter(this).attemptImporting();
-		new Notifier(this).notifyAboutPendingMileages();
+		new WorkflowNotifier(this).notifyAboutPendingMileages();
 	}
 	
 	@Override
