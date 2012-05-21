@@ -33,7 +33,10 @@ public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
 		try {
 			do {
 				poster.addTrackInfo(track);
-				publishProgress(track.getPosition() * total / (PROGRESS_COMPLETE - PROGRESS_ADD_TRACK_INFO) + PROGRESS_ADD_TRACK_INFO);
+				final int progress = track.getPosition() * (PROGRESS_COMPLETE - PROGRESS_ADD_TRACK_INFO) / total + PROGRESS_ADD_TRACK_INFO;
+				if(0 == progress % 5) {
+					publishProgress(progress);
+				}
 			} while(track.moveToNext());
 		} catch (IOException e) {
 			Log.d(TAG, "Unable to add track info", e);

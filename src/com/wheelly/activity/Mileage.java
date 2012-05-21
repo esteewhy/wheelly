@@ -19,7 +19,7 @@ import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
-import com.wheelly.service.Notifier;
+import com.wheelly.service.WorkflowNotifier;
 import com.wheelly.widget.MileageInput;
 import com.wheelly.content.TrackRepository;
 
@@ -130,7 +130,7 @@ public class Mileage extends FragmentActivity {
 					final long id = new MileageBroker(Mileage.this).updateOrInsert(values);
 					intent.putExtra(BaseColumns._ID, id);
 					
-					final Notifier n = new Notifier(Mileage.this);
+					final WorkflowNotifier n = new WorkflowNotifier(Mileage.this);
 					
 					if(startHeartbeatId < 0 || stopHeartbeatId < 0) {
 						n.notifyAboutPendingMileage(id);
