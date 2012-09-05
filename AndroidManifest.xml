@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		package="com.wheelly"
+		android:versionCode="5"
+		android:versionName="20120412">
+	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="7"/>
+	<supports-screens 
+		android:smallScreens="true"
+		android:normalScreens="true"
+		android:largeScreens="true"
+		android:anyDensity="true"/>
+	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+	<uses-feature android:name="android.hardware.location" android:required="false" />
+	<uses-feature android:name="android.hardware.location.network" android:required="false" />
+	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
+	
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.VIBRATE"/>
+	<uses-permission android:name="com.google.android.apps.mytracks.WRITE_TRACK_DATA" />
+	<uses-permission android:name="com.google.android.apps.mytracks.READ_TRACK_DATA"/>
+	<!-- sync to Google Docs-->
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
+	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
+	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.local" />
+	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.wise" />
+	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.writely" />
+	<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+	
+	<application
+			android:name=".app.WheellyApplication"
+			android:icon="@drawable/icon"
+			android:label="@string/app_name">
+		
+		<uses-library android:name="com.google.android.maps" android:required="false" />
+		
+		<activity
+				android:label="@string/app_name"
+				android:configChanges="orientation|keyboardHidden"
+				android:taskAffinity=".Main"
+				android:name=".activity.Main">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		
+		<activity android:name=".activity.Heartbeat"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
+		<activity android:name=".activity.HeartbeatDialog"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name=".activity.Mileage"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Mileage"
+			android:launchMode="singleTop" />
+		
+		<activity android:name=".activity.Refuel"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Refuel"
+			android:launchMode="singleTop" />
+		<activity android:name=".widget.QuickMultiNumberInput"
+			android:label="@string/amount"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	="ru.orangesoftwar.financisto.activity.DateFilterActivity"
+			android:label	="@string/filter"
+			android:theme	="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity
+			android:name	=".activity.Preferences"
+			android:label	="@string/preferences" />
+		
+		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
+			android:label="@string/amount"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
+			android:label="@string/calculator"
+			android:theme="@android:style/Theme.Dialog"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.DateFilterActivity"
+			android:label="@string/filter"
+			android:theme="@android:style/Theme.Dialog"
+			android:configChanges="orientation|keyboardHidden"
+			android:launchMode="singleTop" />
+		
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity"
+			android:label="@string/location"
+			android:launchMode="singleTop" />
+		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
+			android:label="@string/locations"
+			android:launchMode="singleTop" />
+		<activity android:name=".io.docs.SyncDocsActivity"
+			android:launchMode="singleTop"/>
+		
+		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.AccountChooserActivity" />
+		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.UploadResultActivity" />
+		<activity android:name="com.google.android.apps.mytracks.io.docs.SendDocsActivity" />
+		
+		<provider
+			android:authorities="com.wheelly"
+			android:multiprocess="true"
+			android:name=".content.ChronologyProvider" />
+		
+		<provider android:label="Unified event stream"
+			android:name=".content.EventContentProvider"
+			android:authorities="com.wheelly.provider.events" />
+		
+		<receiver android:name=".activity.Widget"
+			 android:label="Wheelly Car Status" >
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+				<action android:name="com.wheelly.UPDATE_WIDGET" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider"
+				android:resource="@xml/widget_2x1" />
+		</receiver>
+	</application>
+</manifest> 

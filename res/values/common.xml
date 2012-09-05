@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wheelly</string>
+	<!-- GDocs sync status -->
+	<color name="sync_succeeded">#39b54a</color>
+	<color name="sync_conflict">#f26522</color>
+	<color name="sync_outdated">#FFD800</color>
+	<color name="sync_unknown">#444</color>
+	
+	<color name="positive_amount">#39b54a</color>
+	<color name="negative_amount">#f26522</color>
+	<color name="fuel">#ff0094FF</color>
+</resources>

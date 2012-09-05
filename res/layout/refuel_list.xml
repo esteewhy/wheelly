@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/refuels"
+	xmlns:android			="http://schemas.android.com/apk/res/android"
+	android:layout_height	="fill_parent"
+	android:layout_width	="fill_parent"
+	android:orientation		="vertical">
+	
+	<fragment class="com.wheelly.app.ListContentFragment"
+		android:layout_weight	="1" 
+		android:layout_width	="fill_parent"
+		android:layout_height	="0dip" />
+	
+	<include layout="@layout/status_bar"/>
+</LinearLayout>
