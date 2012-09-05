@@ -27,13 +27,13 @@ public class ProgressNotifier extends Notifier {
 			? new NotificationCompat.Builder(context)
 				.setSmallIcon(R.drawable.icon_small)
 				//.setContentTitle("Synchronizing")
-				.setContentIntent(PendingIntent.getService(context, 0, new Intent(context, Main.class), 0))
 				.setContent(new RemoteViews(context.getApplicationContext().getPackageName(), R.layout.notification_progress))
 				.getNotification()
 			: new NotificationCompat.Builder(context)
 				.setSmallIcon(R.drawable.icon_small)
 				.getNotification();
 		
+		notification.contentIntent = PendingIntent.getService(context, 0, new Intent(context, Main.class), 0); 
 		nm.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notification);
 		notification.flags = Notification.FLAG_ONGOING_EVENT | Notification.FLAG_ONLY_ALERT_ONCE;
 	}

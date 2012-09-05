@@ -98,7 +98,7 @@ public class Synchronizer {
 	private int getPreferredAccountIndex() {
 		String preferredAccount = PreferencesUtils.getString(activity,
 			R.string.preferred_account_key,
-			PreferencesUtils.PREFERRED_ACCOUNT_DEFAULT);
+			PreferencesUtils.GOOGLE_ACCOUNT_DEFAULT);
 
 		for (int i = 0; i < accounts.length; i++) {
 			if (accounts[i].name.equals(preferredAccount)) {

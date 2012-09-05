@@ -119,7 +119,7 @@ public class TripControlBar extends Fragment {
 							"h." + BaseColumns._ID,
 							"odometer",
 							"fuel",
-							"_created"
+							"h._created"
 						},
 						Heartbeats.IconColumnExpression + " = 0",
 						null,

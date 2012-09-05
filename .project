@@ -85,24 +85,6 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334044974556</id>
-			<name>MyTracks_src/com/dsi/ant</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1334044991612</id>
-			<name>MyTracks_src/com/dsi/ant/exception</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
 			<id>1334045115661</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks</name>
 			<type>5</type>
@@ -211,12 +193,12 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1337261371717</id>
+			<id>1346344674663</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/sendtogoogle</name>
 			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-true-(U|SendRequest|A).*</arguments>
+				<arguments>1.0-name-matches-false-true-(U|SendRequest|A|Confirm).*</arguments>
 			</matcher>
 		</filter>
 		<filter>

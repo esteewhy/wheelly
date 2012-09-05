@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.util.Log;
 import android.util.Pair;
 import api.wireless.gdata.spreadsheets.data.ListEntry;
 import api.wireless.gdata.spreadsheets.parser.xml.XmlSpreadsheetsGDataParserFactory;
@@ -80,7 +81,8 @@ public class SpreadsheetPoster {
 			// so re-iterating..
 			syncRow(track, new Pair<String, String>(null, null));
 		} else {
-			throw new IOException("Something bad..");
+			Log.e("GDocs", "Newly created record doesn't match original");
+			//throw new IOException("Something bad..");
 		}
 	}
 	
