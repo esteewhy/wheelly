@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
+import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,7 +52,7 @@ public class MileageListFragment extends ConfigurableListFragment {
 								v.setText(com.wheelly.util.DateUtils.formatVarying(text));
 								break;
 							case R.id.mileage:
-								v.setText("+".concat(Integer.toString((int)Math.ceil(Float.parseFloat(text)))));
+								v.setText("+".concat(Integer.toString((int)FloatMath.ceil(Float.parseFloat(text)))));
 								break;
 							case R.id.indicator:
 								final int status = Integer.parseInt(text);

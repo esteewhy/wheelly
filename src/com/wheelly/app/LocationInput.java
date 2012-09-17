@@ -152,11 +152,11 @@ public final class LocationInput extends Fragment {
 			final Location mLocation = lm.getLastKnownLocation(provider);
 			
 			if(null!= mLocation) {
-				Toast.makeText(getActivity(), "Obtained location", 5).show();
+				Toast.makeText(getActivity(), "Obtained location", Toast.LENGTH_LONG).show();
 				long locationId = resolveLocation(mLocation);
 				
 				if(locationId > 0) {
-					Toast.makeText(getActivity(), "Resolved location id: " + locationId, 5).show();
+					Toast.makeText(getActivity(), "Resolved location id: " + locationId, Toast.LENGTH_LONG).show();
 					setValue(locationId);
 					return true;
 				}

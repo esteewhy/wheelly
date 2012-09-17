@@ -52,5 +52,5 @@
 		android:textSize="15dip"
 		android:textScaleX="1.1"
 		/>
-	></LinearLayout>
+	</LinearLayout>
 </RelativeLayout>
