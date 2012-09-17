@@ -12,7 +12,6 @@ import com.google.android.apps.mytracks.services.ITrackRecordingService;
 import com.wheelly.R;
 
 public class Tracker {
-	
 	final Intent serviceIntent;
 	final Context context;
 	
@@ -50,7 +49,7 @@ public class Tracker {
 	}
 	
 	public boolean Start() {
-		ComponentName name = context.startService(serviceIntent);
+		final ComponentName name = context.startService(serviceIntent);
 		
 		if(null != name) {
 			return context.bindService(serviceIntent, new ServiceConnection() {
@@ -61,25 +60,27 @@ public class Tracker {
 				@Override
 				public void onServiceConnected(ComponentName name, IBinder service) {
 					synchronized (Tracker.this) {
-						if(null != listener) {
-							try {
-								final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
-								long trackId = svc.startNewTrack();
-								
-								//TODO investigate why the latter returns 0
-								if(0 == trackId) {
-									trackId = svc.getRecordingTrackId();
-								}
-								
-								listener.onStartTrack(trackId);
-							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+						try {
+							final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
+							long trackId = svc.startNewTrack();
+							
+							//TODO investigate why the latter returns 0
+							if(trackId <= 0) {
+								trackId = svc.getRecordingTrackId();
 							}
+							
+							if(null != listener) {
+								listener.onStartTrack(trackId);
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} finally {
+							context.unbindService(this);
 						}
 					}
 				}
-			}, Activity.BIND_AUTO_CREATE);
+			}, 0/*Activity.BIND_AUTO_CREATE*/);
 		}
 		
 		return false;
@@ -94,19 +95,23 @@ public class Tracker {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				synchronized (Tracker.this) {
-					if(listener != null) {
-						try {
-							final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
-							if(svc.getRecordingTrackId() == trackId) {
-								svc.endCurrentTrack();
-								listener.onTrackStopped();
-							}
-							context.unbindService(this);
-							context.stopService(serviceIntent);
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+					try {
+						final ITrackRecordingService svc = ITrackRecordingService.Stub.asInterface(service);
+						if(svc.getRecordingTrackId() > 0 && svc.isRecording()) {
+							svc.endCurrentTrack();
 						}
+						
+						if(listener != null) {
+							listener.onTrackStopped();
+						}
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch(IllegalStateException e) {
+						e.printStackTrace();
+					} finally {
+						context.unbindService(this);
+						context.stopService(serviceIntent);
 					}
 				}
 			}

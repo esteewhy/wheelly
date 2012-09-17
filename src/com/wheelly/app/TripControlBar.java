@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
+import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -208,9 +209,9 @@ public class TripControlBar extends Fragment {
 	 * Calculate final mileage in case track length is known.
 	 */
 	private void presetStopMileage(Value val) {
-		float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
-		
 		if(val.StartHeartbeat != null) {
+			float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
+			
 			// On new mileage there might be no stop heartbeat until after [stop]
 			// button been clicked and heartbeat form submitted,
 			// so we have to create default heartbeat values in advance
@@ -221,7 +222,7 @@ public class TripControlBar extends Fragment {
 			
 			val.StopHeartbeat.put("odometer",
 				val.StartHeartbeat.getAsLong("odometer")
-				+ (long)Math.ceil(distance));
+				+ (long)FloatMath.ceil(distance));
 		}
 	}
 	
