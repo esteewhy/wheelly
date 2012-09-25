@@ -2965,4 +2965,11 @@ limitations under the License.
     translation_description="The title of the welcome dialog.">
     Welcome to My Tracks
   </string>
+    <string name="value_integer_kilometer"
+    translation_description="In a setting picker, the string format to display an integer value in
+      kilometers (km).
+
+      %1$d: an integer value. E.g., '2'">
+    %1$d km
+  </string>
 </resources>
