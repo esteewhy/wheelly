@@ -7,7 +7,7 @@ import com.wheelly.activity.HeartbeatDialog;
 import com.wheelly.content.TrackRepository;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.HeartbeatBroker;
-import com.wheelly.service.Tracker;
+import com.wheelly.service.MyTracksTracker;
 import com.wheelly.service.Tracker.TrackListener;
 import com.wheelly.util.DateUtils;
 
@@ -187,7 +187,7 @@ public class TripControlBar extends Fragment {
 		
 		if(val.TrackId < 0) {
 			val.TrackId = val.TrackId * -1;
-			new Tracker(getActivity())
+			new MyTracksTracker(getActivity())
 				.setStartTrackListener(new TrackListener() {
 					@Override
 					public void onTrackStopped() {
@@ -229,7 +229,7 @@ public class TripControlBar extends Fragment {
 	private void start(final View v) {
 		final Value val = getValue();
 		
-		if(new Tracker(getActivity())
+		if(new MyTracksTracker(getActivity())
 			.setStartTrackListener(new TrackListener() {
 				@Override
 				public void onStartTrack(long trackId) {
@@ -351,7 +351,7 @@ public class TripControlBar extends Fragment {
 		this.canStartTracking = startId > 0
 			&& value.TrackId == 0
 			&& stopId <= 0
-			&& new Tracker(getActivity()).checkAvailability();
+			&& new MyTracksTracker(getActivity()).checkAvailability();
 		
 		// Store temp values into controls.
 		initButton(c.StartButton, startId,  value.StartHeartbeat,

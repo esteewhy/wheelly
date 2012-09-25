@@ -24,7 +24,7 @@ import com.wheelly.R;
 import com.wheelly.activity.Mileage;
 import com.wheelly.app.InfoDialogFragment.Options;
 import com.wheelly.db.DatabaseSchema.Mileages;
-import com.wheelly.service.Tracker;
+import com.wheelly.service.MyTracksTracker;
 import com.wheelly.service.WorkflowNotifier;
 
 public class MileageListFragment extends ConfigurableListFragment {
@@ -131,7 +131,7 @@ public class MileageListFragment extends ConfigurableListFragment {
 		suggestInstall =
 			null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
 				? savedInstanceState.getBoolean("suggestInstall")
-				: !new Tracker(context).checkAvailability();
+				: !new MyTracksTracker(context).checkAvailability();
 		
 		if(suggestInstall) {
 			Toast.makeText(context, R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
