@@ -16,13 +16,14 @@
 	android:minHeight="40dp"
 	android:minWidth="120dp"
 	android:id="@+id/layout">
-
+	
 	<ImageView android:id="@+id/wheelly_icon"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:src="@drawable/icon"
 		android:layout_marginRight="3dp"/>
-		<ProgressBar android:id		="@+id/fuel_gauge"
+	
+	<ProgressBar android:id		="@+id/fuel_gauge"
 		android:max				="60"
 		android:layout_width	="fill_parent"
 		android:progress		="40"
@@ -31,7 +32,7 @@
 		android:layout_toRightOf="@id/wheelly_icon"
 		android:layout_alignParentRight="true"
 		android:layout_alignParentTop="true" />
-	
+	
 	<LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
@@ -40,7 +41,7 @@
 	    android:layout_centerInParent="true"
 	    android:layout_toRightOf="@id/wheelly_icon"
 	    android:gravity="center" >
- 
+	
 	<TextView
 		android:id="@+id/odometer"
 		android:layout_width="wrap_content"
