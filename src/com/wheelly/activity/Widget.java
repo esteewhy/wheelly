@@ -15,7 +15,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.*;
 import android.widget.RemoteViews;
-import ru.orangesoftware.financisto.R;
+import com.wheelly.R;
 import java.util.ArrayList;
 import java.util.List;
 
