@@ -2972,4 +2972,13 @@ limitations under the License.
       %1$d: an integer value. E.g., '2'">
     %1$d km
   </string>
+  	  <string name="unit_minute_per_kilometer"
+    translation_description="Abbreviation for minutes per kilometer. E.g., '5 min/km'.">
+    min/km
+  </string>
+  <string name="unit_minute_per_mile"
+    translation_description="Abbreviation for minutes per mile. E.g., '5 min/mi'.">
+    min/mi
+  </string>
+	  
 </resources>

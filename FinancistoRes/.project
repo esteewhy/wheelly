@@ -165,12 +165,12 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1334832754917</id>
+			<id>1366663375434</id>
 			<name>Financisto_src/ru/orangesoftware/financisto/utils</name>
 			<type>5</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-true-(Address|Date|Thumb).*</arguments>
+				<arguments>1.0-name-matches-false-true-(Address|Date|Thumb|Localizable).*</arguments>
 			</matcher>
 		</filter>
 		<filter>

@@ -203,8 +203,8 @@ public final class R {
         public static int backup_to_sd_key=0x7f050054;
         public static int bluetooth_pairing_key=0x7f050031;
         public static int bluetooth_sensor_key=0x7f050032;
-        /**  Permissions 
- This must be kept in sync with AndroidManifest.xml (we can't reference it there) 
+        /**  Do not translate 
+ Permissions, need to be in sync with the permissions in AndroidManifest.xml 
          */
         public static int broadcast_notifications_permission=0x7f050001;
         /**  Chart Settings 
@@ -323,6 +323,8 @@ public final class R {
         public static int import_no_file=0x7f0500fb;
         public static int import_progress_message=0x7f0500fc;
         public static int import_success=0x7f0500fd;
+        /**  Do not translate 
+         */
         public static int lib_name=0x7f050000;
         /**  Maps List 
          */
@@ -400,7 +402,7 @@ public final class R {
         public static int my_tracks_recording_service_name=0x7f050016;
         public static int my_tracks_support_url=0x7f050017;
         public static int my_tracks_web_url=0x7f050018;
-        /**  My Tracks service constants 
+        /**  My Tracks service 
          */
         public static int mytracks_service_class=0x7f05000a;
         public static int mytracks_service_package=0x7f05000b;
@@ -648,23 +650,21 @@ public final class R {
         public static int track_edit_activity_type_hint=0x7f0501e2;
         public static int track_edit_new_track_title=0x7f0501e3;
         public static int track_icon_description=0x7f0501e0;
-        /**  Next API refactor depricate track_id_broadcast_extra and rename it to remove the broadcast as it is used when SHARING tracks as 
+        /**  Broadcast 
          */
-        public static int track_id_broadcast_extra=0x7f050009;
+        public static int track_id_broadcast_extra=0x7f050004;
         public static int track_list_delete_all_confirm_message=0x7f0501e4;
         public static int track_list_empty_message=0x7f0501e5;
         public static int track_list_record_error=0x7f0501e6;
         public static int track_list_record_success=0x7f0501e7;
         public static int track_name_format=0x7f0501e8;
         public static int track_name_key=0x7f050052;
-        /**  Broadcast notification Intent constants 
-         */
-        public static int track_paused_broadcast_action=0x7f050004;
+        public static int track_paused_broadcast_action=0x7f050005;
         public static int track_record_notification=0x7f0501e9;
-        public static int track_resumed_broadcast_action=0x7f050005;
-        public static int track_started_broadcast_action=0x7f050006;
-        public static int track_stopped_broadcast_action=0x7f050007;
-        public static int track_update_broadcast_action=0x7f050008;
+        public static int track_resumed_broadcast_action=0x7f050006;
+        public static int track_started_broadcast_action=0x7f050007;
+        public static int track_stopped_broadcast_action=0x7f050008;
+        public static int track_update_broadcast_action=0x7f050009;
         /**  Unit 
          */
         public static int unit_feet=0x7f0501ea;
@@ -675,6 +675,8 @@ public final class R {
         public static int unit_mile=0x7f0501ef;
         public static int unit_mile_per_hour=0x7f0501f0;
         public static int unit_minute=0x7f0501f1;
+        public static int unit_minute_per_kilometer=0x7f050271;
+        public static int unit_minute_per_mile=0x7f050272;
         /**  Value 
          */
         public static int value_adapt_accuracy=0x7f0501f2;

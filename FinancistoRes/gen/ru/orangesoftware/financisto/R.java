@@ -589,11 +589,14 @@ public final class R {
         public static int payment_day_hint=0x7f0701e7;
         public static int pending=0x7f0701d3;
         public static int period=0x7f070030;
+        public static int period_custom=0x7f070286;
         public static int period_from=0x7f070031;
         public static int period_last_month=0x7f07009e;
         public static int period_last_week=0x7f07009d;
         public static int period_not_set=0x7f070093;
         public static int period_recur=0x7f070033;
+        public static int period_this_and_last_month=0x7f070285;
+        public static int period_this_and_last_week=0x7f070284;
         public static int period_this_month=0x7f07009c;
         public static int period_this_week=0x7f07009b;
         public static int period_to=0x7f070032;

@@ -31,6 +31,9 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+import static ru.orangesoftware.financisto.utils.DateUtils.is24HourFormat;
+import static ru.orangesoftware.financisto.utils.EnumUtils.createSpinnerAdapter;
+
 public class DateFilterActivity extends Activity {
 	
 	public static final String EXTRA_FILTER_PERIOD_TYPE = "filter_period_type";
@@ -56,31 +59,17 @@ public class DateFilterActivity extends Activity {
 		df = DateUtils.getShortDateFormat(this);
 		
 		spinnerPeriodType = (Spinner)findViewById(R.id.period);
+        final PeriodType[] periods = PeriodType.values();
+        spinnerPeriodType.setAdapter(createSpinnerAdapter(this, periods));
 		spinnerPeriodType.setOnItemSelectedListener(new OnItemSelectedListener(){
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				switch(position) {
-				case 0:
-					selectToday();
-					break;
-				case 1:
-					selectYesterday();
-					break;
-				case 2:
-					selectThisWeek();
-					break;
-				case 3:
-					selectThisMonth();
-					break;
-				case 4:
-					selectLastWeek();
-					break;
-				case 5:
-					selectLastMonth();
-					break;
-				default:
-					selectCustom();
-				}
+                PeriodType period = periods[position];
+                if (period == PeriodType.CUSTOM) {
+                    selectCustom();
+                } else {
+                    selectPeriod(period);
+                }
 			}
 
 			@Override
@@ -158,15 +147,9 @@ public class DateFilterActivity extends Activity {
 		}		
 	}
 	
-	public static int selectPeriodType(String s) {
-		PeriodType[] periods = PeriodType.values(); 
-		for (PeriodType p : periods) {
-			if (p.name().equals(s)) {
-				return p.ordinal();
-			}
-		}
-		return -1;
-	}		
+	private void selectPeriod(Period p) {
+		spinnerPeriodType.setSelection(p.type.ordinal());
+	}
 
 	private void selectPeriod(long from, long to) {
 		cFrom.setTimeInMillis(from);
@@ -209,6 +192,7 @@ public class DateFilterActivity extends Activity {
 		TimePicker tp = (TimePicker)dialog.findViewById(R.id.time);
 		tp.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
 		tp.setCurrentMinute(c.get(Calendar.MINUTE));
+        tp.setIs24HourView(is24HourFormat(this));
 		tp.setIs24HourView(true);
 	}
 
@@ -244,35 +228,10 @@ public class DateFilterActivity extends Activity {
 		buttonPeriodTo.setText(df.format(cTo.getTime()));
 	}
 
-	protected void selectToday() {
-		disableButtons();
-		updateDate(DateUtils.today());
-	}
-
-	protected void selectYesterday() {
-		disableButtons();
-		updateDate(DateUtils.yesterday());
-	}
-
-	protected void selectThisWeek() {
-		disableButtons();
-		updateDate(DateUtils.thisWeek());
-	}
-
-	protected void selectThisMonth() {
-		disableButtons();
-		updateDate(DateUtils.thisMonth());
-	}
-
-	protected void selectLastWeek() {
-		disableButtons();
-		updateDate(DateUtils.lastWeek());
-	}
-
-	protected void selectLastMonth() {
-		disableButtons();
-		updateDate(DateUtils.lastMonth());
-	}
+    private void selectPeriod(PeriodType periodType) {
+        disableButtons();
+        updateDate(periodType.calculatePeriod());
+    }
 
 	protected void selectCustom() {
 		updateDate();
