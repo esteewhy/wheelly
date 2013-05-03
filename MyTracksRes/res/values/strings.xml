@@ -2980,5 +2980,18 @@ limitations under the License.
     translation_description="Abbreviation for minutes per mile. E.g., '5 min/mi'.">
     min/mi
   </string>
-	  
+  <string name="permission_request_message"
+    translation_description="The message when requesting permission.
+      %1$s account name. E.g., 'foo@foo.com'.">
+    for account %1$s
+  </string>
+  <string name="permission_request_title"
+    translation_description="The title when requesting permission.">
+    Request permission
+  </string>
+    <string name="send_google_no_account_permission"
+    translation_description="When sending to Google, the message when not able to get account
+      permission.">
+    Not able to get account permission. Make sure network is available.
+  </string>
 </resources>

@@ -15,7 +15,8 @@
  */
 package com.wheelly.io.docs;
 
-import com.google.android.apps.mytracks.util.StringUtils;
+import com.google.gdata.data.spreadsheet.ListEntry;
+
 import android.database.Cursor;
 
 /**
@@ -26,65 +27,38 @@ import android.database.Cursor;
  * @author Matthew Simmons
  */
 public class DocsHelper {
-  /**
-   * Gets the row content containing the track's info.
-   */
-  static String getRowContent(Cursor track, String entityId) {
-    StringBuilder builder = new StringBuilder().append("<entry xmlns='http://www.w3.org/2005/Atom' "
-        + "xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>");
-    
-    if(null != entityId) {
-    	appendGenericTag(builder, "id", entityId);
-    }
-    
+  
+  static void assignEntityFromCursor(Cursor track, ListEntry row, String entityId)
+  {
+    row.setId(entityId);
+    assignEntityFromCursor(track, row);
+  }
+  
+  static void assignEntityFromCursor(Cursor track, ListEntry row)
+  {
     final String type = iconFlagsToTypeString(track.getInt(track.getColumnIndexOrThrow("icons")));
-    appendTag(builder, "type", type);
-    appendTag(builder, "date", track.getString(track.getColumnIndexOrThrow("_created")));
+    row.getCustomElements().setValueLocal("type", type);
+    row.getCustomElements().setValueLocal("date", track.getString(track.getColumnIndexOrThrow("_created")));
     final String location = track.getString(track.getColumnIndexOrThrow("place"));
     if(null != location) {
-    	appendTag(builder, "location", location);
+      row.getCustomElements().setValueLocal("location", location);
     }
-    appendTag(builder, "fuel", Long.toString(track.getLong(track.getColumnIndexOrThrow("fuel"))));
-    appendTag(builder, "odometer", Float.toString(track.getFloat(track.getColumnIndexOrThrow("odometer"))));
+    row.getCustomElements().setValueLocal("fuel", Long.toString(track.getLong(track.getColumnIndexOrThrow("fuel"))));
+    row.getCustomElements().setValueLocal("odometer", Float.toString(track.getFloat(track.getColumnIndexOrThrow("odometer"))));
     
     if("STOP".equals(type)) {
-    	appendTag(builder, "distance", Float.toString(track.getFloat(track.getColumnIndex("distance"))));
-    	appendTag(builder, "destination", track.getString(track.getColumnIndex("destination")));
+      row.getCustomElements().setValueLocal("distance", Float.toString(track.getFloat(track.getColumnIndex("distance"))));
+      row.getCustomElements().setValueLocal("destination", track.getString(track.getColumnIndex("destination")));
     }
     
     if("REFUEL".equals(type)) {
-    	appendTag(builder, "fuel", Float.toString(track.getFloat(track.getColumnIndex("fuel"))));
-    	appendTag(builder, "amount", Float.toString(track.getFloat(track.getColumnIndex("amount"))));
-    	appendTag(builder, "cost", Float.toString(track.getFloat(track.getColumnIndex("cost"))));
-    	appendTag(builder, "transaction", Float.toString(track.getFloat(track.getColumnIndex("transaction_id"))));
+      row.getCustomElements().setValueLocal("fuel", Float.toString(track.getFloat(track.getColumnIndex("fuel"))));
+      row.getCustomElements().setValueLocal("amount", Float.toString(track.getFloat(track.getColumnIndex("amount"))));
+      row.getCustomElements().setValueLocal("cost", Float.toString(track.getFloat(track.getColumnIndex("cost"))));
+      row.getCustomElements().setValueLocal("transaction", Float.toString(track.getFloat(track.getColumnIndex("transaction_id"))));
     }
-    
-    builder.append("</entry>");
-    return builder.toString();
   }
-
-  /**
-   * Appends a name-value pair as a gsx tag to a string builder.
-   *
-   * @param stringBuilder the string builder
-   * @param name the name
-   * @param value the value
-   */
-  static void appendTag(StringBuilder stringBuilder, String name, String value) {
-      appendGenericTag(stringBuilder, "gsx:" + name, StringUtils.formatCData(value));
-  }
-  
-  static void appendGenericTag(StringBuilder stringBuilder, String name, String value) {
-	  stringBuilder
-	  	.append("<")
-	  	.append(name)
-	  	.append(">")
-	  	.append(value)
-	  	.append("</")
-	  	.append(name)
-	  	.append(">");
-  }
-  
+	
   public static String iconFlagsToTypeString(int flags) {
     return
       (flags & 1) != 0

@@ -1,34 +1,42 @@
 package com.wheelly.io.docs;
 
 import java.io.IOException;
+import java.net.URL;
 
 import android.accounts.Account;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.gdata.client.spreadsheet.SpreadsheetService;
+import com.google.gdata.util.ServiceException;
 import com.google.wireless.gdata.client.HttpException;
 import com.wheelly.content.WheellyProviderUtils;
 
-public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
-
-	private static final String TAG = SendDocsAsyncTask.class.getSimpleName();
+/**
+ * Comparing to MyTracks implementation, most of the low-level functionality
+ * of spreadhseet maangement workflow moved to a base class, so that only
+ * spreadhseet content presistence logic remains here.
+ */
+public class SendSpreadsheetsAsyncTask extends AbstractSendAsyncTask<Cursor> {
+	private static final String TAG = SendSpreadsheetsAsyncTask.class.getSimpleName();
+	
 	protected final WheellyProviderUtils myTracksProviderUtils;
 	
-	public SendDocsAsyncTask(Context context, long trackId, Account account) {
+	public SendSpreadsheetsAsyncTask(Context context, long trackId, Account account) {
 		super(context, trackId, account);
 		
 		myTracksProviderUtils = new WheellyProviderUtils(context);
 	}
 	
 	@Override
-	protected boolean addTrackInfo(Cursor track) {
+	protected boolean addTrackInfo(SpreadsheetService spreadsheetService, URL worksheetUrl, Cursor track) {
 		if (isCancelled() || !track.moveToFirst()) {
 			return false;
 		}
 		
-		final String worksheetUri = String.format(SendDocsUtils.GET_WORKSHEET_URI, spreadsheetId, worksheetId);
-		final SpreadsheetPoster poster = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken);
+		final SpreadsheetPoster poster = new SpreadsheetPoster(context, worksheetUrl, spreadsheetService);
 		final int total = track.getCount();
 		try {
 			do {
@@ -41,7 +49,7 @@ public class SendDocsAsyncTask extends AbstractSendDocsAsyncTask<Cursor> {
 		} catch (IOException e) {
 			Log.d(TAG, "Unable to add track info", e);
 			return false;
-		} catch (HttpException e) {
+		} catch (ServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;

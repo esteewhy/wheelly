@@ -1,19 +1,22 @@
 package com.wheelly.io.docs;
 
 import java.io.IOException;
+import java.net.URL;
 
 import android.accounts.Account;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import api.wireless.gdata.spreadsheets.data.ListEntry;
 
+import com.google.gdata.client.spreadsheet.SpreadsheetService;
+import com.google.gdata.data.spreadsheet.ListEntry;
+import com.google.gdata.util.ServiceException;
 import com.wheelly.content.WheellyProviderUtils;
 
 /**
  * @author tstrypko
  */
-public class SyncDocsAsyncTask extends SendDocsAsyncTask {
+public class SyncDocsAsyncTask extends SendSpreadsheetsAsyncTask {
 	
 	public SyncDocsAsyncTask(Context context, long trackId, Account account) {
 		super(context, trackId, account);
@@ -32,21 +35,34 @@ public class SyncDocsAsyncTask extends SendDocsAsyncTask {
 	}
 	
 	@Override
-	protected boolean addTrackInfo(Cursor track) {
+	protected boolean addTrackInfo(
+			SpreadsheetService spreadsheetService,
+			URL worksheetUrl,
+			Cursor track) {
 		try {
-			return super.addTrackInfo(MatrixCursor.class == track.getClass() ? resolveRealEntity() : track);
+			return super.addTrackInfo(
+				spreadsheetService,
+				worksheetUrl,
+				MatrixCursor.class == track.getClass()
+					? resolveRealEntity(worksheetUrl, spreadsheetService)
+					: track
+			);
 		} catch (IOException e) {
+			return false;
+		} catch (ServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return false;
 		}
 	}
 	
-	private Cursor resolveRealEntity() throws IOException {
-		final String worksheetUri = String.format(SendDocsUtils.GET_WORKSHEET_URI, spreadsheetId, worksheetId);
-		ListEntry entry = new SpreadsheetPoster(context, worksheetUri, spreadsheetsAuthToken).getLatestRow();
+	private Cursor resolveRealEntity(URL worksheetUrl, SpreadsheetService spreadsheetService)
+			throws IOException, ServiceException {
+		ListEntry entry = new SpreadsheetPoster(context, worksheetUrl, spreadsheetService).getLatestRow();
 		
 		WheellyProviderUtils provider = new WheellyProviderUtils(this.context); 
 		return null != entry
-			? provider.getLatestRecords(entry.getValue("date"))
+			? provider.getLatestRecords(entry.getCustomElements().getValue("date"))
 			: provider.getSyncCursor(-1);
 	}
 }

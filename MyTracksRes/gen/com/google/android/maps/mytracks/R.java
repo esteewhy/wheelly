@@ -413,6 +413,8 @@ public final class R {
         public static int permission_notification_value=0x7f050019;
         public static int permission_read_description=0x7f050136;
         public static int permission_read_label=0x7f050137;
+        public static int permission_request_message=0x7f050273;
+        public static int permission_request_title=0x7f050274;
         public static int permission_write_description=0x7f050138;
         public static int permission_write_label=0x7f050139;
         public static int pick_existing_map_key=0x7f05003a;
@@ -465,6 +467,7 @@ public final class R {
         public static int send_google_maps_url=0x7f05001c;
         public static int send_google_new_map=0x7f050154;
         public static int send_google_no_account_message=0x7f050155;
+        public static int send_google_no_account_permission=0x7f050275;
         public static int send_google_no_account_title=0x7f050156;
         public static int send_google_no_service_selected=0x7f050157;
         public static int send_google_progress_message=0x7f050158;

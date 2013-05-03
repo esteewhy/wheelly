@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.wheelly"
-		android:versionCode="5"
-		android:versionName="20120412">
+		android:versionCode="6"
+		android:versionName="20130503">
 	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="7"/>
 	<supports-screens 
 		android:smallScreens="true"
@@ -34,6 +34,7 @@
 	<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 	
 	<application
+			android:allowBackup="true"
 			android:name=".app.WheellyApplication"
 			android:icon="@drawable/icon"
 			android:label="@string/app_name">
@@ -77,7 +78,7 @@
 			android:launchMode="singleTop" />
 		
 		<activity
-			android:name	="ru.orangesoftwar.financisto.activity.DateFilterActivity"
+			android:name	="ru.orangesoftware.financisto.activity.DateFilterActivity"
 			android:label	="@string/filter"
 			android:theme	="@android:style/Theme.Dialog"
 			android:configChanges="orientation|keyboardHidden"
@@ -95,12 +96,6 @@
 		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
 			android:label="@string/calculator"
 			android:theme="@android:style/Theme.Dialog"
-			android:launchMode="singleTop" />
-		
-		<activity android:name="ru.orangesoftware.financisto.activity.DateFilterActivity"
-			android:label="@string/filter"
-			android:theme="@android:style/Theme.Dialog"
-			android:configChanges="orientation|keyboardHidden"
 			android:launchMode="singleTop" />
 		
 		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity"

@@ -27,9 +27,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
+import com.google.android.apps.mytracks.io.sendtogoogle.PermissionCallback;
+import com.google.android.apps.mytracks.io.sendtogoogle.SendToGoogleUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
 import com.wheelly.activity.NoAccountsDialog;
@@ -37,44 +39,49 @@ import com.wheelly.activity.SelectDialog;
 import com.wheelly.io.docs.ReportingSendAsyncTask;
 import com.wheelly.io.docs.SyncDocsAsyncTask;
 
-/**
- * A chooser to select an account.
- *
- * @author Jimmy Shih
- */
 public class Synchronizer {
-	private static final String TAG = Synchronizer.class.getSimpleName();
-	private Account[] accounts;
 	private final FragmentActivity activity;
 	
 	public Synchronizer(FragmentActivity activity) {
 		this.activity = activity; 
 	}
 	
+	private void checkPermission(final Account account, final long id)
+	{
+		final PermissionCallback spreadsheetsCallback = new PermissionCallback() {
+			@Override
+			public void onSuccess() {
+				ReportingSendAsyncTask asyncTask = new SyncDocsAsyncTask(activity, id, account);
+				asyncTask.execute();
+			}
+			
+			@Override
+			public void onFailure() {
+				handleNoAccountPermission();
+			}
+		};
+		
+		SendToGoogleUtils.checkPermissionByActivity(activity, account.name,
+		          SendToGoogleUtils.SPREADSHEET_SCOPE,
+		          SendToGoogleUtils.SPREADSHEET_PERMISSION_REQUEST_CODE, spreadsheetsCallback);
+	}
+	
 	public void execute(final long id) {
-		accounts = AccountManager.get(activity).getAccountsByType(Constants.ACCOUNT_TYPE);
+		final Account[] accounts = AccountManager.get(activity).getAccountsByType(Constants.ACCOUNT_TYPE);
 		
 		if(0 == accounts.length) {
 			new NoAccountsDialog().show(activity.getSupportFragmentManager(), "no_accounts");
 			return;
 		}
 		
-		final ConditionalCallback<Account> syncTask = new ConditionalCallback<Account>() {
-			@Override
-			public void onSuccess(Account item) {
-				ReportingSendAsyncTask asyncTask = new SyncDocsAsyncTask(activity, id, item);
-				asyncTask.execute();
-
-			}
-		};
-		
 		if(1 == accounts.length) {
-			getPermission(SpreadsheetsClient.SERVICE, true, accounts[0], syncTask);
+			setPreferredAccountName(accounts[0].name);
+			checkPermission(accounts[0], id);
 		} else {
-			final int selectedAccountIndex = getPreferredAccountIndex();
+			final int selectedAccountIndex = getPreferredAccountIndex(accounts);
 			
 			if(selectedAccountIndex >= 0) {
-				getPermission(SpreadsheetsClient.SERVICE, true, accounts[selectedAccountIndex], syncTask);
+				checkPermission(accounts[selectedAccountIndex], id);
 			} else {
 				new SelectDialog<Account>(accounts,
 						selectedAccountIndex,
@@ -88,14 +95,14 @@ public class Synchronizer {
 						@Override
 						public void onSelect(DialogInterface dialog, int which, Account account) {
 							setPreferredAccountName(account.name);
-							getPermission(SpreadsheetsClient.SERVICE, true, account, syncTask);
+							checkPermission(account, id);
 						}
 					}).show(activity.getSupportFragmentManager(), "select");
 			}
 		}
 	}
 	
-	private int getPreferredAccountIndex() {
+	private int getPreferredAccountIndex(Account[] accounts) {
 		String preferredAccount = PreferencesUtils.getString(activity,
 			R.string.preferred_account_key,
 			PreferencesUtils.GOOGLE_ACCOUNT_DEFAULT);
@@ -115,46 +122,7 @@ public class Synchronizer {
 			name);
 	}
 	
-  /**
-   * Gets the user permission to access a service.
-   * 
-   * @param authTokenType the auth token type of the service
-   * @param needPermission true if need the permission
-   * @param callback callback after getting the permission
-   */
-  private void getPermission(
-      String authTokenType, boolean needPermission, final Account account, final ConditionalCallback<Account> onSuccess) {
-    if (needPermission) {
-      AccountManager.get(activity).getAuthToken(
-    		  account,
-    		  authTokenType,
-    		  null,
-    		  activity,
-          new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-              try {
-                if (future.getResult().getString(AccountManager.KEY_AUTHTOKEN) != null) {
-                	onSuccess.onSuccess(account);
-                } else {
-                  Log.d(TAG, "auth token is null");
-
-                }
-              } catch (OperationCanceledException e) {
-                Log.d(TAG, "Unable to get auth token", e);
-              } catch (AuthenticatorException e) {
-                Log.d(TAG, "Unable to get auth token", e);
-              } catch (IOException e) {
-                Log.d(TAG, "Unable to get auth token", e);
-              }
-            }
-          }, null);
-    } else {
-      onSuccess.onSuccess(account);
-    }
+  private void handleNoAccountPermission() {
+    Toast.makeText(activity, R.string.send_google_no_account_permission, Toast.LENGTH_LONG).show();
   }
-  
-	private static interface ConditionalCallback<T> {
-		public void onSuccess(T item);
-	}
 }
