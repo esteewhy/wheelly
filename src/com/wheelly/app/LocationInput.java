@@ -55,13 +55,32 @@ public final class LocationInput extends Fragment {
 		final Activity ctx = getActivity();  
 		locationCursor = new LocationRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
 		ctx.startManagingCursor(locationCursor);
+		final Location location = getLastKnownLocation();
+		final Location dest = new Location(location);
 		final ListAdapter adapter =
 			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_spinner_dropdown_item,
+					android.R.layout.simple_list_item_2,
 					locationCursor, 
-					new String[] {"name"},
+					new String[] {"name" },
 					new int[] { android.R.id.text1 }
-			);
+			) {
+				@Override
+				public void bindView(View view, Context context, Cursor cursor) {
+					super.bindView(view, context, cursor);
+					
+					((TextView)view.findViewById(android.R.id.text1))
+						.setTextColor(getResources().getColor(android.R.color.black));
+					
+					if(null != location) {
+						TextView tv = (TextView)view.findViewById(android.R.id.text2);
+						dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
+						dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
+						tv.setText(String.valueOf(location.distanceTo(dest)));
+					}
+				}
+				
+				
+			};
 		
 		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
 		v.setOnClickListener(new OnClickListener() {
@@ -137,6 +156,23 @@ public final class LocationInput extends Fragment {
 	}
 	
 	private boolean selectNearestExistingLocation() {
+		final Location mLocation = getLastKnownLocation();
+		
+		if(null!= mLocation) {
+			Toast.makeText(getActivity(), "Obtained location", Toast.LENGTH_LONG).show();
+			long locationId = resolveLocation(mLocation);
+			
+			if(locationId > 0) {
+				Toast.makeText(getActivity(), "Resolved location id: " + locationId, Toast.LENGTH_LONG).show();
+				setValue(locationId);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private Location getLastKnownLocation() {
 		LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
 		
 		Criteria criteria = new Criteria(); 
@@ -148,22 +184,9 @@ public final class LocationInput extends Fragment {
 		criteria.setCostAllowed(false); 
 		String provider = lm.getBestProvider(criteria, true);
 		
-		if(provider != null) {
-			final Location mLocation = lm.getLastKnownLocation(provider);
-			
-			if(null!= mLocation) {
-				Toast.makeText(getActivity(), "Obtained location", Toast.LENGTH_LONG).show();
-				long locationId = resolveLocation(mLocation);
-				
-				if(locationId > 0) {
-					Toast.makeText(getActivity(), "Resolved location id: " + locationId, Toast.LENGTH_LONG).show();
-					setValue(locationId);
-					return true;
-				}
-			}
-		}
-		
-		return false;
+		return provider != null
+			? lm.getLastKnownLocation(provider)
+			: null;
 	}
 	
 	/**

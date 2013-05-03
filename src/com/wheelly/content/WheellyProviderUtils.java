@@ -1,6 +1,5 @@
 package com.wheelly.content;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import com.wheelly.db.DatabaseSchema.Heartbeats;
