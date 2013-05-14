@@ -10,6 +10,8 @@ import com.wheelly.db.LocationBroker;
 
 public class TrackRepository {
 	
+	public final static String MYTRACKS_ACTION = "com.google.android.apps.mytracks.TrackDetailActivity";
+	
 	private final Context context;
 	
 	public TrackRepository(Context context) {

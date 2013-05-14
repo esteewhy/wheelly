@@ -184,6 +184,15 @@
 			</matcher>
 		</filter>
 		<filter>
+			<id>1368141037484</id>
+			<name>MyTracks_src/com/google/android/apps/mytracks/io/gdata</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
 			<id>1334045305630</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/io/maps</name>
 			<type>6</type>
@@ -231,15 +240,6 @@
 		<filter>
 			<id>1334045388863</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/services/tasks</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1334045291341</id>
-			<name>MyTracks_src/com/google/android/apps/mytracks/io/gdata/maps</name>
 			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
