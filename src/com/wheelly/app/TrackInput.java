@@ -4,10 +4,12 @@ import ru.orangesoftware.financisto.utils.Utils;
 
 import com.wheelly.R;
 import com.wheelly.content.TrackRepository;
+import com.wheelly.content.TransactionRepository;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -15,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
@@ -78,7 +81,6 @@ public final class TrackInput extends Fragment {
 						new int[] { android.R.id.text1 }
 				);
 			
-			
 			v.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -112,12 +114,22 @@ public final class TrackInput extends Fragment {
 		return selectedTrackId;
 	}
 	
-	public void setValue(long trackId) {
+	public void setValue(final long trackId) {
 		if(selectedTrackId != trackId) {
 			if(trackId != 0 && Utils.moveCursor(tracksCursor, "_id", trackId) != -1) {
 				c.locationText.setText(tracksCursor.getString(tracksCursor.getColumnIndexOrThrow("name")));
+				((View)c.labelView.getParent()).setOnLongClickListener(new OnLongClickListener() {
+					@Override
+					public boolean onLongClick(View v) {
+						Intent intent = new Intent(TrackRepository.MYTRACKS_ACTION);
+						intent.putExtra("track_id", trackId);
+						startActivity(intent);
+						return false;
+					}
+				});
 			} else {
 				c.locationText.setText(R.string.no_track);
+				((View)c.labelView.getParent()).setOnLongClickListener(null);
 			}
 			selectedTrackId = trackId;
 		}
