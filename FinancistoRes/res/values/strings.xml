@@ -180,6 +180,14 @@
 	<string name="period_this_month">This month</string>
 	<string name="period_last_week">Last week</string>
 	<string name="period_last_month">Last month</string>
+	
+	    <string name="period_tomorrow">Tomorrow</string>
+    <string name="period_next_week">Next week</string>
+    <string name="period_this_and_next_week">This and next week</string>
+    <string name="period_next_month">Next month</string>
+    <string name="period_this_and_next_month">This and next month</string>
+    <string name="period_next_3_months">Next 3 months</string>
+	
 	<string-array name="datetime_filter_items">
 		<item>Today</item>
 		<item>Yesterday</item>

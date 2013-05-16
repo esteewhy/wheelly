@@ -46,7 +46,7 @@
 				android:label="@string/app_name"
 				android:configChanges="orientation|keyboardHidden"
 				android:taskAffinity=".Main"
-				android:name=".activity.Main">
+				android:name="com.wheelly.activity.Main">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -105,6 +105,9 @@
 		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
 			android:label="@string/locations"
 			android:launchMode="singleTop" />
+		<activity android:name="com.wheelly.activity.LocationsList"
+			android:label="@string/locations"
+			android:launchMode="singleTop" />
 		<activity android:name=".io.docs.SyncDocsActivity"
 			android:launchMode="singleTop"/>
 		
@@ -130,5 +133,9 @@
 			<meta-data android:name="android.appwidget.provider"
 				android:resource="@xml/widget_2x1" />
 		</receiver>
+		
+		<meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="0cJI0WVHtbB0sFFAHH9xV7Y28WcYuFrk7Kj6imQ" />
 	</application>
 </manifest> 

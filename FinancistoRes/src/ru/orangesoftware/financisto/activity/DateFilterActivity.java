@@ -14,9 +14,9 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import ru.orangesoftware.financisto.R;
-import ru.orangesoftware.financisto.utils.DateUtils;
-import ru.orangesoftware.financisto.utils.DateUtils.Period;
-import ru.orangesoftware.financisto.utils.DateUtils.PeriodType;
+import ru.orangesoftware.financisto.datetime.DateUtils;
+import ru.orangesoftware.financisto.datetime.Period;
+import ru.orangesoftware.financisto.datetime.PeriodType;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -31,7 +31,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import static ru.orangesoftware.financisto.utils.DateUtils.is24HourFormat;
+import static ru.orangesoftware.financisto.datetime.DateUtils.is24HourFormat;
 import static ru.orangesoftware.financisto.utils.EnumUtils.createSpinnerAdapter;
 
 public class DateFilterActivity extends Activity {
@@ -49,6 +49,7 @@ public class DateFilterActivity extends Activity {
 	private Button buttonPeriodTo;
 	
 	private DateFormat df;
+	private PeriodType[] periods = PeriodType.allRegular();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,24 +59,8 @@ public class DateFilterActivity extends Activity {
 
 		df = DateUtils.getShortDateFormat(this);
 		
-		spinnerPeriodType = (Spinner)findViewById(R.id.period);
-        final PeriodType[] periods = PeriodType.values();
-        spinnerPeriodType.setAdapter(createSpinnerAdapter(this, periods));
-		spinnerPeriodType.setOnItemSelectedListener(new OnItemSelectedListener(){
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PeriodType period = periods[position];
-                if (period == PeriodType.CUSTOM) {
-                    selectCustom();
-                } else {
-                    selectPeriod(period);
-                }
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}			
-		});		
+		Intent intent = getIntent();
+		createPeriodsSpinner();
 		
 		buttonPeriodFrom = (Button)findViewById(R.id.bPeriodFrom);
 		buttonPeriodFrom.setOnClickListener(new OnClickListener(){
@@ -97,7 +82,6 @@ public class DateFilterActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent data = new Intent();
-				PeriodType[] periods = PeriodType.values();
 				PeriodType period = periods[spinnerPeriodType.getSelectedItemPosition()];
 				data.putExtra("period",
 						period.name()
@@ -129,7 +113,6 @@ public class DateFilterActivity extends Activity {
 			}
 		});		
 
-		Intent intent = getIntent();
 		if (intent == null || !intent.hasExtra("period")) {
 			reset();
 		} else {
@@ -138,7 +121,7 @@ public class DateFilterActivity extends Activity {
 			if (type == PeriodType.CUSTOM) {
 				selectPeriod(Long.valueOf(parts[1]), Long.valueOf(parts[2]));
 			} else {
-				spinnerPeriodType.setSelection(type.ordinal());
+				spinnerPeriodType.setSelection(indexOf(type));
 			}
 			
 			if (intent.getBooleanExtra(EXTRA_FILTER_DONT_SHOW_NO_FILTER, false)) {
@@ -147,8 +130,30 @@ public class DateFilterActivity extends Activity {
 		}		
 	}
 	
+    private void createPeriodsSpinner() {
+		spinnerPeriodType = (Spinner)findViewById(R.id.period);
+        final PeriodType[] periods = PeriodType.values();
+        spinnerPeriodType.setAdapter(createSpinnerAdapter(this, periods));
+		spinnerPeriodType.setOnItemSelectedListener(new OnItemSelectedListener(){
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PeriodType period = periods[position];
+                if (period == PeriodType.CUSTOM) {
+                    selectCustom();
+                } else {
+                    selectPeriod(period);
+                }
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}			
+		});		
+    }
+
+	
 	private void selectPeriod(Period p) {
-		spinnerPeriodType.setSelection(p.type.ordinal());
+		spinnerPeriodType.setSelection(indexOf(p.type));
 	}
 
 	private void selectPeriod(long from, long to) {
@@ -156,7 +161,16 @@ public class DateFilterActivity extends Activity {
 		cTo.setTimeInMillis(to);			
 		spinnerPeriodType.setSelection(PeriodType.CUSTOM.ordinal());
 	}
-
+	
+    private int indexOf(PeriodType type) {
+        for (int i = 0; i < periods.length; i++) {
+            if (periods[i] == type) {
+                return i;
+            }
+        }
+        return 0;
+    }
+	
 	@Override
 	protected Dialog onCreateDialog(final int id) {
 		final Dialog d = new Dialog(this);
@@ -190,10 +204,9 @@ public class DateFilterActivity extends Activity {
 		DatePicker dp = (DatePicker)dialog.findViewById(R.id.date);
 		dp.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), null);
 		TimePicker tp = (TimePicker)dialog.findViewById(R.id.time);
-		tp.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
+		tp.setIs24HourView(is24HourFormat(this));
+        tp.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
 		tp.setCurrentMinute(c.get(Calendar.MINUTE));
-        tp.setIs24HourView(is24HourFormat(this));
-		tp.setIs24HourView(true);
 	}
 
 	private void setDialogResult(Dialog d, Calendar c) {

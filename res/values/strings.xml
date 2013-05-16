@@ -88,4 +88,11 @@
 
       Screenshot: send_google_choose_service.png">Google Docs</string>
 	<!-- do not translate  -->
+	
+	
+	    <string name="map_view_google">Google Map</string>
+    <string name="map_view_osm">OpenStreetMap</string>
+
+    <string name="enable_my_location">Enable MyLocation</string>
+    <string name="disable_my_location">Disable MyLocation</string>
 </resources>

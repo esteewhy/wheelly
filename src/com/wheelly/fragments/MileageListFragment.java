@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,8 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.wheelly.R;
 import com.wheelly.activity.Mileage;
-import com.wheelly.app.InfoDialogFragment.Options;
+import com.wheelly.app.ListConfiguration;
+import com.wheelly.app.TripControlBar;
 import com.wheelly.db.DatabaseSchema.Mileages;
+import com.wheelly.fragments.InfoDialogFragment.Options;
 import com.wheelly.service.MyTracksTracker;
 import com.wheelly.service.WorkflowNotifier;
 

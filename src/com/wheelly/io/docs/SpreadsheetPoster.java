@@ -6,8 +6,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.text.TextUtils.StringSplitter;
 import android.util.Log;
 import android.util.Pair;
+
+import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.gdata.client.spreadsheet.ListQuery;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.data.BaseEntry;
@@ -15,7 +18,6 @@ import com.google.gdata.data.spreadsheet.ListEntry;
 import com.google.gdata.data.spreadsheet.ListFeed;
 import com.google.gdata.util.ResourceNotFoundException;
 import com.google.gdata.util.ServiceException;
-import com.google.wireless.gdata.data.StringUtils;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
 
@@ -89,7 +91,7 @@ public class SpreadsheetPoster {
 		);
 		
 		return odo.first.equals(odo.second)
-				&& !StringUtils.isEmptyOrWhitespace(type.second)
+				&& null != type.second && type.second.length() > 0
 				&& type.second.equals(type.first);
 	}
 	

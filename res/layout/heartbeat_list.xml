@@ -5,7 +5,7 @@
 	android:layout_width	="fill_parent"
 	android:orientation		="vertical">
 	
-	<fragment class="com.wheelly.app.ListContentFragment"
+	<fragment class="com.wheelly.fragments.ListContentFragment"
 		android:layout_weight	="1" 
 		android:layout_width	="fill_parent"
 		android:layout_height	="0dip" />

@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 import com.wheelly.R;
 import com.wheelly.app.AndiCarImporter;
-import com.wheelly.app.HeartbeatListFragment;
-import com.wheelly.app.MileageListFragment;
-import com.wheelly.app.RefuelListFragment;
+import com.wheelly.fragments.HeartbeatListFragment;
+import com.wheelly.fragments.MileageListFragment;
+import com.wheelly.fragments.RefuelListFragment;
 import com.wheelly.service.WorkflowNotifier;
 
 import android.content.Context;

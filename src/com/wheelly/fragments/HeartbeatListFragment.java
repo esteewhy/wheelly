@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -24,10 +24,11 @@ import android.support.v4.widget.SimpleCursorAdapter;
 
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
-import com.wheelly.app.InfoDialogFragment.Options;
+import com.wheelly.app.ListConfiguration;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
+import com.wheelly.fragments.InfoDialogFragment.Options;
 import com.wheelly.service.Synchronizer;
 
 public class HeartbeatListFragment extends ConfigurableListFragment {

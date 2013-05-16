@@ -75,7 +75,7 @@ public class LocationActivity extends MapActivity {
 				myLocation = new LocationBroker(this).loadOrCreate(locationId);
 				EditText name = (EditText)findViewById(R.id.name);
 				name.setText(myLocation.getAsString("name"));
-				String resolvedAddress = myLocation.getAsString("resolvedAddress"); 
+				String resolvedAddress = myLocation.getAsString("resolved_address"); 
 				if (resolvedAddress != null) {
 					location.setText(resolvedAddress);
 				}
@@ -327,7 +327,13 @@ public class LocationActivity extends MapActivity {
 		private Point p;
 		private int dx;
 		private int dy;
-
+		
+		@Override
+		public boolean onTap(GeoPoint arg0, MapView arg1) {
+			// TODO Auto-generated method stub
+			return super.onTap(arg0, arg1);
+		}
+		
 		@Override
 		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
 			int action = event.getAction();

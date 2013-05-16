@@ -159,6 +159,7 @@ public abstract class AbstractSendAsyncTask<EntityType> extends ReportingSendAsy
    * Gets the spreadsheet id.
    * 
    * @param fileName the file name
+ * @throws GoogleAuthException 
    */
   private String getSpreadSheetId(String fileName)
       throws IOException, GoogleAuthException {

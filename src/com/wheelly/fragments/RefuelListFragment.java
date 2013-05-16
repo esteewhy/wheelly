@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +21,10 @@ import android.widget.Toast;
 
 import com.wheelly.R;
 import com.wheelly.activity.Refuel;
-import com.wheelly.app.InfoDialogFragment.Options;
+import com.wheelly.app.ListConfiguration;
 import com.wheelly.content.TransactionRepository;
 import com.wheelly.db.DatabaseSchema.Refuels;
+import com.wheelly.fragments.InfoDialogFragment.Options;
 
 public class RefuelListFragment extends ConfigurableListFragment {
 	@Override
