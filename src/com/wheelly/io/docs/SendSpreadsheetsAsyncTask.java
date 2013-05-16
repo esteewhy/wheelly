@@ -8,10 +8,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
 import com.google.gdata.util.ServiceException;
-import com.google.wireless.gdata.client.HttpException;
 import com.wheelly.content.WheellyProviderUtils;
 
 /**

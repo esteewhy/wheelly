@@ -39,6 +39,15 @@
 	</linkedResources>
 	<filteredResources>
 		<filter>
+			<id>1368523291445</id>
+			<name>Financisto_src/greendroid/widget</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
 			<id>1334828627656</id>
 			<name>Financisto_src/javax/persistence</name>
 			<type>6</type>
@@ -120,6 +129,15 @@
 			</matcher>
 		</filter>
 		<filter>
+			<id>1368523349316</id>
+			<name>Financisto_src/ru/orangesoftware/financisto/filter</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+		<filter>
 			<id>1334828719010</id>
 			<name>Financisto_src/ru/orangesoftware/financisto/graph</name>
 			<type>6</type>
@@ -135,6 +153,15 @@
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-MultiChoice*</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1368523365154</id>
+			<name>Financisto_src/ru/orangesoftware/financisto/rates</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -165,12 +192,12 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1366663375434</id>
+			<id>1368523835337</id>
 			<name>Financisto_src/ru/orangesoftware/financisto/utils</name>
 			<type>5</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-true-(Address|Date|Thumb|Localizable).*</arguments>
+				<arguments>1.0-name-matches-false-true-(Address|Thumb|Localizable).*</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -221,24 +248,6 @@
 		<filter>
 			<id>1334828730708</id>
 			<name>Financisto_src/ru/orangesoftware/financisto/export/qif</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1334828825421</id>
-			<name>Financisto_src/ru/orangesoftware/financisto/model/info</name>
-			<type>6</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1334828838042</id>
-			<name>Financisto_src/ru/orangesoftware/financisto/model/rates</name>
 			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>

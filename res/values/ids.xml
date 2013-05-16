@@ -11,4 +11,6 @@
 	<item type="id" name="ctx_menu_sync"/>
 	<item type="id" name="ctx_menu_sync_pull"/>
 	<item type="id" name="ctx_menu_sync_push"/>
+	
+	<item type="id" name="pager"/>
 </resources>

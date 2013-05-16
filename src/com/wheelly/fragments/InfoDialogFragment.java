@@ -1,4 +1,4 @@
-package com.wheelly.app;
+package com.wheelly.fragments;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

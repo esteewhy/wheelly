@@ -1,14 +1,15 @@
-package com.wheelly.app;
+package com.wheelly.fragments;
 
 import java.io.File;
 
 import org.openintents.calendarpicker.contract.CalendarPickerConstants;
 
-import ru.orangesoftware.financisto.activity.LocationsListActivity;
-
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
+import com.wheelly.activity.LocationsList;
 import com.wheelly.activity.Preferences;
+import com.wheelly.app.ListConfiguration;
+import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
@@ -171,7 +172,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
 		menu.findItem(R.id.opt_menu_restore).setVisible(backupEnabled);
-		menu.findItem(R.id.opt_menu_locations).setIntent(new Intent(this.getActivity(), LocationsListActivity.class));
+		menu.findItem(R.id.opt_menu_locations).setIntent(new Intent(this.getActivity(), LocationsList.class));
 		menu.findItem(R.id.opt_menu_preferences).setIntent(new Intent(this.getActivity(), Preferences.class));
 	}
 	

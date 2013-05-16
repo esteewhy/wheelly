@@ -2,6 +2,8 @@ package com.wheelly.app;
 
 import java.util.Map;
 
+import com.wheelly.fragments.InfoDialogFragment;
+
 import android.content.Context;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;

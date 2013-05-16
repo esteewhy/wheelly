@@ -14,8 +14,7 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:clickable="true"
-		android:apiKey="0cJI0WVHtbB0sFFAHH9xV7Y28WcYuFrk7Kj6imQ" />
+		android:layout_height="fill_parent" android:clickable="true" />
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:paddingLeft="3dp"
 		android:paddingRight="3dp" android:paddingTop="3dp">
@@ -34,7 +33,7 @@
 			<TextView android:text="@string/no_fix" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_below="@+id/name"
 				android:id="@id/location" android:layout_toLeftOf="@id/okButton"
-				android:layout_alignParentLeft="true" android:textSize="10dp"/>
+				android:layout_alignParentLeft="true" android:textSize="10sp"/>
 		</ru.orangesoftware.financisto.widget.TransparentLayout>
 	</LinearLayout>
 </RelativeLayout>	
