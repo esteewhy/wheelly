@@ -6,6 +6,7 @@
 	android:orientation		="vertical">
 	
 	<fragment class="com.wheelly.fragments.ListContentFragment"
+	    android:tag				="heartbeats"
 		android:layout_weight	="1" 
 		android:layout_width	="fill_parent"
 		android:layout_height	="0dip" />

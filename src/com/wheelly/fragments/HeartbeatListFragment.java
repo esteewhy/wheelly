@@ -1,7 +1,6 @@
 package com.wheelly.fragments;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -40,91 +39,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	
 	@Override
 	protected ListConfiguration configure() {
-		ListConfiguration cfg = new ListConfiguration() {
-			
-			@Override
-			public SimpleCursorAdapter createListAdapter(final Context context) {
-				final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60);
-				return
-					new SimpleCursorAdapter(getActivity(), R.layout.heartbeat_list_item, null,
-						new String[] {
-							"odometer", "_created", "fuel", "fuel", "place", "icons", "sync_state"
-						},
-						new int[] {
-							R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icon_refuel, R.id.indicator
-						},
-						0
-					) {{
-						setViewBinder(new SimpleCursorAdapter.ViewBinder(){
-							@Override
-							public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-								switch(view.getId()) {
-								case R.id.date:
-									((TextView)view).setText(com.wheelly.util.DateUtils.formatVarying(cursor.getString(columnIndex)));
-									return true;
-								case R.id.fuelGauge:
-									ProgressBar pb = (ProgressBar)view; 
-									pb.setProgress(cursor.getInt(columnIndex));
-									pb.setMax(fuelCapacity);
-									return true;
-								case R.id.icon_refuel:
-									int mask = cursor.getInt(columnIndex);
-									final View v = (View)view.getParent();
-									v.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
-									v.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
-									v.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
-									return true;
-								case R.id.indicator:
-									final int status = cursor.getInt(columnIndex);
-									view.setBackgroundColor(context.getResources().getColor(getStatusColor(status)));
-									//((RelativeLayout)view.getParent()).setb;
-									return true;
-								}
-								return false;
-							}
-						});
-					}};
-			}
-			
-			private int getStatusColor(int status) {
-				switch(status) {
-				case 1:
-					return R.color.sync_succeeded;
-				case 2:
-					return R.color.sync_outdated;
-				case 3:
-					return R.color.sync_conflict;
-				}
-				return R.color.sync_unknown;
-			}
-			
-			@Override
-			public Options configureViewItemDialog() {
-				return
-					new InfoDialogFragment.Options() {{
-						
-						fields.put(R.string.odometer_input_label, "odometer");
-						fields.put(R.string.fuel_input_label, "fuel");
-						
-						titleField = "place";
-						dataField = "_created";
-						iconResId = R.drawable.ic_tab_cam_selected;
-					}};
-			}
-			
-			@Override
-			public CursorLoader createViewItemCursorLoader(Context context, long id) {
-				return
-					new CursorLoader(
-						context,
-						Heartbeats.CONTENT_URI,
-						Heartbeats.ListProjection,
-						"h." + BaseColumns._ID + " = ?",
-						new String[] { Long.toString(id) },
-						"h." + BaseColumns._ID + " DESC LIMIT 1"
-					);
-			}
-		};
+		ListConfiguration cfg = new ListConfiguration();
 		
 		cfg.ConfirmDeleteResourceId = R.string.delete_heartbeat_confirm;
 		cfg.EmptyTextResourceId = R.string.no_heartbeats;
@@ -137,6 +52,89 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 		return cfg;
 	}
 	
+	@Override
+	public SimpleCursorAdapter createListAdapter() {
+		final int fuelCapacity = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("fuel_capacity", 60);
+		return
+			new SimpleCursorAdapter(getActivity(), R.layout.heartbeat_list_item, null,
+				new String[] {
+					"odometer", "_created", "fuel", "fuel", "place", "icons", "sync_state"
+				},
+				new int[] {
+					R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icon_refuel, R.id.indicator
+				},
+				0
+			) {{
+				setViewBinder(new SimpleCursorAdapter.ViewBinder(){
+					@Override
+					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+						switch(view.getId()) {
+						case R.id.date:
+							((TextView)view).setText(com.wheelly.util.DateUtils.formatVarying(cursor.getString(columnIndex)));
+							return true;
+						case R.id.fuelGauge:
+							ProgressBar pb = (ProgressBar)view; 
+							pb.setProgress(cursor.getInt(columnIndex));
+							pb.setMax(fuelCapacity);
+							return true;
+						case R.id.icon_refuel:
+							int mask = cursor.getInt(columnIndex);
+							final View v = (View)view.getParent();
+							v.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
+							v.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
+							v.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
+							return true;
+						case R.id.indicator:
+							final int status = cursor.getInt(columnIndex);
+							view.setBackgroundColor(getResources().getColor(getStatusColor(status)));
+							//((RelativeLayout)view.getParent()).setb;
+							return true;
+						}
+						return false;
+					}
+				});
+			}};
+	}
+	
+	private int getStatusColor(int status) {
+		switch(status) {
+		case 1:
+			return R.color.sync_succeeded;
+		case 2:
+			return R.color.sync_outdated;
+		case 3:
+			return R.color.sync_conflict;
+		}
+		return R.color.sync_unknown;
+	}
+	
+	@Override
+	public Options configureViewItemDialog() {
+		return
+			new InfoDialogFragment.Options() {{
+				
+				fields.put(R.string.odometer_input_label, "odometer");
+				fields.put(R.string.fuel_input_label, "fuel");
+				
+				titleField = "place";
+				dataField = "_created";
+				iconResId = R.drawable.ic_tab_cam_selected;
+			}};
+	}
+	
+	@Override
+	public CursorLoader createViewItemCursorLoader(long id) {
+		return
+			new CursorLoader(
+				getActivity(),
+				Heartbeats.CONTENT_URI,
+				Heartbeats.ListProjection,
+				"h." + BaseColumns._ID + " = ?",
+				new String[] { Long.toString(id) },
+				"h." + BaseColumns._ID + " DESC LIMIT 1"
+			);
+	}
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if(!super.onContextItemSelected(item)) {
