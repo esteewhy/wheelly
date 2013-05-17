@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -41,16 +40,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public abstract class ConfigurableListFragment extends ListFragment
 	implements LoaderCallbacks<Cursor> {
 	
+	@Override
+	public void onDestroyView() {
+		final View v = getView();
+		((ViewGroup)v.getParent()).removeViewInLayout(v);
+		super.onDestroyView();
+	}
+	
 	private ListConfiguration configuration;
 	
 	protected abstract ListConfiguration configure();
-	
+	public abstract SimpleCursorAdapter createListAdapter();
+	public abstract CursorLoader createViewItemCursorLoader(long id);
+	public abstract InfoDialogFragment.Options configureViewItemDialog();
+
 	private ListConfiguration getConfiguration() {
 		return null == configuration ? (configuration = configure()) : configuration;
 	}
@@ -66,23 +76,26 @@ public abstract class ConfigurableListFragment extends ListFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		final FragmentActivity ctx = getActivity();
-		final ListConfiguration cfg = getConfiguration();
-		
-		setEmptyText(getString(cfg.EmptyTextResourceId));
-		setListAdapter(cfg.createListAdapter(ctx));
+		setListAdapter(createListAdapter());
 		registerForContextMenu(getListView());
 		setHasOptionsMenu(true);
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		final ListConfiguration cfg = getConfiguration();
+		setEmptyText(getString(cfg.EmptyTextResourceId));
 		
-		final ContentValues globalFiler = ((IFilterHolder)ctx.getApplicationContext()).getFilter();
-		
+		final ContentValues globalFiler = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
 		// Set up status bar (if present).
-		c = new StatusBarControls(ctx);
+		c = new StatusBarControls(view);
+		
 		c.AddButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				c.AddButton.setEnabled(false);
-				Intent intent = new Intent(ctx, cfg.ItemActivityClass);
+				Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
 				startActivityForResult(intent, NEW_REQUEST);
 			}
 		});
@@ -103,12 +116,13 @@ public abstract class ConfigurableListFragment extends ListFragment
 			}
 		});
 		c.TotalLayout.setVisibility(View.GONE);
+		
+		final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
+		c.FilterButton.setFilter(filter);
 	}
 	
 	@Override
 	public void onResume() {
-		final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
-		c.FilterButton.setFilter(filter);
 		if(null == getLoaderManager().getLoader(LIST_LOADER)) {
 			getLoaderManager().initLoader(LIST_LOADER, null, this);
 		}
@@ -116,8 +130,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	}
 	
 	protected void viewItem(final long id) {
-		final ListConfiguration cfg = getConfiguration();
-		final InfoDialogFragment.Options dialogCfg = cfg.configureViewItemDialog();
+		final InfoDialogFragment.Options dialogCfg = configureViewItemDialog();
 		
 		dialogCfg.onClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -128,7 +141,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 			};
 		};
 		
-		dialogCfg.loader = cfg.createViewItemCursorLoader(getActivity(), id);
+		dialogCfg.loader = createViewItemCursorLoader(id);
 		
 		new InfoDialogFragment(dialogCfg).show(getFragmentManager(), "dialog");
 	}
@@ -266,12 +279,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		final ContentValues filter;
 		
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				setListShown(false);
-			}
-		});
+		setListShown(false);
 		
 		final ListConfiguration cfg = getConfiguration();
 		
@@ -293,14 +301,15 @@ public abstract class ConfigurableListFragment extends ListFragment
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		((CursorAdapter) getListAdapter()).swapCursor(data);
+		final CursorAdapter a = (CursorAdapter) getListAdapter();
+		a.swapCursor(data);
+		a.notifyDataSetChanged();
 		
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				setListShown(true);
-			}
-		});
+		if (isResumed()) {
+			setListShown(true);
+		} else {
+			setListShownNoAnimation(true);
+		}
 	}
 
 	@Override

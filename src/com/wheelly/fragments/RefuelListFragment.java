@@ -1,6 +1,5 @@
 package com.wheelly.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,63 +34,7 @@ public class RefuelListFragment extends ConfigurableListFragment {
 	
 	@Override
 	protected ListConfiguration configure() {
-		ListConfiguration cfg = new ListConfiguration() {
-			@Override
-			public SimpleCursorAdapter createListAdapter(Context context) {
-				return
-					new SimpleCursorAdapter(context, R.layout.refuel_list_item, null,
-						new String[] {
-							"name", "mileage", "cost", "_created", "amount", "place"
-						},
-						new int[] {
-							R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.place
-						},
-						0
-					) {
-						@Override
-						public void setViewText(TextView v, String text) {
-							switch(v.getId()) {
-							case R.id.date:
-								v.setText(com.wheelly.util.DateUtils.formatVarying(text));
-								break;
-							case R.id.mileage:
-							case R.id.fuel:
-								v.setText(TextUtils.isEmpty(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
-								break;
-							default: super.setViewText(v, text);
-							}
-						}
-					};
-			}
-			
-			@Override
-			public Options configureViewItemDialog() {
-				return
-					new InfoDialogFragment.Options() {{
-						
-						fields.put(R.string.odometer_input_label, "mileage");
-						fields.put(R.string.fuel_input_label, "amount");
-						fields.put(R.string.amount, "cost");
-						
-						titleField = "place";
-						dataField = "_created";
-						iconResId = R.drawable.ic_tab_utensils_selected;
-					}};
-			}
-			
-			@Override
-			public CursorLoader createViewItemCursorLoader(Context context, long id) {
-				return
-					new CursorLoader(
-						context,
-						Refuels.CONTENT_URI,
-						Refuels.ListProjection,
-						"f." + BaseColumns._ID + " = ?",
-						new String[] { Long.toString(id) },
-						"f." + BaseColumns._ID + " DESC LIMIT 1"
-					);
-			}
-		};
+		ListConfiguration cfg = new ListConfiguration();
 		
 		cfg.ConfirmDeleteResourceId = R.string.delete_refuel_confirm;
 		cfg.EmptyTextResourceId = R.string.no_refuels;
@@ -104,6 +47,62 @@ public class RefuelListFragment extends ConfigurableListFragment {
 		return cfg;
 	}
 	
+	@Override
+	public SimpleCursorAdapter createListAdapter() {
+		return
+			new SimpleCursorAdapter(getActivity(), R.layout.refuel_list_item, null,
+				new String[] {
+					"name", "mileage", "cost", "_created", "amount", "place"
+				},
+				new int[] {
+					R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.place
+				},
+				0
+			) {
+				@Override
+				public void setViewText(TextView v, String text) {
+					switch(v.getId()) {
+					case R.id.date:
+						v.setText(com.wheelly.util.DateUtils.formatVarying(text));
+						break;
+					case R.id.mileage:
+					case R.id.fuel:
+						v.setText(TextUtils.isEmpty(text) ? text : String.format("%+.2f", Float.parseFloat(text)));
+						break;
+					default: super.setViewText(v, text);
+					}
+				}
+			};
+	}
+	
+	@Override
+	public Options configureViewItemDialog() {
+		return
+			new InfoDialogFragment.Options() {{
+				
+				fields.put(R.string.odometer_input_label, "mileage");
+				fields.put(R.string.fuel_input_label, "amount");
+				fields.put(R.string.amount, "cost");
+				
+				titleField = "place";
+				dataField = "_created";
+				iconResId = R.drawable.ic_tab_utensils_selected;
+			}};
+	}
+	
+	@Override
+	public CursorLoader createViewItemCursorLoader(long id) {
+		return
+			new CursorLoader(
+				getActivity(),
+				Refuels.CONTENT_URI,
+				Refuels.ListProjection,
+				"f." + BaseColumns._ID + " = ?",
+				new String[] { Long.toString(id) },
+				"f." + BaseColumns._ID + " DESC LIMIT 1"
+			);
+	}
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);

@@ -1,6 +1,6 @@
 package com.wheelly.app;
 
-import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
@@ -17,7 +17,7 @@ public final class StatusBarControls {
 	public final FilterButton FilterButton;
 	public final ViewGroup TotalLayout;
 		
-	public StatusBarControls(FragmentActivity v) {
+	public StatusBarControls(View v) {
 		AddButton		= (ImageButton)v.findViewById(R.id.bAdd);
 		TransferButton	= (ImageButton)v.findViewById(R.id.bTransfer);
 		TemplateButton	= (ImageButton)v.findViewById(R.id.bTemplate);
