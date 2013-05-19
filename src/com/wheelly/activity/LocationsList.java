@@ -32,8 +32,7 @@ public class LocationsList extends FragmentActivity {
                 LocationsListFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText("Map"),
                 LocationsMapFragment.class, null);
-        mTabsAdapter.addTab(bar.newTab().setText("List2"),
-                LocationsListFragment.class, null);
+        
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
         }
