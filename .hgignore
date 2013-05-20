@@ -2,3 +2,6 @@ bin
 .orig
 resource-matrices
 gen
+libs
+R.java
+.google_apis
