@@ -6,10 +6,11 @@ import org.openintents.calendarpicker.contract.CalendarPickerConstants;
 
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
+import com.wheelly.activity.FilterDialog;
+import com.wheelly.activity.FilterDialog.OnFilterChangedListener;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.activity.Preferences;
 import com.wheelly.app.ListConfiguration;
-import com.wheelly.app.StatusBarControls;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
@@ -22,6 +23,7 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,20 +41,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public abstract class ConfigurableListFragment extends ListFragment
 	implements LoaderCallbacks<Cursor> {
-	
-	@Override
-	public void onDestroyView() {
-		final View v = getView();
-		((ViewGroup)v.getParent()).removeViewInLayout(v);
-		super.onDestroyView();
-	}
 	
 	private ListConfiguration configuration;
 	
@@ -70,9 +63,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	protected static final int EDIT_REQUEST = 2;
 	private static final int DELETE_REQUEST = 3;
 	
-	//private ProgressDialog progressDialog;
-	private StatusBarControls c;
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -88,22 +78,9 @@ public abstract class ConfigurableListFragment extends ListFragment
 		setEmptyText(getString(cfg.EmptyTextResourceId));
 		
 		final ContentValues globalFiler = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
-		// Set up status bar (if present).
-		c = new StatusBarControls(view);
 		
-		c.AddButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				c.AddButton.setEnabled(false);
-				Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
-				startActivityForResult(intent, NEW_REQUEST);
-			}
-		});
-		c.TransferButton.setVisibility(View.GONE);
-		c.TemplateButton.setVisibility(View.GONE);
-		
-		c.FilterButton.setLocationConstraint(cfg.LocationFacetTable);
-		c.FilterButton.SetOnFilterChangedListener(new com.wheelly.widget.FilterButton.OnFilterChangedListener() {
+		setLocationConstraint(cfg.LocationFacetTable);
+		SetOnFilterChangedListener(new OnFilterChangedListener() {
 			@Override
 			public void onFilterChanged(ContentValues value) {
 				final Bundle args = new Bundle();
@@ -115,10 +92,9 @@ public abstract class ConfigurableListFragment extends ListFragment
 				globalFiler.putAll(value);
 			}
 		});
-		c.TotalLayout.setVisibility(View.GONE);
 		
 		final ContentValues filter = ((IFilterHolder)getActivity().getApplicationContext()).getFilter();
-		c.FilterButton.setFilter(filter);
+		setFilter(filter);
 	}
 	
 	@Override
@@ -168,8 +144,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(requestCode) {
-		case NEW_REQUEST:
-			c.AddButton.setEnabled(true);
 		case EDIT_REQUEST:
 			((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
 			break;
@@ -199,6 +173,30 @@ public abstract class ConfigurableListFragment extends ListFragment
 			case R.id.opt_menu_add:
 				Intent intent = new Intent(getActivity(), cfg.ItemActivityClass);
 				startActivityForResult(intent, NEW_REQUEST);
+				return true;
+			case R.id.opt_menu_filter:
+				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
+				final FilterDialog fd = new FilterDialog(new ContentValues(filter), new OnFilterChangedListener() {
+					
+					@Override
+					public void onFilterChanged(ContentValues value) {
+						if (null == value) {
+							setFilter(null);
+						} else {
+							filter.remove(F.LOCATION_CONSTRAINT);
+							setFilter(value);
+						}
+						
+						
+					}
+				});
+				fd.setOnCancelListener(new OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface paramDialogInterface) {
+						
+					}
+				});
+				fd.show(getActivity().getSupportFragmentManager(), "filter");
 				return true;
 			case R.id.opt_menu_backup:
 				return BackupUtils.backupDatabase(
@@ -316,4 +314,54 @@ public abstract class ConfigurableListFragment extends ListFragment
 	public void onLoaderReset(Loader<Cursor> loader) {
 		((CursorAdapter) getListAdapter()).swapCursor(null);
 	}
+	
+	// Filter management
+	private final ContentValues filter = new ContentValues();
+	public String locationConstraint = null; 
+	
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+	
+	public ContentValues getFilter() {
+		return filter;
+	}
+	
+	private void setFilter(ContentValues filter) {
+		if(!this.filter.equals(filter)
+				&& (this.filter.size() > 0 || null != filter)) {
+			
+			setFilterUnchecked(filter);
+			
+			if(null != listener) {
+				listener.onFilterChanged(this.filter);
+			}
+		}
+	}
+	
+	private void setFilterUnchecked(ContentValues filter) {
+		boolean reset = null == filter || 0 == filter.size();
+		
+		this.filter.clear();
+		
+		if(!reset) {
+			this.filter.putAll(filter);
+		}
+		
+		//setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
+	}
+	
+
+	private void setLocationConstraint(String locationConstraint) {
+		this.locationConstraint = locationConstraint;
+	}
+	
+	private OnFilterChangedListener listener;
+	
+	private void SetOnFilterChangedListener(OnFilterChangedListener listener) {
+		this.listener = listener;
+	}
+	
 }

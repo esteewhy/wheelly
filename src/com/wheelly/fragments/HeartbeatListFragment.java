@@ -2,17 +2,14 @@ package com.wheelly.fragments;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
@@ -31,11 +28,6 @@ import com.wheelly.fragments.InfoDialogFragment.Options;
 import com.wheelly.service.Synchronizer;
 
 public class HeartbeatListFragment extends ConfigurableListFragment {
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.heartbeat_list, null);
-	}
 	
 	@Override
 	protected ListConfiguration configure() {

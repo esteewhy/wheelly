@@ -19,7 +19,6 @@ import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationRepository;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
-import com.wheelly.widget.FilterButton.OnFilterChangedListener;
 
 import ru.orangesoftware.financisto.activity.ActivityLayout;
 import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
@@ -279,5 +278,9 @@ public class FilterDialog extends DialogFragment {
 		if(null != this.cancelListener) {
 			this.cancelListener.onCancel(dialog);
 		}
+	}
+	
+	public static interface OnFilterChangedListener {
+		void onFilterChanged(ContentValues value);
 	}
 }

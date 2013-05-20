@@ -96,4 +96,5 @@
     <string name="enable_my_location">Enable MyLocation</string>
     <string name="disable_my_location">Disable MyLocation</string>
     <string name="google_maps_api_key">0cJI0WVHtbB0sFFAHH9xV7Y28WcYuFrk7Kj6imQ</string>
+    <string name="internalEmpty">0x00ff0001</string>
 </resources>
