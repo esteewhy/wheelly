@@ -3,6 +3,7 @@ package com.wheelly.widget;
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.activity.FilterDialog;
+import com.wheelly.activity.FilterDialog.OnFilterChangedListener;
 import com.wheelly.util.FilterUtils.F;
 
 import android.content.ContentValues;
@@ -134,9 +135,5 @@ public class FilterButton extends ImageButton implements IFilterHolder {
 	
 	public void SetOnFilterChangedListener(OnFilterChangedListener listener) {
 		this.listener = listener;
-	}
-	
-	public static interface OnFilterChangedListener {
-		void onFilterChanged(ContentValues value);
 	}
 }
