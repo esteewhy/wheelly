@@ -2,7 +2,13 @@
 	<item
 		android:id		="@+id/opt_menu_add"
 		android:icon	="@android:drawable/ic_menu_add"
-		android:title	="@string/item_add" />
+		android:title	="@string/item_add"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_filter"
+		android:icon	="@drawable/ic_menu_filter_off"
+		android:title	="@string/filter"
+		android:showAsAction="ifRoom" />
 	
 	<item android:id	="@+id/opt_menu_locations"
 		android:title	="@string/locations"

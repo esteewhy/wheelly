@@ -8,12 +8,10 @@ import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.util.FloatMath;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.ListView;
@@ -116,13 +114,6 @@ public class MileageListFragment extends ConfigurableListFragment {
 			return R.color.sync_conflict;
 		}
 		return R.color.sync_unknown;
-	}
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.mileage_list, null);
-		return v;
 	}
 	
 	@Override
