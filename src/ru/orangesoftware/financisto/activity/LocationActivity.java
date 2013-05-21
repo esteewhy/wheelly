@@ -11,6 +11,7 @@
 package ru.orangesoftware.financisto.activity;
 
 import com.wheelly.R;
+import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.LocationBroker;
 import ru.orangesoftware.financisto.utils.AddressGeocoder;
 import ru.orangesoftware.financisto.utils.Utils;

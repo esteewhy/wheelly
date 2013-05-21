@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.wheelly.R;
 import com.wheelly.db.DatabaseHelper;
+import com.wheelly.db.LocationBroker;
 import com.wheelly.db.LocationRepository;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
@@ -209,7 +210,7 @@ public class FilterDialog extends DialogFragment {
 			? filter.getAsLong(F.LOCATION)
 			: 0;
 		if (locationId > 0 && Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
-			final ContentValues location = LocationRepository.deserialize(locationCursor);
+			final ContentValues location = LocationBroker.deserialize(locationCursor);
 			c.location.setText(location != null ? location.getAsString("name") : filterValueNotFound);
 		} else {
 			c.location.setText(R.string.no_filter);
