@@ -319,12 +319,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	private final ContentValues filter = new ContentValues();
 	public String locationConstraint = null; 
 	
-	@Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-	}
-	
 	public ContentValues getFilter() {
 		return filter;
 	}
@@ -353,7 +347,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		//setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 	}
 	
-
 	private void setLocationConstraint(String locationConstraint) {
 		this.locationConstraint = locationConstraint;
 	}
@@ -363,5 +356,4 @@ public abstract class ConfigurableListFragment extends ListFragment
 	private void SetOnFilterChangedListener(OnFilterChangedListener listener) {
 		this.listener = listener;
 	}
-	
 }
