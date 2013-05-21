@@ -5,8 +5,8 @@ import ru.orangesoftware.financisto.utils.Utils;
 
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.LocationRepository;
+import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
 
 import android.annotation.SuppressLint;
@@ -17,7 +17,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -52,13 +51,12 @@ public final class LocationInput extends Fragment {
 	private Location lastFix;
 	private Controls c;
 	private Cursor locationCursor;
-	private SQLiteDatabase db;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
-		locationCursor = new LocationRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
+		locationCursor = getActivity().getContentResolver().query(Locations.CONTENT_URI, null, null, null, null);
 		ctx.startManagingCursor(locationCursor);
 		
 		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
@@ -67,7 +65,7 @@ public final class LocationInput extends Fragment {
 			@Override
 			public boolean onLongClick(View paramView) {
 				Intent intent = new Intent(ctx, LocationsList.class);
-				intent.putExtra(BaseColumns._ID, selectedLocationId);
+				intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, selectedLocationId);
 				startActivityForResult(intent, EDIT_LOCATION_REQUEST);
 				return true;
 			}
@@ -133,12 +131,6 @@ public final class LocationInput extends Fragment {
 					}
 				}
 			};
-	}
-	
-	@Override
-	public void onDestroyView() {
-		db.close();
-		super.onDestroyView();
 	}
 	
 	@Override
@@ -219,7 +211,7 @@ public final class LocationInput extends Fragment {
 	 * Attempts to select location from current cursor position.
 	 */
 	private void setLocationFromCursor() {
-		ContentValues location = LocationRepository.deserialize(locationCursor);
+		ContentValues location = LocationBroker.deserialize(locationCursor);
 		//c.locationText.setText(LocationUtils.locationToText(location));
 		setLocation(location);
 	}

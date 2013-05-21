@@ -65,7 +65,6 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "refuels/#", REFUELS_ID);
 			addURI(a, "heartbeats/#", HEARTBEATS_ID);
 			addURI(a, "timeline/#", TIMELINE_ID);
-			
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
@@ -90,7 +89,7 @@ public class ChronologyProvider extends ContentProvider {
 		UriMap.put(REFUELS, Refuels.CONTENT_URI);
 		UriMap.put(HEARTBEATS, Heartbeats.CONTENT_URI);
 		UriMap.put(TIMELINE, Timeline.CONTENT_URI);
-		UriMap.put(TIMELINE, Locations.CONTENT_URI);
+		UriMap.put(LOCATIONS, Locations.CONTENT_URI);
 	}
 	
 	private SQLiteOpenHelper dbHelper;
@@ -192,6 +191,7 @@ public class ChronologyProvider extends ContentProvider {
 		case REFUELS_ID:
 		case HEARTBEATS_ID:
 		case TIMELINE_ID:
+		case LOCATIONS_ID:
 			return dbHelper.getReadableDatabase().query(
 				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 				projection,

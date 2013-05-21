@@ -82,27 +82,31 @@ public final class R {
         public static int success=0x7f020002;
     }
     public static final class id {
-        public static int upload_result_docs_result=0x7f0a0004;
-        public static int upload_result_docs_result_icon=0x7f0a0005;
-        public static int upload_result_error_footer=0x7f0a0007;
-        public static int upload_result_fusion_tables_result=0x7f0a0002;
-        public static int upload_result_fusion_tables_result_icon=0x7f0a0003;
-        public static int upload_result_maps_result=0x7f0a0000;
-        public static int upload_result_maps_result_icon=0x7f0a0001;
-        public static int upload_result_success_footer=0x7f0a0006;
+        public static int list_item_name=0x7f080000;
+        public static int upload_result_docs_result=0x7f080005;
+        public static int upload_result_docs_result_icon=0x7f080006;
+        public static int upload_result_error_footer=0x7f080008;
+        public static int upload_result_fusion_tables_result=0x7f080003;
+        public static int upload_result_fusion_tables_result_icon=0x7f080004;
+        public static int upload_result_maps_result=0x7f080001;
+        public static int upload_result_maps_result_icon=0x7f080002;
+        public static int upload_result_success_footer=0x7f080007;
     }
     public static final class layout {
         public static int upload_result=0x7f030000;
     }
+    public static final class menu {
+        public static int list_context_menu=0x7f0b0000;
+    }
     public static final class plurals {
-        public static int importGpxFiles=0x7f080000;
-        public static int voiceHours=0x7f080001;
-        public static int voiceMinutes=0x7f080002;
-        public static int voiceSeconds=0x7f080003;
-        public static int voiceSpeedKilometersPerHour=0x7f080004;
-        public static int voiceSpeedMilesPerHour=0x7f080005;
-        public static int voiceTotalDistanceKilometers=0x7f080006;
-        public static int voiceTotalDistanceMiles=0x7f080007;
+        public static int importGpxFiles=0x7f090000;
+        public static int voiceHours=0x7f090001;
+        public static int voiceMinutes=0x7f090002;
+        public static int voiceSeconds=0x7f090003;
+        public static int voiceSpeedKilometersPerHour=0x7f090004;
+        public static int voiceSpeedMilesPerHour=0x7f090005;
+        public static int voiceTotalDistanceKilometers=0x7f090006;
+        public static int voiceTotalDistanceMiles=0x7f090007;
     }
     public static final class raw {
         public static int mytracks_empty_spreadsheet=0x7f040000;
@@ -821,84 +825,84 @@ public final class R {
     public static final class style {
         /**  The style for the about value 
          */
-        public static int AboutValue=0x7f090000;
+        public static int AboutValue=0x7f0a0000;
         /**  The style for the bottom button 
          */
-        public static int BottomButton=0x7f090001;
+        public static int BottomButton=0x7f0a0001;
         /**  The style for the bottom button bar 
          */
-        public static int BottomButtonBar=0x7f090002;
+        public static int BottomButtonBar=0x7f0a0002;
         /**  The style for the edit category 
          */
-        public static int EditCategory=0x7f090003;
+        public static int EditCategory=0x7f0a0003;
         /**  The style for the edit description 
          */
-        public static int EditDescription=0x7f090004;
+        public static int EditDescription=0x7f0a0004;
         /**  The style for the edit label 
          */
-        public static int EditLabel=0x7f090005;
+        public static int EditLabel=0x7f0a0005;
         /**  The style for the edit lable with padding top 
          */
-        public static int EditLabel_WithPaddingTop=0x7f090006;
+        public static int EditLabel_WithPaddingTop=0x7f0a0006;
         /**  The style for the edit name 
          */
-        public static int EditName=0x7f090007;
+        public static int EditName=0x7f0a0007;
         /**  The style for the help answer 
          */
-        public static int HelpAnswer=0x7f090008;
+        public static int HelpAnswer=0x7f0a0008;
         /**  The style for help question 
          */
-        public static int HelpQuestion=0x7f090009;
+        public static int HelpQuestion=0x7f0a0009;
         /**  The style for the list empty text view 
          */
-        public static int ListEmptyTextView=0x7f09000a;
+        public static int ListEmptyTextView=0x7f0a000a;
         /**  style for the list item stats 
          */
-        public static int ListItemStats=0x7f09000b;
+        public static int ListItemStats=0x7f0a000b;
         /**  The style for the scroll view 
          */
-        public static int ScrollView=0x7f09000c;
+        public static int ScrollView=0x7f0a000c;
         /**  The style for the scroll view with bottom buttons 
          */
-        public static int ScrollView_WithBottomButtons=0x7f09000d;
+        public static int ScrollView_WithBottomButtons=0x7f0a000d;
         /**  The style for the sensor state value 
          */
-        public static int SensorStateValue=0x7f09000e;
+        public static int SensorStateValue=0x7f0a000e;
         /**  The style for the stats label 
          */
-        public static int StatsLabel=0x7f09000f;
+        public static int StatsLabel=0x7f0a000f;
         /**  The style for the stats spacer 
          */
-        public static int StatsSpacer=0x7f090010;
+        public static int StatsSpacer=0x7f0a0010;
         /**  The style for the stats value 
          */
-        public static int StatsValue=0x7f090011;
+        public static int StatsValue=0x7f0a0011;
         /**  The style for large size text 
          */
-        public static int TextLarge=0x7f090012;
+        public static int TextLarge=0x7f0a0012;
         /**  The style for large size text with an icon on the left 
          */
-        public static int TextLarge_WithIcon=0x7f090013;
+        public static int TextLarge_WithIcon=0x7f0a0013;
         /**  The style for medium size text 
          */
-        public static int TextMedium=0x7f090014;
+        public static int TextMedium=0x7f0a0014;
         /**  The style for medium size text with an icon on the left 
          */
-        public static int TextMedium_WithIcon=0x7f090015;
+        public static int TextMedium_WithIcon=0x7f0a0015;
         /**  The style for large size text 
          */
-        public static int TextSmall=0x7f090016;
+        public static int TextSmall=0x7f0a0016;
         /**  Theme selector 
          */
-        public static int ThemeSelector=0x7f090017;
+        public static int ThemeSelector=0x7f0a0017;
         /**  The style for the track widget value 
          */
-        public static int TrackWidgetValue=0x7f090018;
+        public static int TrackWidgetValue=0x7f0a0018;
         /**  The style for upload service chooser check box 
          */
-        public static int UploadServiceChooserCheckBox=0x7f090019;
+        public static int UploadServiceChooserCheckBox=0x7f0a0019;
         /**  The style for upload service chooser image view 
          */
-        public static int UploadServiceChooserImageView=0x7f09001a;
+        public static int UploadServiceChooserImageView=0x7f0a001a;
     }
 }

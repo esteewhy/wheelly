@@ -14,9 +14,7 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.wheelly.R;
-import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.LocationBroker;
-import com.wheelly.db.LocationRepository;
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.util.LocationUtils;
 
@@ -28,6 +26,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -42,6 +41,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,43 +58,57 @@ public class LocationsListFragment extends ListFragment
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
 	
+	boolean inSelectMode;
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
-		final Location location = LocationUtils.getLastKnownLocation(getActivity());
-		final Location dest = new Location(location);
-
-		setListAdapter(
-			new SimpleCursorAdapter(getActivity(), R.layout.location_item, null,
-				new String[] { "name", "resolved_address", "name" },
-				new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 }, 0
-			) {{
-				setViewBinder(new ViewBinder() {
-					@Override
-					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-						switch(view.getId()) {
-						case android.R.id.text2:
-							((TextView)view).setText(LocationUtils.locationToText(cursor));
-							return true;
-						case R.id.text3:
-							if(null != location) {
-								TextView tv = (TextView)view.findViewById(R.id.text3);
-								dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
-								dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
-								tv.setText(LocationUtils.formatDistance(location.distanceTo(dest)));
-							}
-							
-							return true;
-						}
-						return false;
-					}
-				});
-			}}
-		);
-		
+		final Intent intent = getActivity().getIntent();
+		inSelectMode = intent.hasExtra(LocationActivity.LOCATION_ID_EXTRA);
+		getListView().setChoiceMode(inSelectMode ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+		setListAdapter(inSelectMode ? buildSelectableAdapter() : buildAdapter());
 		registerForContextMenu(getListView());
 		setHasOptionsMenu(true);
+	}
+	
+	private ListAdapter buildSelectableAdapter() {
+		return
+			new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_single_choice, null,
+				new String[] { "name" },
+				new int[] { android.R.id.text1 }, 0
+			);
+	}
+	
+	private ListAdapter buildAdapter() {
+		final Location location = LocationUtils.getLastKnownLocation(getActivity());
+		final Location dest = new Location(location);
+		
+		return
+			new SimpleCursorAdapter(getActivity(), R.layout.location_item, null,
+					new String[] { "name", "resolved_address", "name" },
+					new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 }, 0
+				) {{
+					setViewBinder(new ViewBinder() {
+						@Override
+						public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+							switch(view.getId()) {
+							case android.R.id.text2:
+								((TextView)view).setText(LocationUtils.locationToText(cursor));
+								return true;
+							case R.id.text3:
+								if(null != location) {
+									TextView tv = (TextView)view.findViewById(R.id.text3);
+									dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
+									dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
+									tv.setText(LocationUtils.formatDistance(location.distanceTo(dest)));
+								}
+								
+								return true;
+							}
+							return false;
+						}
+					});
+				}};
 	}
 	
 	@Override
@@ -122,8 +136,11 @@ public class LocationsListFragment extends ListFragment
 			onListItemClick(getListView(), null, mi.position, mi.id);
 			return true;
 		case MENU_DELETE:
-			new LocationRepository(new DatabaseHelper(getActivity()).getWritableDatabase()).delete(mi.id);
-			getLoaderManager().restartLoader(0, null, this);
+			getActivity().getContentResolver().delete(
+				Locations.CONTENT_URI,
+				BaseColumns._ID + " = ?",
+				new String[] { Long.toString(mi.id) }
+			);
 			return true;
 		};
 		return false;
@@ -151,12 +168,20 @@ public class LocationsListFragment extends ListFragment
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, final long id) {
-		startActivityForResult(
-			new Intent(getActivity(), LocationActivity.class) {{
-				putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
-			}},
-			EDIT_LOCATION_REQUEST
-		);
+		if(inSelectMode) {
+			l.setItemChecked(position, true);
+			final Intent intent = new Intent();
+			intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
+			getActivity().setResult(Activity.RESULT_OK, intent);
+			getActivity().finish();
+		} else {
+			startActivityForResult(
+				new Intent(getActivity(), LocationActivity.class) {{
+					putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
+				}},
+				EDIT_LOCATION_REQUEST
+			);
+		}
 	}
 	
 	@Override
@@ -232,10 +257,27 @@ public class LocationsListFragment extends ListFragment
 		final CursorAdapter a = (CursorAdapter) getListAdapter();
 		a.swapCursor(cursor);
 		a.notifyDataSetChanged();
+		
+		if(inSelectMode && getListView().getSelectedItemPosition() < 0) {
+			final int position = getItemPositionByAdapterId(getActivity().getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1));
+			
+			if(position >= 0) {
+				getListView().setItemChecked(position, true);
+			}
+		}
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> paramLoader) {
 		((CursorAdapter) getListAdapter()).swapCursor(null);
+	}
+	
+	private int getItemPositionByAdapterId(final long id)
+	{
+		final ListAdapter adapter = getListAdapter();
+		int i = 0;
+		while(i < adapter.getCount() && id != adapter.getItemId(i++));
+		
+		return i == adapter.getCount() ? -1 : --i;
 	}
 }
