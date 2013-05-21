@@ -1,0 +1,29 @@
+<merge xmlns:android ="http://schemas.android.com/apk/res/android">
+	<EditText
+		android:layout_height	="wrap_content"
+		android:textStyle		="bold"
+		android:singleLine		="true"
+		android:layout_width	="wrap_content"
+		android:layout_weight	="1"
+		android:textSize		="20sp"
+		android:gravity			="center_vertical"
+		android:id				="@+id/primary"
+		android:numeric			="integer" 
+		android:phoneNumber		="true"
+		android:maxLength		="16"
+		android:visibility		="gone"/>
+	
+	<com.kdion.tutorial.odometer.Odometer
+	    android:id="@+id/odo"
+	    android:layout_width	="wrap_content"
+	    android:layout_weight	="1"
+	    android:gravity			="center_vertical"
+	    android:layout_height	="64dip" />
+	
+	<ImageButton
+		android:id				="@+id/amount_input"
+		android:layout_height	="wrap_content"
+		android:layout_width	="wrap_content"
+		android:layout_gravity	="right|center_vertical"
+		style					="@style/UpDownButton"/>
+</merge>

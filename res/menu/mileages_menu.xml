@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id		="@+id/opt_menu_install_mytracks"
+		android:icon	="@drawable/arrow_icon"
+		android:title	="@string/item_install_mytracks"
+		android:visible ="false" />
+</menu>
