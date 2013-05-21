@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.wheelly.fragments;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -17,13 +19,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wheelly.R;
+import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.util.FilterUtils.F;
+
+import android.app.Dialog;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-public class LocationsMapFragment extends SupportMapFragment {
+public class LocationsMapFragment extends SupportMapFragment
+		implements LoaderCallbacks<Cursor> {
 	private GoogleMap googleMap;
 	private View mapView;
 
@@ -72,6 +84,65 @@ public class LocationsMapFragment extends SupportMapFragment {
 		return layout;
 	}
 
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return new CursorLoader(getActivity(),
+				Locations.CONTENT_URI, null,
+				null, null, null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		if(cursor.moveToFirst()) {
+			int latIdx = cursor.getColumnIndex("latitude");
+			int lonIdx = cursor.getColumnIndex("longitude");
+			do {
+				final LatLng location = new LatLng(
+						cursor.getDouble(latIdx),
+			        	cursor.getDouble(lonIdx));
+				MarkerOptions markerOptions = new MarkerOptions();
+				 
+		        // Setting latitude and longitude for the marker
+		        markerOptions.position(location);
+		 
+		        // Adding marker on the Google Map
+		        googleMap.addMarker(markerOptions);
+			} while(cursor.moveToNext());
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> cursor) {
+	}
+	
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		
+		// Getting Google Play availability status
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+ 
+        // Showing status
+        if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+ 
+            int requestCode = 10;
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, getActivity(), requestCode);
+            dialog.show();
+ 
+        }else { // Google Play Services are available
+ 
+            // Getting GoogleMap object from the fragment
+            googleMap = getMap();
+ 
+            // Enabling MyLocation Layer of Google Map
+            googleMap.setMyLocationEnabled(true);
+ 
+            // Invoke LoaderCallbacks to retrieve and draw already saved locations in map
+            getActivity().getSupportLoaderManager().initLoader(0, null, this);
+        }
+	}
+	
 	/*
 	 * @Override protected void onCreate(Bundle savedInstanceState) {
 	 * super.onCreate(savedInstanceState);

@@ -9,6 +9,7 @@ import java.util.Map;
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.DatabaseSchema;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.DatabaseSchema.Refuels;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Timeline;
@@ -84,11 +85,14 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
 		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
+		DataSchemaLookup.put(LOCATIONS, new String[] { Locations.CONTENT_TYPE, "locations", null });
+		DataSchemaLookup.put(LOCATIONS_ID, new String[] { Locations.CONTENT_ITEM_TYPE, "locations", null });
 		
 		UriMap.put(MILEAGES, Mileages.CONTENT_URI);
 		UriMap.put(REFUELS, Refuels.CONTENT_URI);
 		UriMap.put(HEARTBEATS, Heartbeats.CONTENT_URI);
 		UriMap.put(TIMELINE, Timeline.CONTENT_URI);
+		UriMap.put(LOCATIONS, Locations.CONTENT_URI);
 	}
 	
 	private SQLiteOpenHelper dbHelper;
