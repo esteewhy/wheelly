@@ -9,6 +9,9 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
 @SuppressLint("NewApi")
 public class LocationsList extends FragmentActivity {
@@ -21,6 +24,12 @@ public class LocationsList extends FragmentActivity {
 
         mViewPager = new ViewPager(this);
         mViewPager.setId(R.id.pager);
+        mViewPager.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View paramView, MotionEvent paramMotionEvent) {
+				return true;
+			}
+		});
         setContentView(mViewPager);
 
         final ActionBar bar = getActionBar();
