@@ -149,7 +149,6 @@ public class LocationsMapFragment extends SupportMapFragment {
 						if(id == selectedId) {
 							selected = l;
 						}
-						
 					}
 					
 					@Override
