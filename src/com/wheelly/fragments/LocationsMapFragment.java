@@ -14,6 +14,7 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -92,10 +93,12 @@ public class LocationsMapFragment extends SupportMapFragment
 		}
 	}
 	
+	private boolean inSelectMode;
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getActivity().getIntent();
+		inSelectMode = getActivity().getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
@@ -121,7 +124,45 @@ public class LocationsMapFragment extends SupportMapFragment
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		return new CursorLoader(getActivity(), Locations.CONTENT_URI, null, null, null, null);
 	}
-
+	
+	private static interface Aggregate {
+		void seed(LatLng l, long id);
+		CameraUpdate result();
+	}
+	
+	private Aggregate buildCameraUpdateDelegate() {
+		return
+			!inSelectMode
+				? new Aggregate() {
+					private final LatLngBounds.Builder b = LatLngBounds.builder();
+					@Override
+					public void seed(LatLng l, long id) {
+						b.include(l);
+					}
+					
+					@Override
+					public CameraUpdate result() {
+						return CameraUpdateFactory.newLatLngBounds(b.build(), 15);
+					}
+				}
+				: new Aggregate() {
+					private final long selectedId = getActivity().getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
+					private LatLng selected = null;
+					@Override
+					public void seed(LatLng l, long id) {
+						if(id == selectedId) {
+							selected = l;
+						}
+						
+					}
+					
+					@Override
+					public CameraUpdate result() {
+						return CameraUpdateFactory.newLatLngZoom(selected, 17);
+					}
+				};
+	}
+	
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		if(cursor.moveToFirst()) {
@@ -130,23 +171,23 @@ public class LocationsMapFragment extends SupportMapFragment
 			final int nameIdx = cursor.getColumnIndex("name");
 			final int idIdx = cursor.getColumnIndex(BaseColumns._ID);
 			
-			final LatLngBounds.Builder b = LatLngBounds.builder();
-			
+			final Aggregate delegate = buildCameraUpdateDelegate();
+				
 			do {
 				final LatLng l = new LatLng(cursor.getDouble(latIdx), cursor.getDouble(lonIdx));
+				final long id = cursor.getLong(idIdx);
 				final MarkerOptions markerOptions = new MarkerOptions()
 		        	.position(l)
 		        	.title(cursor.getString(nameIdx))
-		        	.snippet(Long.toString(cursor.getLong(idIdx)))
+		        	.snippet(Long.toString(id))
 		        	.draggable(true);
 		        
 		        // Adding marker on the Google Map
 		        googleMap.addMarker(markerOptions);
-		        
-		        b.include(l);
+		        delegate.seed(l, id);
 			} while(cursor.moveToNext());
 			
-			googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(b.build(), 15));
+			googleMap.animateCamera(delegate.result());
 		}
 	}
 
