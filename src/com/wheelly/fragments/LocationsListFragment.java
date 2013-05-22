@@ -15,6 +15,8 @@ import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
+import com.google.android.apps.mytracks.ContextualActionModeCallback;
+import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.wheelly.R;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
@@ -58,6 +60,30 @@ public class LocationsListFragment extends ListFragment {
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
 	
+	private ContextualActionModeCallback contextualActionModeCallback = new ContextualActionModeCallback() {
+		@Override
+		public boolean onClick(int itemId, int position, long id) {
+			return handleContextItem(itemId, id);
+		}
+
+		@Override
+		public void onPrepare(Menu menu, int position, long id) {
+		}
+
+		@Override
+		public void onCreate(Menu menu) {
+			menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
+			menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
+			menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete);
+		}
+
+		@Override
+		public CharSequence getCaption(View view) {
+			TextView textView = (TextView) view.findViewById(android.R.id.text1);
+			return textView != null ? textView.getText() : null;
+		}
+	};
+	
 	boolean inSelectMode;
 	
 	@Override
@@ -67,7 +93,7 @@ public class LocationsListFragment extends ListFragment {
 		inSelectMode = intent.hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		getListView().setChoiceMode(inSelectMode ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		setListAdapter(inSelectMode ? buildSelectableAdapter() : buildAdapter());
-		registerForContextMenu(getListView());
+		ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, getListView(), contextualActionModeCallback);
 		setHasOptionsMenu(true);
 		BusProvider.getInstance().register(this);
 	}
@@ -117,31 +143,32 @@ public class LocationsListFragment extends ListFragment {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		BusProvider.getInstance().post(new LocationSelectedEvent(((AdapterContextMenuInfo)menuInfo).id, LocationsListFragment.this));
 		menu.setHeaderTitle(R.string.locations);
-		menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
-		menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
-		menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete);
+		contextualActionModeCallback.onCreate(menu);
+		contextualActionModeCallback.onPrepare(menu, 0, 0);
 	}
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		if (super.onContextItemSelected(item)) {
-			return true;
-		}
-		
-		final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-		
-		switch(item.getItemId()) {
+		return
+			(handleContextItem(item.getItemId(), ((AdapterContextMenuInfo) item.getMenuInfo()).id))
+				? true
+				: super.onContextItemSelected(item);
+
+	}
+	
+	private boolean handleContextItem(int itemId, long id) {
+		switch(itemId) {
 		case MENU_RESOLVE:
-			startGeocode(new LocationBroker(getActivity()).loadOrCreate(mi.id));
+			startGeocode(new LocationBroker(getActivity()).loadOrCreate(id));
 			return true;
 		case MENU_EDIT:
-			onListItemClick(getListView(), null, mi.position, mi.id);
+			onListItemClick(getListView(), null, 0, id);
 			return true;
 		case MENU_DELETE:
 			getActivity().getContentResolver().delete(
 				Locations.CONTENT_URI,
 				BaseColumns._ID + " = ?",
-				new String[] { Long.toString(mi.id) }
+				new String[] { Long.toString(id) }
 			);
 			return true;
 		};

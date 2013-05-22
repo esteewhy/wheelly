@@ -244,33 +244,33 @@ public abstract class ConfigurableListFragment extends ListFragment
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		super.onContextItemSelected(item);
-		
-		final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-		
-		switch (item.getItemId()) {
-			case R.id.ctx_menu_view: {
-				viewItem(mi.id);
-				return true;
+		if(getUserVisibleHint()) {
+			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
+			
+			switch (item.getItemId()) {
+				case R.id.ctx_menu_view: {
+					viewItem(mi.id);
+					return true;
+				}
+				case R.id.ctx_menu_edit:
+					editItem(mi.id);
+					return true;
+				case R.id.ctx_menu_delete:
+					new AlertDialog.Builder(getActivity())
+						.setMessage(getConfiguration().ConfirmDeleteResourceId)
+						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								deleteItem(mi.id);
+								onActivityResult(DELETE_REQUEST, Activity.RESULT_OK, null);
+							}
+						})
+						.setNegativeButton(R.string.no, null)
+						.show();
+					return true;
 			}
-			case R.id.ctx_menu_edit:
-				editItem(mi.id);
-				return true;
-			case R.id.ctx_menu_delete:
-				new AlertDialog.Builder(getActivity())
-					.setMessage(getConfiguration().ConfirmDeleteResourceId)
-					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
-						@Override
-						public void onClick(DialogInterface arg0, int arg1) {
-							deleteItem(mi.id);
-							onActivityResult(DELETE_REQUEST, Activity.RESULT_OK, null);
-						}
-					})
-					.setNegativeButton(R.string.no, null)
-					.show();
-				return true;
 		}
-		return false;
+		return super.onContextItemSelected(item);
 	}
 	
 	@Override
