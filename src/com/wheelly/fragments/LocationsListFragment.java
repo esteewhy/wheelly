@@ -68,6 +68,7 @@ public class LocationsListFragment extends ListFragment {
 
 		@Override
 		public void onPrepare(Menu menu, int position, long id) {
+			BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsListFragment.this));
 		}
 
 		@Override
@@ -141,10 +142,10 @@ public class LocationsListFragment extends ListFragment {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		BusProvider.getInstance().post(new LocationSelectedEvent(((AdapterContextMenuInfo)menuInfo).id, LocationsListFragment.this));
 		menu.setHeaderTitle(R.string.locations);
 		contextualActionModeCallback.onCreate(menu);
-		contextualActionModeCallback.onPrepare(menu, 0, 0);
+		AdapterContextMenuInfo mi = (AdapterContextMenuInfo)menuInfo;
+		contextualActionModeCallback.onPrepare(menu, mi.position, mi.id);
 	}
 	
 	@Override
