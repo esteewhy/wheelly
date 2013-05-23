@@ -2,10 +2,7 @@ package com.wheelly.content;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import com.wheelly.db.DatabaseHelper;
 import com.wheelly.db.DatabaseSchema;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
@@ -25,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.SparseArray;
 
 /**
  * Meant to be a single entry point to Wheelly Data API.
@@ -46,8 +44,8 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
 	
-	private static final Map<Integer, String[]> DataSchemaLookup = new HashMap<Integer, String[]>();
-	private static final Map<Integer, Uri> UriMap = new HashMap<Integer, Uri>();
+	private static final SparseArray<String[]> DataSchemaLookup = new SparseArray<String[]>();
+	private static final SparseArray<Uri> UriMap = new SparseArray<Uri>();
 	private static final UriMatcher uriMatcher;
 	
 	private static final int LOOKUP_CONTENT_TYPE = 0;
@@ -67,7 +65,6 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "refuels/#", REFUELS_ID);
 			addURI(a, "heartbeats/#", HEARTBEATS_ID);
 			addURI(a, "timeline/#", TIMELINE_ID);
-			
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
@@ -85,8 +82,8 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
 		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
-		DataSchemaLookup.put(LOCATIONS, new String[] { Locations.CONTENT_TYPE, "locations", null });
-		DataSchemaLookup.put(LOCATIONS_ID, new String[] { Locations.CONTENT_ITEM_TYPE, "locations", null });
+		DataSchemaLookup.put(LOCATIONS, new String[] { Locations.CONTENT_TYPE, "locations", "locations" });
+		DataSchemaLookup.put(LOCATIONS_ID, new String[] { Locations.CONTENT_ITEM_TYPE, "locations", "locations" });
 		
 		UriMap.put(MILEAGES, Mileages.CONTENT_URI);
 		UriMap.put(REFUELS, Refuels.CONTENT_URI);
@@ -101,7 +98,7 @@ public class ChronologyProvider extends ContentProvider {
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(DataSchemaLookup.containsKey(uriCode)) {
+		if(DataSchemaLookup.indexOfKey(uriCode) >= 0) {
 			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
 			if(null != tableName) {
@@ -133,7 +130,7 @@ public class ChronologyProvider extends ContentProvider {
 	public String getType(Uri uri) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(DataSchemaLookup.containsKey(uriCode)) {
+		if(DataSchemaLookup.indexOfKey(uriCode) >= 0) {
 			return DataSchemaLookup.get(uriCode)[LOOKUP_CONTENT_TYPE];
 		}
 		
@@ -144,7 +141,7 @@ public class ChronologyProvider extends ContentProvider {
 	public Uri insert(Uri uri, ContentValues values) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(DataSchemaLookup.containsKey(uriCode) && UriMap.containsKey(uriCode)) {
+		if(DataSchemaLookup.indexOfKey(uriCode) >= 0 && UriMap.indexOfKey(uriCode) >= 0) {
 			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
 			if(null != tableName) {
@@ -194,6 +191,7 @@ public class ChronologyProvider extends ContentProvider {
 		case REFUELS_ID:
 		case HEARTBEATS_ID:
 		case TIMELINE_ID:
+		case LOCATIONS_ID:
 			return dbHelper.getReadableDatabase().query(
 				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE],
 				projection,
@@ -204,7 +202,7 @@ public class ChronologyProvider extends ContentProvider {
 				"1");
 		}
 		
-		if(DataSchemaLookup.containsKey(uriCode)) {
+		if(DataSchemaLookup.indexOfKey(uriCode) >= 0) {
 			final Cursor cursor = dbHelper.getReadableDatabase().query(
 				DataSchemaLookup.get(uriCode)[LOOKUP_TABLE_LIST],
 				projection, selection, selectionArgs,
@@ -243,7 +241,7 @@ public class ChronologyProvider extends ContentProvider {
 			String[] selectionArgs) {
 		final int uriCode = uriMatcher.match(uri);
 		
-		if(DataSchemaLookup.containsKey(uriCode)) {
+		if(DataSchemaLookup.indexOfKey(uriCode) >= 0) {
 			final String tableName = DataSchemaLookup.get(uriCode)[LOOKUP_TABLE];
 			
 			if(null != tableName) {

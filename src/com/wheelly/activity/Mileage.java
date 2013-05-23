@@ -8,15 +8,17 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.FloatMath;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
+import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.wheelly.R;
 import com.wheelly.app.LocationInput;
 import com.wheelly.app.TrackInput;
 import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
+import com.wheelly.bus.BusProvider;
+import com.wheelly.bus.TrackChangedEvent;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.service.WorkflowNotifier;
@@ -31,7 +33,6 @@ public class Mileage extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.mileage_edit);
 		
 		//components
@@ -52,12 +53,15 @@ public class Mileage extends FragmentActivity {
 						? (long)FloatMath.ceil(new TrackRepository(Mileage.this).getDistance(trackId))
 						: 0);
 				}
+				
+				BusProvider.getInstance().post(new TrackChangedEvent(trackId));
 			}
 		});
 		c.Track.setValue(values.getAsLong("track_id"));
 		
 		final TripControlBar.Value heartbeats = new TripControlBar.Value();
 		heartbeats.TrackId = values.getAsLong("track_id");
+		BusProvider.getInstance().post(new TrackChangedEvent(heartbeats.TrackId));
 		
 		HeartbeatBroker broker = new HeartbeatBroker(this);
 		heartbeats.StartHeartbeat = broker.loadOrCreate(values.getAsLong("start_heartbeat_id"));
@@ -155,6 +159,8 @@ public class Mileage extends FragmentActivity {
 			final int uiCommand = intent.getIntExtra("ui_command", 0);
 			c.Heartbeats.performUICommand(uiCommand);
 		}
+		
+		ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
 	}
 		
 	/**

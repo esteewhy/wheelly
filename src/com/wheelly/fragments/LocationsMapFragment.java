@@ -10,43 +10,45 @@
  ******************************************************************************/
 package com.wheelly.fragments;
 
+import ru.orangesoftware.financisto.activity.LocationActivity;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.wheelly.R;
-import com.wheelly.db.DatabaseSchema.Locations;
-import com.wheelly.util.FilterUtils.F;
+import com.squareup.otto.Subscribe;
+import com.squareup.otto.sample.BusProvider;
+import com.wheelly.bus.LocationSelectedEvent;
+import com.wheelly.bus.LocationsLoadedEvent;
+import com.wheelly.db.LocationBroker;
 
 import android.app.Dialog;
-import android.database.Cursor;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
+import android.provider.BaseColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
-public class LocationsMapFragment extends SupportMapFragment
-		implements LoaderCallbacks<Cursor> {
+public class LocationsMapFragment extends SupportMapFragment {
+	static final int NEW_LOCATION_REQUEST = 1;
+	static final int EDIT_LOCATION_REQUEST = 2;
+	
 	private GoogleMap googleMap;
-	private View mapView;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		mapView = super.onCreateView(inflater, container, savedInstanceState);
-		View layout = inflater.inflate(R.layout.map, container, false);
-		RelativeLayout mapContainer = (RelativeLayout) layout
-				.findViewById(R.id.map_container);
-		mapContainer.addView(mapView, 0);
+		View layout = super.onCreateView(inflater, container, savedInstanceState);
 
 		/*
 		 * At this point, after super.onCreateView, getMap will not return null
@@ -61,107 +63,146 @@ public class LocationsMapFragment extends SupportMapFragment
 			googleMap = getMap();
 			googleMap.setMyLocationEnabled(true);
 
-			/*
-			 * My Tracks needs to handle the onClick event when the my location
-			 * button is clicked. Currently, the API doesn't allow handling
-			 * onClick event, thus hiding the default my location button and
-			 * providing our own.
-			 */
-			googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+			googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 			googleMap.getUiSettings().setAllGesturesEnabled(true);
 			googleMap.setIndoorEnabled(true);
 			googleMap.setOnMarkerClickListener(new OnMarkerClickListener() {
-
 				@Override
 				public boolean onMarkerClick(Marker marker) {
+					final long id = Long.parseLong(marker.getSnippet());
+					BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsMapFragment.this));
+					return false;
+				}
+			});
+			
+			googleMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+				
+				@Override
+				public void onInfoWindowClick(Marker marker) {
+					final long id = Long.parseLong(marker.getSnippet());
 					if (isResumed()) {
+						startActivityForResult(
+								new Intent(getActivity(), LocationActivity.class) {{
+									putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
+								}},
+								EDIT_LOCATION_REQUEST
+							);
 					}
-					return true;
 				}
 			});
 		}
 
 		return layout;
 	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		return new CursorLoader(getActivity(),
-				Locations.CONTENT_URI, null,
-				null, null, null);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		if(cursor.moveToFirst()) {
-			int latIdx = cursor.getColumnIndex("latitude");
-			int lonIdx = cursor.getColumnIndex("longitude");
-			do {
-				final LatLng location = new LatLng(
-						cursor.getDouble(latIdx),
-			        	cursor.getDouble(lonIdx));
-				MarkerOptions markerOptions = new MarkerOptions();
-				 
-		        // Setting latitude and longitude for the marker
-		        markerOptions.position(location);
-		 
-		        // Adding marker on the Google Map
-		        googleMap.addMarker(markerOptions);
-			} while(cursor.moveToNext());
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> cursor) {
-	}
 	
+	private boolean inSelectMode;
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		BusProvider.getInstance().register(this);
 		
-		// Getting Google Play availability status
+		inSelectMode = getActivity().getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA);
+		
+        // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
  
         // Showing status
-        if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+        if(status != ConnectionResult.SUCCESS){ // Google Play Services are not available
  
             int requestCode = 10;
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, getActivity(), requestCode);
             dialog.show();
  
-        }else { // Google Play Services are available
+        } else { // Google Play Services are available
  
             // Getting GoogleMap object from the fragment
             googleMap = getMap();
- 
-            // Enabling MyLocation Layer of Google Map
-            googleMap.setMyLocationEnabled(true);
- 
-            // Invoke LoaderCallbacks to retrieve and draw already saved locations in map
-            getActivity().getSupportLoaderManager().initLoader(0, null, this);
         }
 	}
 	
-	/*
-	 * @Override protected void onCreate(Bundle savedInstanceState) {
-	 * super.onCreate(savedInstanceState);
-	 * requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-	 * setContentView(R.layout.location_list);
-	 * 
-	 * this.cursor = new LocationRepository(new
-	 * DatabaseHelper(this).getReadableDatabase()).list();
-	 * startManagingCursor(cursor);
-	 * 
-	 * setListAdapter( new SimpleCursorAdapter(this, R.layout.location_item,
-	 * cursor, new String[] { "name", "resolved_address" }, new int[] {
-	 * R.id.line1, R.id.label } ) {{ setViewBinder(new ViewBinder() {
-	 * 
-	 * @Override public boolean setViewValue(View view, Cursor cursor, int
-	 * columnIndex) { switch(view.getId()) { case R.id.label:
-	 * ((TextView)view).setText(LocationUtils.locationToText(cursor)); return
-	 * true; } return false; } }); }} );
-	 * 
-	 * }
-	 */
+	private interface Aggregate {
+		void seed(LatLng l, long id);
+		CameraUpdate result();
+	}
+	
+	private Aggregate buildCameraUpdateDelegate() {
+		return
+			!inSelectMode
+				? new Aggregate() {
+					private final LatLngBounds.Builder b = LatLngBounds.builder();
+					@Override
+					public void seed(LatLng l, long id) {
+						b.include(l);
+					}
+					
+					@Override
+					public CameraUpdate result() {
+						return CameraUpdateFactory.newLatLngBounds(b.build(), 15);
+					}
+				}
+				: new Aggregate() {
+					private final long selectedId = getActivity().getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
+					private LatLng selected = null;
+					@Override
+					public void seed(LatLng l, long id) {
+						if(id == selectedId) {
+							selected = l;
+						}
+					}
+					
+					@Override
+					public CameraUpdate result() {
+						return CameraUpdateFactory.newLatLngZoom(selected, 17);
+					}
+				};
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		BusProvider.getInstance().unregister(this);
+	}
+	
+	@Subscribe
+	public void onLoadFinished(LocationsLoadedEvent event) {
+		if(null == event.cursor) {
+			googleMap.clear();
+			return;
+		}
+		
+		if(event.cursor.moveToFirst()) {
+			final int latIdx = event.cursor.getColumnIndex("latitude");
+			final int lonIdx = event.cursor.getColumnIndex("longitude");
+			final int nameIdx = event.cursor.getColumnIndex("name");
+			final int idIdx = event.cursor.getColumnIndex(BaseColumns._ID);
+			
+			final Aggregate delegate = buildCameraUpdateDelegate();
+				
+			do {
+				final LatLng l = new LatLng(event.cursor.getDouble(latIdx), event.cursor.getDouble(lonIdx));
+				final long id = event.cursor.getLong(idIdx);
+				final MarkerOptions markerOptions = new MarkerOptions()
+		        	.position(l)
+		        	.title(event.cursor.getString(nameIdx))
+		        	.snippet(Long.toString(id))
+		        	.draggable(true);
+		        
+		        // Adding marker on the Google Map
+		        googleMap.addMarker(markerOptions);
+		        delegate.seed(l, id);
+			} while(event.cursor.moveToNext());
+			
+			googleMap.animateCamera(delegate.result());
+		}
+	}
+	
+	@Subscribe
+	public void onSelectionChanged(final LocationSelectedEvent event) {
+		if(this != event.sender) {
+			final ContentValues c = new LocationBroker(getActivity()).loadOrCreate(event.id);
+			final LatLng selected = new LatLng(c.getAsDouble("latitude"), c.getAsDouble("longitude"));
+			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selected, 17));
+		}
+	}
 }
