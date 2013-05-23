@@ -4,10 +4,12 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
 import com.wheelly.R;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.LocationRepository;
+import com.wheelly.activity.LocationsList;
+import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -15,7 +17,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -37,9 +39,11 @@ import android.widget.Toast;
 /**
  * Location selection and creation control.
  */
+@SuppressLint("NewApi")
 public final class LocationInput extends Fragment {
 	
 	private static final int NEW_LOCATION_REQUEST = 4002;
+	private static final int EDIT_LOCATION_REQUEST = 4003;
 	
 	private long selectedLocationId = 0;
 	private boolean setCurrentLocation;
@@ -47,47 +51,32 @@ public final class LocationInput extends Fragment {
 	private Location lastFix;
 	private Controls c;
 	private Cursor locationCursor;
-	private SQLiteDatabase db;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final Activity ctx = getActivity();  
-		locationCursor = new LocationRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
+		final Activity ctx = getActivity();
+		locationCursor = getActivity().getContentResolver().query(Locations.CONTENT_URI, null, null, null, null);
 		ctx.startManagingCursor(locationCursor);
-		final Location location = getLastKnownLocation();
-		final Location dest = new Location(location);
-		final ListAdapter adapter =
-			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_list_item_2,
-					locationCursor, 
-					new String[] {"name" },
-					new int[] { android.R.id.text1 }
-			) {
-				@Override
-				public void bindView(View view, Context context, Cursor cursor) {
-					super.bindView(view, context, cursor);
-					
-					((TextView)view.findViewById(android.R.id.text1))
-						.setTextColor(getResources().getColor(android.R.color.black));
-					
-					if(null != location) {
-						TextView tv = (TextView)view.findViewById(android.R.id.text2);
-						dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
-						dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
-						tv.setText(String.valueOf(location.distanceTo(dest)));
-					}
-				}
-				
-				
-			};
 		
 		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		
+		v.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View paramView) {
+				Intent intent = new Intent(ctx, LocationsList.class);
+				intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, selectedLocationId);
+				startActivityForResult(intent, EDIT_LOCATION_REQUEST);
+				return true;
+			}
+		});
+		
 		v.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(ctx)
-					.setSingleChoiceItems(adapter,
+				
+				new AlertDialog.Builder(getActivity())
+					.setSingleChoiceItems(buildAdapter(locationCursor),
 						Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
 						new DialogInterface.OnClickListener(){
 							@Override
@@ -116,10 +105,32 @@ public final class LocationInput extends Fragment {
 		return v;
 	}
 	
-	@Override
-	public void onDestroyView() {
-		db.close();
-		super.onDestroyView();
+	private ListAdapter buildAdapter(Cursor cursor) {
+		final Location location = LocationUtils.getLastKnownLocation(getActivity());
+		final Location dest = new Location(location);
+		
+		return
+			new SimpleCursorAdapter(getActivity(),
+					R.layout.location_item,
+					cursor, 
+					new String[] {"name", "resolved_address" },
+					new int[] { android.R.id.text1, android.R.id.text2 }, 0
+			) {
+				@Override
+				public void bindView(View view, Context context, Cursor cursor) {
+					super.bindView(view, context, cursor);
+					
+					((TextView)view.findViewById(android.R.id.text1))
+						.setTextColor(getResources().getColor(android.R.color.black));
+					
+					if(null != location) {
+						TextView tv = (TextView)view.findViewById(R.id.text3);
+						dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
+						dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
+						tv.setText(String.valueOf(location.distanceTo(dest)));
+					}
+				}
+			};
 	}
 	
 	@Override
@@ -128,6 +139,7 @@ public final class LocationInput extends Fragment {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case NEW_LOCATION_REQUEST:
+				case EDIT_LOCATION_REQUEST:
 					locationCursor.requery();
 					long locationId = data.getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
 					if (locationId > 0) {
@@ -135,7 +147,6 @@ public final class LocationInput extends Fragment {
 					}
 					break;
 			}
-		} else {
 		}
 	}
 	
@@ -156,7 +167,7 @@ public final class LocationInput extends Fragment {
 	}
 	
 	private boolean selectNearestExistingLocation() {
-		final Location mLocation = getLastKnownLocation();
+		final Location mLocation = LocationUtils.getLastKnownLocation(getActivity());
 		
 		if(null!= mLocation) {
 			Toast.makeText(getActivity(), "Obtained location", Toast.LENGTH_LONG).show();
@@ -170,23 +181,6 @@ public final class LocationInput extends Fragment {
 		}
 		
 		return false;
-	}
-	
-	private Location getLastKnownLocation() {
-		LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-		
-		Criteria criteria = new Criteria(); 
-		criteria.setPowerRequirement(Criteria.POWER_LOW); 
-		criteria.setAccuracy(Criteria.ACCURACY_COARSE); 
-		criteria.setAltitudeRequired(false); 
-		criteria.setBearingRequired(false); 
-		criteria.setSpeedRequired(false); 
-		criteria.setCostAllowed(false); 
-		String provider = lm.getBestProvider(criteria, true);
-		
-		return provider != null
-			? lm.getLastKnownLocation(provider)
-			: null;
 	}
 	
 	/**
@@ -217,8 +211,12 @@ public final class LocationInput extends Fragment {
 	 * Attempts to select location from current cursor position.
 	 */
 	private void setLocationFromCursor() {
-		ContentValues location = LocationRepository.deserialize(locationCursor);
+		ContentValues location = LocationBroker.deserialize(locationCursor);
 		//c.locationText.setText(LocationUtils.locationToText(location));
+		setLocation(location);
+	}
+	
+	private void setLocation(ContentValues location) {
 		c.locationText.setText(location.getAsString("name"));
 		selectedLocationId = location.getAsLong(BaseColumns._ID);
 		setCurrentLocation = false;

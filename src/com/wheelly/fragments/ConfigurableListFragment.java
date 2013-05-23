@@ -142,19 +142,16 @@ public abstract class ConfigurableListFragment extends ListFragment
 	}
 	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case EDIT_REQUEST:
-			((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
-			break;
-		}
-	}
-	
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		
 		inflater.inflate(R.menu.common_menu, menu);
+		
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
 		
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
@@ -244,33 +241,33 @@ public abstract class ConfigurableListFragment extends ListFragment
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		super.onContextItemSelected(item);
-		
-		final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-		
-		switch (item.getItemId()) {
-			case R.id.ctx_menu_view: {
-				viewItem(mi.id);
-				return true;
+		if(getUserVisibleHint()) {
+			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
+			
+			switch (item.getItemId()) {
+				case R.id.ctx_menu_view: {
+					viewItem(mi.id);
+					return true;
+				}
+				case R.id.ctx_menu_edit:
+					editItem(mi.id);
+					return true;
+				case R.id.ctx_menu_delete:
+					new AlertDialog.Builder(getActivity())
+						.setMessage(getConfiguration().ConfirmDeleteResourceId)
+						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								deleteItem(mi.id);
+								onActivityResult(DELETE_REQUEST, Activity.RESULT_OK, null);
+							}
+						})
+						.setNegativeButton(R.string.no, null)
+						.show();
+					return true;
 			}
-			case R.id.ctx_menu_edit:
-				editItem(mi.id);
-				return true;
-			case R.id.ctx_menu_delete:
-				new AlertDialog.Builder(getActivity())
-					.setMessage(getConfiguration().ConfirmDeleteResourceId)
-					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
-						@Override
-						public void onClick(DialogInterface arg0, int arg1) {
-							deleteItem(mi.id);
-							onActivityResult(DELETE_REQUEST, Activity.RESULT_OK, null);
-						}
-					})
-					.setNegativeButton(R.string.no, null)
-					.show();
-				return true;
 		}
-		return false;
+		return super.onContextItemSelected(item);
 	}
 	
 	@Override
@@ -319,12 +316,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	private final ContentValues filter = new ContentValues();
 	public String locationConstraint = null; 
 	
-	@Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-	}
-	
 	public ContentValues getFilter() {
 		return filter;
 	}
@@ -353,7 +344,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		//setImageResource(reset ? R.drawable.ic_menu_filter_off : R.drawable.ic_menu_filter_on);
 	}
 	
-
 	private void setLocationConstraint(String locationConstraint) {
 		this.locationConstraint = locationConstraint;
 	}
@@ -363,5 +353,4 @@ public abstract class ConfigurableListFragment extends ListFragment
 	private void SetOnFilterChangedListener(OnFilterChangedListener listener) {
 		this.listener = listener;
 	}
-	
 }

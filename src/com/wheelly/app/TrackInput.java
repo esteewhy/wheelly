@@ -4,8 +4,7 @@ import ru.orangesoftware.financisto.utils.Utils;
 
 import com.wheelly.R;
 import com.wheelly.content.TrackRepository;
-import com.wheelly.content.TransactionRepository;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -53,6 +52,7 @@ public final class TrackInput extends Fragment {
 		}
 	}
 	
+	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -73,6 +73,7 @@ public final class TrackInput extends Fragment {
 		//@todo implement notification about disabled sharing in MyTracks
 		if(null != tracksCursor) {
 			ctx.startManagingCursor(tracksCursor);
+			@SuppressWarnings("deprecation")
 			final ListAdapter adapter =
 				new SimpleCursorAdapter(ctx,
 						android.R.layout.simple_spinner_dropdown_item,
