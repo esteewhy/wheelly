@@ -142,19 +142,16 @@ public abstract class ConfigurableListFragment extends ListFragment
 	}
 	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case EDIT_REQUEST:
-			((SimpleCursorAdapter)getListAdapter()).notifyDataSetChanged();
-			break;
-		}
-	}
-	
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		
 		inflater.inflate(R.menu.common_menu, menu);
+		
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
 		
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);

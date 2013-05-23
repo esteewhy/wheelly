@@ -53,6 +53,8 @@ public class Mileage extends FragmentActivity {
 						? (long)FloatMath.ceil(new TrackRepository(Mileage.this).getDistance(trackId))
 						: 0);
 				}
+				
+				BusProvider.getInstance().post(new TrackChangedEvent(trackId));
 			}
 		});
 		c.Track.setValue(values.getAsLong("track_id"));
