@@ -1,62 +1,100 @@
 package com.wheelly.activity;
 
+import ru.orangesoftware.financisto.activity.LocationActivity;
+
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
+import com.wheelly.bus.LocationSelectedEvent;
+import com.wheelly.bus.LocationsLoadedEvent;
+import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.fragments.LocationsListFragment;
 import com.wheelly.fragments.LocationsMapFragment;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 @SuppressLint("NewApi")
 public class LocationsList extends FragmentActivity {
-    ViewPager mViewPager;
-    TabsAdapter mTabsAdapter;
+	ViewPager mViewPager;
+	TabsAdapter mTabsAdapter;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        mViewPager = new ViewPager(this);
-        mViewPager.setId(R.id.pager);
-        
-        setContentView(mViewPager);
+		mViewPager = new ViewPager(this);
+		mViewPager.setId(R.id.pager);
 
-        final ActionBar bar = getActionBar();
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-        ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
+		setContentView(mViewPager);
 
-        mTabsAdapter = new TabsAdapter(this, mViewPager);
-        mTabsAdapter.addTab(bar.newTab().setText("List"),
-                LocationsListFragment.class, null);
-        mTabsAdapter.addTab(bar.newTab().setText("Map"),
-                LocationsMapFragment.class, null);
-        
-        if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
-        }
-    }
+		final ActionBar bar = getActionBar();
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+		ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
-            //NavUtils.navigateUpFromSameTask(this);
-            onBackPressed();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
+		mTabsAdapter = new TabsAdapter(this, mViewPager);
+		mTabsAdapter.addTab(bar.newTab().setText("List"),
+				LocationsListFragment.class, null);
+		mTabsAdapter.addTab(bar.newTab().setText("Map"),
+				LocationsMapFragment.class, null);
+		
+		if (savedInstanceState != null) {
+			bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+		}
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// NavUtils.navigateUpFromSameTask(this);
+			onBackPressed();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		if(null == getLoaderManager().getLoader(0)) {
+			getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+				@Override
+				public Loader<Cursor> onCreateLoader(int paramInt, Bundle paramBundle) {
+					return new CursorLoader(LocationsList.this, Locations.CONTENT_URI, null, null, null, null);
+				}
+				
+				@Override
+				public void onLoadFinished(Loader<Cursor> paramLoader, Cursor cursor) {
+					BusProvider.getInstance().post(new LocationsLoadedEvent(cursor));
+					
+					if(getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA)) {
+						final long id = getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
+						BusProvider.getInstance().post(new LocationSelectedEvent(id, this));
+					}
+				}
+				
+				@Override
+				public void onLoaderReset(Loader<Cursor> paramLoader) {
+					BusProvider.getInstance().post(new LocationsLoadedEvent(null));
+				}
+			});
+		}
+		super.onResume();
+	}
 }

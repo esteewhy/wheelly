@@ -18,26 +18,28 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.wheelly.db.DatabaseSchema.Locations;
+import com.squareup.otto.Subscribe;
+import com.squareup.otto.sample.BusProvider;
+import com.wheelly.bus.LocationSelectedEvent;
+import com.wheelly.bus.LocationsLoadedEvent;
+import com.wheelly.db.LocationBroker;
+
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class LocationsMapFragment extends SupportMapFragment
-		implements LoaderCallbacks<Cursor> {
+public class LocationsMapFragment extends SupportMapFragment {
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
 	
@@ -64,6 +66,15 @@ public class LocationsMapFragment extends SupportMapFragment
 			googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 			googleMap.getUiSettings().setAllGesturesEnabled(true);
 			googleMap.setIndoorEnabled(true);
+			googleMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+				@Override
+				public boolean onMarkerClick(Marker marker) {
+					final long id = Long.parseLong(marker.getSnippet());
+					BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsMapFragment.this));
+					return false;
+				}
+			});
+			
 			googleMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 				
 				@Override
@@ -84,20 +95,13 @@ public class LocationsMapFragment extends SupportMapFragment
 		return layout;
 	}
 	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		if(EDIT_LOCATION_REQUEST == requestCode) {
-			getActivity().getSupportLoaderManager().restartLoader(0, null, this);
-		}
-	}
-	
 	private boolean inSelectMode;
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		BusProvider.getInstance().register(this);
+		
 		inSelectMode = getActivity().getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		
         // Getting Google Play availability status
@@ -114,18 +118,10 @@ public class LocationsMapFragment extends SupportMapFragment
  
             // Getting GoogleMap object from the fragment
             googleMap = getMap();
- 
-            // Invoke LoaderCallbacks to retrieve and draw already saved locations in map
-            getActivity().getSupportLoaderManager().initLoader(0, null, this);
         }
 	}
 	
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		return new CursorLoader(getActivity(), Locations.CONTENT_URI, null, null, null, null);
-	}
-	
-	private static interface Aggregate {
+	private interface Aggregate {
 		void seed(LatLng l, long id);
 		CameraUpdate result();
 	}
@@ -164,35 +160,50 @@ public class LocationsMapFragment extends SupportMapFragment
 	}
 	
 	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		if(cursor.moveToFirst()) {
-			final int latIdx = cursor.getColumnIndex("latitude");
-			final int lonIdx = cursor.getColumnIndex("longitude");
-			final int nameIdx = cursor.getColumnIndex("name");
-			final int idIdx = cursor.getColumnIndex(BaseColumns._ID);
+	public void onDestroy() {
+		super.onDestroy();
+		BusProvider.getInstance().unregister(this);
+	}
+	
+	@Subscribe
+	public void onLoadFinished(LocationsLoadedEvent event) {
+		if(null == event.cursor) {
+			googleMap.clear();
+			return;
+		}
+		
+		if(event.cursor.moveToFirst()) {
+			final int latIdx = event.cursor.getColumnIndex("latitude");
+			final int lonIdx = event.cursor.getColumnIndex("longitude");
+			final int nameIdx = event.cursor.getColumnIndex("name");
+			final int idIdx = event.cursor.getColumnIndex(BaseColumns._ID);
 			
 			final Aggregate delegate = buildCameraUpdateDelegate();
 				
 			do {
-				final LatLng l = new LatLng(cursor.getDouble(latIdx), cursor.getDouble(lonIdx));
-				final long id = cursor.getLong(idIdx);
+				final LatLng l = new LatLng(event.cursor.getDouble(latIdx), event.cursor.getDouble(lonIdx));
+				final long id = event.cursor.getLong(idIdx);
 				final MarkerOptions markerOptions = new MarkerOptions()
 		        	.position(l)
-		        	.title(cursor.getString(nameIdx))
+		        	.title(event.cursor.getString(nameIdx))
 		        	.snippet(Long.toString(id))
 		        	.draggable(true);
 		        
 		        // Adding marker on the Google Map
 		        googleMap.addMarker(markerOptions);
 		        delegate.seed(l, id);
-			} while(cursor.moveToNext());
+			} while(event.cursor.moveToNext());
 			
 			googleMap.animateCamera(delegate.result());
 		}
 	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		googleMap.clear();
+	
+	@Subscribe
+	public void onSelectionChanged(final LocationSelectedEvent event) {
+		if(this != event.sender) {
+			final ContentValues c = new LocationBroker(getActivity()).loadOrCreate(event.id);
+			final LatLng selected = new LatLng(c.getAsDouble("latitude"), c.getAsDouble("longitude"));
+			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selected, 17));
+		}
 	}
 }
