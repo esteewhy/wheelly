@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.location.Location;
 import android.provider.BaseColumns;
 
 /**
@@ -38,6 +39,31 @@ public class LocationBroker {
 			cursor.close();
 		}
 
+	}
+	
+	public long getNearest(Location location, float minDistance) {
+		final Cursor locationCursor = context.getContentResolver().query(Locations.CONTENT_URI, null, null, null, null);
+		long locationId = -1;
+		
+		try {
+			if(locationCursor.moveToFirst()) {
+				do {
+					final float distance = location.distanceTo(new Location("existing") {{
+						setLongitude(locationCursor.getDouble(locationCursor.getColumnIndex("longitude")));
+						setLatitude(locationCursor.getDouble(locationCursor.getColumnIndex("latitude")));
+					}});
+					
+					if(minDistance >= distance) {
+						minDistance = distance;
+						locationId = locationCursor.getLong(locationCursor.getColumnIndex(BaseColumns._ID)); 
+					}
+				} while(locationCursor.moveToNext());
+			}
+		} finally {
+			locationCursor.close();
+		}
+		
+		return locationId;
 	}
 	
 	public long updateOrInsert(ContentValues values) {

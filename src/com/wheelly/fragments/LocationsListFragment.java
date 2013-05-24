@@ -17,6 +17,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.google.android.gms.location.LocationListener;
 import com.wheelly.R;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
@@ -34,8 +35,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -93,50 +96,64 @@ public class LocationsListFragment extends ListFragment {
 		final Intent intent = getActivity().getIntent();
 		inSelectMode = intent.hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		getListView().setChoiceMode(inSelectMode ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
-		setListAdapter(inSelectMode ? buildSelectableAdapter() : buildAdapter());
+		setListAdapter(buildAdapter());
 		ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, getListView(), contextualActionModeCallback);
 		setHasOptionsMenu(true);
 		BusProvider.getInstance().register(this);
 	}
 	
-	private ListAdapter buildSelectableAdapter() {
-		return
-			new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_single_choice, null,
-				new String[] { "name" },
-				new int[] { android.R.id.text1 }, 0
-			);
+	private ListAdapter buildAdapter() {
+		if(inSelectMode) {
+			return
+				new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_single_choice, null,
+					new String[] { "name" },
+					new int[] { android.R.id.text1 }, 0
+				);
+		}
+		
+		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.location_item, null,
+			new String[] { "name", "resolved_address", "name" },
+			new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 }, 0
+		);
+		
+		adapter.setViewBinder(new LocationViewBinder(null));
+		
+		LocationUtils.obtainLocation(getActivity(), new LocationListener() {
+			@Override
+			public void onLocationChanged(Location paramLocation) {
+				((LocationViewBinder)adapter.getViewBinder()).location = paramLocation;
+				adapter.notifyDataSetChanged();
+			}
+		});
+		
+		return adapter;
 	}
 	
-	private ListAdapter buildAdapter() {
-		final Location location = LocationUtils.getLastKnownLocation(getActivity());
-		final Location dest = new Location(location);
+	private static class LocationViewBinder implements ViewBinder {
+		public Location location;
 		
-		return
-			new SimpleCursorAdapter(getActivity(), R.layout.location_item, null,
-					new String[] { "name", "resolved_address", "name" },
-					new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 }, 0
-				) {{
-					setViewBinder(new ViewBinder() {
-						@Override
-						public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-							switch(view.getId()) {
-							case android.R.id.text2:
-								((TextView)view).setText(LocationUtils.locationToText(cursor));
-								return true;
-							case R.id.text3:
-								if(null != location) {
-									TextView tv = (TextView)view.findViewById(R.id.text3);
-									dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
-									dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
-									tv.setText(LocationUtils.formatDistance(location.distanceTo(dest)));
-								}
-								
-								return true;
-							}
-							return false;
-						}
-					});
-				}};
+		public LocationViewBinder(Location location) {
+			this.location = location;
+		}
+		
+		@Override
+		public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+			switch(view.getId()) {
+			case android.R.id.text2:
+				((TextView)view).setText(LocationUtils.locationToText(cursor));
+				return true;
+			case R.id.text3:
+				if(null != location) {
+					Location dest = new Location(location);
+					dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
+					dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
+					((TextView)view.findViewById(R.id.text3)).setText(LocationUtils.formatDistance(location.distanceTo(dest)));
+				}
+				
+				return true;
+			}
+			return false;
+		}
 	}
 	
 	@Override
@@ -176,12 +193,12 @@ public class LocationsListFragment extends ListFragment {
 		return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		menu.add(0, MENU_ADD, 0, R.string.item_add)
-			.setIcon(android.R.drawable.ic_menu_add)
-			.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuCompat.setShowAsAction(menu.add(0, MENU_ADD, 0, R.string.item_add)
+			.setIcon(android.R.drawable.ic_menu_add), MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 	
 	@Override
