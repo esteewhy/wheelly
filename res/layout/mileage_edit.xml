@@ -11,7 +11,8 @@
 	2011-02-27: Adapted for Wheelly by esteewhy.
 -->
 <LinearLayout
-	xmlns:android			="http://schemas.android.com/apk/res/android"
+	xmlns:android	="http://schemas.android.com/apk/res/android"
+	xmlns:wheelly	="http://schemas.android.com/apk/res/com.wheelly"
 	android:layout_width	="fill_parent"
 	android:layout_height	="fill_parent"
 	android:orientation		="vertical">
@@ -34,26 +35,23 @@
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" /> 
 			
-			<fragment
-				class					="com.wheelly.app.TrackInput"
-				android:id				="@+id/track"
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
 				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
+				wheelly:label			="@string/location">
 			
-			<include
-				layout	="@layout/edit_divider" />
+				<fragment
+					class					="com.wheelly.app.LocationInput"
+					android:id				="@+id/place"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
 			
-			<fragment
-				class					="com.wheelly.app.LocationInput"
-				android:id				="@+id/place"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
+			</com.wheelly.widget.LabeledLayout>
 			
 			<include
 				layout	="@layout/edit_divider" />
 			
 			<com.wheelly.widget.LabeledLayout
-				xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
 				android:layout_width	="fill_parent"
 				android:layout_height	="wrap_content"
 				wheelly:label			="@string/mileage_input_label">
@@ -65,12 +63,24 @@
 				
 			</com.wheelly.widget.LabeledLayout>
 			
+			<include
+				layout	="@layout/edit_divider" />
+			
 			<fragment
-			    android:layout_width="fill_parent"
-			    android:layout_height="175dp"
-			    class="com.wheelly.fragments.TrackMapFragment"
-			    android:tag="map" />
-
+				class					="com.wheelly.app.TrackInput"
+				android:id				="@+id/track"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
+			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<fragment
+				android:layout_width="fill_parent"
+				android:layout_height="175dp"
+				class="com.wheelly.fragments.TrackMapFragment"
+				android:tag="map" />
+			
 		</LinearLayout>
 	</ScrollView>
 	

@@ -20,6 +20,7 @@
 	<string name="no_heartbeats">Heartbeat is a special type of record, holding basic counters of Your car. Normaly it gets created simultaneously when entering other types of records like Refuel or Mileage. Also, You are welcome to create heartbeats as frequent as possible, this way You can greatly increase usage statistics accuracy. Press "Menu" button then select "Add".</string>
 	<string name="no_refuels">You want to enter a new Refuel record each time after visiting fuel pump. Press "Menu" button then select "Add".</string>
 	<string name="location">Location</string>
+	<string name="destination">Destination</string>
 	<string name="track">Track</string>
 	<string name="locations">Locations</string>
 	<string name="tracks">Tracks</string>
@@ -97,4 +98,6 @@
     <string name="disable_my_location">Disable MyLocation</string>
     <string name="google_maps_api_key">0cJI0WVHtbB0sFFAHH9xV7Y28WcYuFrk7Kj6imQ</string>
     <string name="internalEmpty">0x00ff0001</string>
+    
+    <string name="new_location">New location</string>
 </resources>

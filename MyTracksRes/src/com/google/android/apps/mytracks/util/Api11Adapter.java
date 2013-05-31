@@ -17,11 +17,17 @@
 package com.google.android.apps.mytracks.util;
 
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
+import com.google.android.apps.mytracks.MapContextActionCallback;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
-import android.support.v4.app.Fragment;
+import android.content.Intent;
+import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +35,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 import java.util.List;
 
@@ -52,9 +57,9 @@ public class Api11Adapter extends Api10Adapter {
   }
 
   @Override
-  public void configureListViewContextualMenu(final Fragment activity, ListView listView,
+  public void configureListViewContextualMenu(final ListFragment activity,
       final ContextualActionModeCallback contextualActionModeCallback) {
-    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+    activity.getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
       ActionMode actionMode;
 
         @Override
@@ -98,7 +103,52 @@ public class Api11Adapter extends Api10Adapter {
       }
     });
   };
+  
+  @Override
+  public void configureMapViewContextualMenu(final SupportMapFragment fragment,
+      final MapContextActionCallback callback) {
+    
+    fragment.getMap().setOnMapLongClickListener(new OnMapLongClickListener() {
+      ActionMode actionMode;
+      
+      @Override
+      public void onMapLongClick(final LatLng point) {
+        if (actionMode != null) {
+          actionMode.finish();
+        }
+        
+        callback.onMapLongClick(point);
+        
+        actionMode = fragment.getActivity().startActionMode(new ActionMode.Callback() {
+          @Override
+          public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            callback.onCreate(menu);
+            return true;
+          }
 
+          @Override
+          public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            callback.onPrepare(menu, 0, -1);
+            // Return true to indicate change
+            return true;
+          }
+
+          @Override
+          public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+            callback.onCancel();
+          }
+
+          @Override
+          public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            mode.finish();
+            return callback.onClick(item.getItemId(), 0, 0);
+          }
+        });
+      }
+    });
+  };
+  
   @Override
   public void configureSearchWidget(Activity activity, final MenuItem menuItem) {
     SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);

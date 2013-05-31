@@ -17,8 +17,10 @@ package com.google.android.apps.mytracks.util;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
+import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.apps.mytracks.services.sensors.BluetoothConnectionManager;
 import com.google.android.apps.mytracks.widgets.TrackWidgetProvider;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.ApacheHttpTransport;
 
@@ -27,13 +29,11 @@ import android.appwidget.AppWidgetManager;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.SharedPreferences.Editor;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -106,9 +106,9 @@ public class Api8Adapter implements ApiAdapter {
   }
 
   @Override
-  public void configureListViewContextualMenu(Fragment activity, ListView listView,
+  public void configureListViewContextualMenu(ListFragment activity,
       ContextualActionModeCallback contextualActionModeCallback) {
-    activity.registerForContextMenu(listView);
+    activity.registerForContextMenu(activity.getListView());
   }
 
   @Override
@@ -148,5 +148,11 @@ public class Api8Adapter implements ApiAdapter {
   @Override
   public void setAppWidgetSize(AppWidgetManager appWidgetManager, int appWidgetId, int size) {
     // Do nothing    
+  }
+
+  @Override
+  public void configureMapViewContextualMenu(SupportMapFragment fragment,
+    MapContextActionCallback callback) {
+    // TODO Auto-generated method stub
   }
 }

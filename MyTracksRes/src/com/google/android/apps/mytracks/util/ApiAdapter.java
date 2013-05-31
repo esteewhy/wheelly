@@ -16,6 +16,8 @@
 package com.google.android.apps.mytracks.util;
 
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
+import com.google.android.apps.mytracks.MapContextActionCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.api.client.http.HttpTransport;
 
 import android.app.Activity;
@@ -23,11 +25,9 @@ import android.appwidget.AppWidgetManager;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -125,9 +125,9 @@ public interface ApiAdapter {
    * @param contextualActionModeCallback the callback when an item is selected
    *          in the contextual action mode
    */
-  public void configureListViewContextualMenu(Fragment activity, ListView listView,
+  public void configureListViewContextualMenu(ListFragment fragment,
       ContextualActionModeCallback contextualActionModeCallback);
-
+  
   /**
    * Configures the search widget.
    * <p>
@@ -191,4 +191,7 @@ public interface ApiAdapter {
    * @param size the size
    */
   public void setAppWidgetSize(AppWidgetManager appWidgetManager, int appWidgetId, int size);
+
+  public void configureMapViewContextualMenu(SupportMapFragment fragment,
+	      MapContextActionCallback callback);
 }

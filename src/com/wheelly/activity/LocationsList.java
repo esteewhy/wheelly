@@ -13,6 +13,8 @@ import com.wheelly.fragments.LocationsMapFragment;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -49,6 +51,8 @@ public class LocationsList extends FragmentActivity {
 		
 		if (savedInstanceState != null) {
 			bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+		} else {
+			bar.setSelectedNavigationItem(getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0));
 		}
 	}
 	
@@ -57,7 +61,17 @@ public class LocationsList extends FragmentActivity {
 		super.onSaveInstanceState(outState);
 		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
 	}
-
+	
+	@Override
+	protected void onDestroy() {
+		getSharedPreferences("gui", Context.MODE_PRIVATE)
+			.edit()
+			.putInt("locations_selected_tab", getActionBar().getSelectedNavigationIndex())
+			.commit();
+		
+		super.onDestroy();
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
