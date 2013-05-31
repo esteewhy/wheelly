@@ -18,10 +18,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuCompat;
 import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -378,6 +380,37 @@ public class TripControlBar extends Fragment {
 			c.StopButton.performClick();
 		}
 	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		
+		MenuCompat.setShowAsAction(menu
+				.add(0, R.id.bStart, 1, R.string.start)
+				.setIcon(R.drawable.btn_start),
+			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+		MenuCompat.setShowAsAction(menu
+				.add(0, R.id.bStop, 2, R.string.stop)
+				.setIcon(R.drawable.btn_stop)
+				.setEnabled(false),
+			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		super.onPrepareOptionsMenu(menu);
+		//menu.findItem(R.id.bStart).set
+	}
+	
+	/* stop the madness (for now)
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		setHasOptionsMenu(true);
+	}*/
 	
 	/**
 	 * Encapsulates UI objects.

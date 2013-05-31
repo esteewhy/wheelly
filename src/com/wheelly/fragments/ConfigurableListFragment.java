@@ -146,7 +146,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		super.onCreateOptionsMenu(menu, inflater);
 		
 		inflater.inflate(R.menu.common_menu, menu);
-		
 	}
 	
 	@Override

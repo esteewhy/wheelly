@@ -97,7 +97,7 @@ public class LocationsListFragment extends ListFragment {
 		inSelectMode = intent.hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		getListView().setChoiceMode(inSelectMode ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		setListAdapter(buildAdapter());
-		ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, getListView(), contextualActionModeCallback);
+		ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, contextualActionModeCallback);
 		setHasOptionsMenu(true);
 		BusProvider.getInstance().register(this);
 	}

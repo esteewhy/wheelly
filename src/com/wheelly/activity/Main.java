@@ -9,6 +9,7 @@ import com.wheelly.service.WorkflowNotifier;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -49,6 +50,10 @@ public class Main extends FragmentActivity {
 		
 		if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+        } else {
+        	bar.setSelectedNavigationItem(
+        		getSharedPreferences("gui", Context.MODE_PRIVATE)
+        			.getInt("main_selected_tab", 0));
         }
 		
 		new AndiCarImporter(this).attemptImporting();
@@ -59,7 +64,19 @@ public class Main extends FragmentActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
-	}/*
+	}
+	
+	@Override
+	protected void onDestroy() {
+		getSharedPreferences("gui", Context.MODE_PRIVATE)
+			.edit()
+			.putInt("main_selected_tab", getActionBar().getSelectedNavigationIndex())
+			.commit();
+		
+		super.onDestroy();
+	}
+
+	/*
 	private static final String CURRENT_TAB_TAG_KEY = "current_tab_tag_key";
 	  private TabHost tabHost;
 	  private TabManager tabManager;
