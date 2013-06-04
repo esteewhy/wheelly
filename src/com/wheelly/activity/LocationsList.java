@@ -14,7 +14,6 @@ import com.wheelly.fragments.LocationsMapFragment;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

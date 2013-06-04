@@ -1,8 +1,13 @@
 package com.google.android.apps.mytracks;
 
-import com.google.android.gms.maps.model.LatLng;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
-public interface MapContextActionCallback extends ContextualActionModeCallback {
-	public boolean onMapLongClick(LatLng point);
-	public void onCancel();
+import com.google.android.gms.maps.model.Marker;
+
+public interface MapContextActionCallback {
+	public void onCreate(Menu menu);
+	public boolean onClick(MenuItem item, Marker marker);
+	public void onPrepare(Menu menu, Marker marker);
 }

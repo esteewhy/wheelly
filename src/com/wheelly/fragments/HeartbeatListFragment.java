@@ -1,6 +1,7 @@
 package com.wheelly.fragments;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
@@ -18,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
+import com.google.android.apps.mytracks.io.sendtogoogle.SendToGoogleUtils;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;
@@ -164,6 +166,13 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 					return true;
 				}
 			});
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == SendToGoogleUtils.SPREADSHEET_NOTIFICATION_ID) {
+			new Synchronizer(getActivity()).execute(-1);
+		}
 	}
 	
 	@Override

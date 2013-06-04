@@ -6,17 +6,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.text.TextUtils.StringSplitter;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.gdata.client.spreadsheet.ListQuery;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
-import com.google.gdata.data.BaseEntry;
 import com.google.gdata.data.spreadsheet.ListEntry;
 import com.google.gdata.data.spreadsheet.ListFeed;
-import com.google.gdata.util.ResourceNotFoundException;
 import com.google.gdata.util.ServiceException;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
@@ -125,7 +121,7 @@ public class SpreadsheetPoster {
 		return values;
 	}
 	
-	private static Pair<String, String> getIdAndVersion(BaseEntry entry) {
+	private static Pair<String, String> getIdAndVersion(ListEntry entry) {
 		return new Pair<String, String>(entry.getId(), entry.getVersionId());
 	}
 	
@@ -140,14 +136,11 @@ public class SpreadsheetPoster {
 	private EntryPostResult postRow(Cursor track, Pair<String, String> idAndVersion)
 			throws IOException, ServiceException {
 		ListEntry remote = null;
-		try {
-			remote = null == idAndVersion.first
-				? resolveRow(track)
-				: null == idAndVersion.second
-					? load(idAndVersion.first)
-					: load(idAndVersion.first, idAndVersion.second);
-		} catch(ResourceNotFoundException ex) {
-		}
+		remote = null == idAndVersion.first
+			? resolveRow(track)
+			: null == idAndVersion.second
+				? load(idAndVersion.first)
+				: load(idAndVersion.first, idAndVersion.second);
 		
 		ListEntry local = new ListEntry();
 		DocsHelper.assignEntityFromCursor(track, local);
@@ -184,6 +177,7 @@ public class SpreadsheetPoster {
 	
 	/**
 	 * Attempts to locate remote record by non-key values.
+	 * @throws ServiceException 
 	 */
 	private ListEntry resolveRow(Cursor local) throws IOException, ServiceException {
 		String sq = "odometer="

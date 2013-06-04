@@ -19,14 +19,19 @@ package com.google.android.apps.mytracks.util;
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -107,9 +112,84 @@ public class Api11Adapter extends Api10Adapter {
   @Override
   public void configureMapViewContextualMenu(final SupportMapFragment fragment,
       final MapContextActionCallback callback) {
-    
+	  
+	fragment.getMap().setOnMarkerDragListener(new OnMarkerDragListener() {
+		private LatLng position;
+		private Marker currentMarker;
+		private ActionMode actionMode;
+		
+		@Override
+		public void onMarkerDragStart(Marker marker) {
+			if(null == currentMarker || !marker.getId().equals(currentMarker.getId())) {
+				if(null != actionMode) {
+					actionMode.finish();
+				}
+				
+				position = marker.getPosition();
+				currentMarker = marker;
+				marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+			}
+			
+			((Vibrator)fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+		}
+		
+		@Override
+		public void onMarkerDragEnd(final Marker marker) {
+			if (actionMode != null) {
+				if(null == currentMarker || !marker.getId().equals(currentMarker.getId())) {
+					actionMode.finish();
+				} else {
+					((Vibrator)fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+					return;
+				}
+			}
+			((Vibrator)fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(new long[] { 0, 50, 100, 50, 100 }, -1);
+			actionMode = fragment.getActivity().startActionMode(new ActionMode.Callback() {
+				@Override
+				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+					callback.onCreate(menu);
+					return true;
+				}
+				
+				@Override
+				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+					callback.onPrepare(menu, marker);
+					// Return true to indicate change
+					return true;
+				}
+				
+				@Override
+				public void onDestroyActionMode(ActionMode mode) {
+					actionMode = null;
+					if(null != position) {
+						marker.setPosition(position);
+						position = null;
+						currentMarker = null;
+					}
+				}
+				
+				@Override
+				public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+					mode.finish();
+					
+					if(callback.onClick(item, marker)) {
+						position = null;
+						return true;
+					}
+					
+					return false;
+				}
+			});
+			
+		}
+		
+		@Override
+		public void onMarkerDrag(Marker paramMarker) { }
+	});
+	
     fragment.getMap().setOnMapLongClickListener(new OnMapLongClickListener() {
-      ActionMode actionMode;
+      private ActionMode actionMode;
+      private Marker marker;
       
       @Override
       public void onMapLongClick(final LatLng point) {
@@ -117,7 +197,10 @@ public class Api11Adapter extends Api10Adapter {
           actionMode.finish();
         }
         
-        callback.onMapLongClick(point);
+        marker = fragment.getMap().addMarker(new MarkerOptions()
+			.position(point)
+			.title("New location")
+			.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
         
         actionMode = fragment.getActivity().startActionMode(new ActionMode.Callback() {
           @Override
@@ -128,7 +211,7 @@ public class Api11Adapter extends Api10Adapter {
 
           @Override
           public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            callback.onPrepare(menu, 0, -1);
+            callback.onPrepare(menu, marker);
             // Return true to indicate change
             return true;
           }
@@ -136,13 +219,15 @@ public class Api11Adapter extends Api10Adapter {
           @Override
           public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
-            callback.onCancel();
+			if(null != marker) {
+				marker.remove();
+			}
           }
 
           @Override
           public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             mode.finish();
-            return callback.onClick(item.getItemId(), 0, 0);
+            return callback.onClick(item, marker);
           }
         });
       }
