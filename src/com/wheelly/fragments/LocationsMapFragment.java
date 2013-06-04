@@ -11,9 +11,6 @@
 package com.wheelly.fragments;
 
 import ru.orangesoftware.financisto.activity.LocationActivity;
-import ru.orangesoftware.financisto.utils.AddressGeocoder;
-
-import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.gms.common.ConnectionResult;
@@ -23,10 +20,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -49,19 +44,13 @@ import android.location.Address;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.view.MenuCompat;
-import android.support.v4.view.ViewPager.LayoutParams;
-import android.view.ActionProvider;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class LocationsMapFragment extends SupportMapFragment {
 	static final int NEW_LOCATION_REQUEST = 1;
@@ -157,54 +146,60 @@ public class LocationsMapFragment extends SupportMapFragment {
         }
         
         ApiAdapterFactory.getApiAdapter().configureMapViewContextualMenu(this, new MapContextActionCallback() {
-			private Marker marker;
 			private EditText editText; 
 			@Override
-			public void onPrepare(Menu arg0, int arg1, long arg2) {
-				// TODO Auto-generated method stub
+			public void onPrepare(Menu menu, Marker marker) {
+				configureTitleWidget(marker);
 			}
 			
 			@SuppressLint("NewApi")
 			@Override
 			public void onCreate(Menu menu) {
 				editText = (EditText)
-				menu.add(0, 0, 0, "name")
-					.setIcon(android.R.drawable.ic_menu_edit)
-					.setActionView(R.layout.location_edit)
-					.getActionView()
-					.findViewById(R.id.location_name);
-        	configureTitleWidget();
+					menu.add(0, 0, 0, "name")
+						.setIcon(android.R.drawable.ic_menu_edit)
+						.setActionView(R.layout.location_edit)
+						.getActionView()
+						.findViewById(R.id.location_name);
+				
 				menu.add(0, 1, 0, R.string.item_add)
 					.setIcon(android.R.drawable.ic_menu_save);
 			}
 			
-			private void configureTitleWidget() {
-				if(null != marker) {
-					LocationUtils.resolveAddress(getActivity(), marker.getPosition(), "", new AddressResolveCallback() {
-						@Override
-						public void onResolved(Address address) {
-							if(getResources().getString(R.string.new_location).equals(editText.getText().toString()) && null != address) {
-								editText.setText(LocationUtils.formatAddress(address));
+			private void configureTitleWidget(Marker marker) {
+				if(null != marker && null != editText) {
+					try {
+						final long id = Long.parseLong(marker.getSnippet());
+						editText.setText(new LocationBroker(getActivity()).loadOrCreate(id).getAsString("name"));
+					} catch(NumberFormatException nfex) {
+						LocationUtils.resolveAddress(getActivity(), marker.getPosition(), "", new AddressResolveCallback() {
+							@Override
+							public void onResolved(Address address) {
+								if(getResources().getString(R.string.new_location).equals(editText.getText().toString()) && null != address) {
+									editText.setText(LocationUtils.formatAddress(address));
+								}
 							}
-						}
-					});
+						});
+					}
 				}
 			}
 			
 			@Override
-			public CharSequence getCaption(View arg0) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public boolean onClick(int arg0, int arg1, long arg2) {
+			public boolean onClick(MenuItem item, Marker marker) {
 				if(null != marker) {
 					final ContentValues myLocation = new ContentValues();
+					
+					try {
+						final long id = Long.parseLong(marker.getSnippet());
+						myLocation.put(BaseColumns._ID, id);
+					} catch(NumberFormatException nfex) {
+						myLocation.put("provider", "fusion");
+					}
+					
 					if(null != editText) {
 						myLocation.put("name", editText.getText().toString());
 					}
-					myLocation.put("provider", "fusion");
+					
 					myLocation.put("latitude", marker.getPosition().latitude);
 					myLocation.put("longitude", marker.getPosition().longitude);
 					myLocation.put("datetime", System.currentTimeMillis());
@@ -218,30 +213,12 @@ public class LocationsMapFragment extends SupportMapFragment {
 								}
 								
 								new LocationBroker(getActivity()).updateOrInsert(myLocation);
-								marker.remove();
 							}
 						});
 					
 					return true;
 				}
 				return false;
-			}
-			
-			@Override
-			public boolean onMapLongClick(LatLng point) {
-				marker = googleMap.addMarker(new MarkerOptions()
-					.position(point)
-					.title("New location")
-					.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-				);
-				return true;
-			}
-
-			@Override
-			public void onCancel() {
-				if(null != marker) {
-					marker.remove();
-				}
 			}
 		});
 	}

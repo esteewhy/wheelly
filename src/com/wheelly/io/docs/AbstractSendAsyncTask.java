@@ -133,7 +133,7 @@ public abstract class AbstractSendAsyncTask<EntityType> extends ReportingSendAsy
       publishProgress(PROGRESS_COMPLETE);
       return true;
     } catch (UserRecoverableAuthException e) {
-      SendToGoogleUtils.sendNotification(
+    	SendToGoogleUtils.sendNotification(
           context, account.name, e.getIntent(), SendToGoogleUtils.SPREADSHEET_NOTIFICATION_ID);
       return false;
     } catch (GoogleAuthException e) {

@@ -15,18 +15,10 @@
  */
 package com.wheelly.service;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.apps.mytracks.Constants;
