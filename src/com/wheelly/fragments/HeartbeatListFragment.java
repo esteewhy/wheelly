@@ -19,7 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
-import com.google.android.apps.mytracks.io.sendtogoogle.SendToGoogleUtils;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;
@@ -135,7 +134,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 			switch(item.getItemId()) {
 			case R.id.ctx_menu_sync:
 				final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-				new Synchronizer(getActivity()).execute(mi.id);
+				new Synchronizer(getActivity(), getFragmentManager()).execute(mi.id);
 				return true;
 			case R.id.ctx_menu_sync_pull:
 			case R.id.ctx_menu_sync_push: {
@@ -162,7 +161,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
-					new Synchronizer(getActivity()).execute(-1);
+					new Synchronizer(getActivity(), getFragmentManager()).execute(-1);
 					return true;
 				}
 			});
@@ -170,9 +169,8 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == SendToGoogleUtils.SPREADSHEET_NOTIFICATION_ID) {
-			new Synchronizer(getActivity()).execute(-1);
-		}
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 	@Override

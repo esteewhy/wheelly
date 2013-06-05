@@ -28,10 +28,10 @@ public class ProgressNotifier extends Notifier {
 				.setSmallIcon(R.drawable.icon_small)
 				//.setContentTitle("Synchronizing")
 				.setContent(new RemoteViews(context.getApplicationContext().getPackageName(), R.layout.notification_progress))
-				.getNotification()
+				.build()
 			: new NotificationCompat.Builder(context)
 				.setSmallIcon(R.drawable.icon_small)
-				.getNotification();
+				.build();
 		
 		notification.contentIntent = PendingIntent.getService(context, 0, new Intent(context, Main.class), 0); 
 		nm.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notification);
@@ -44,12 +44,11 @@ public class ProgressNotifier extends Notifier {
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progress, false);
 				notification.contentView.setTextViewText(R.id.status_text, "Synchrozing " + String.valueOf(progress));
 			} else {
-				notification.setLatestEventInfo(context,
-					"Synchronizing",
-					"Progress: "
-						+ String.valueOf(progress)
-						+ "%",
-					notification.contentIntent);
+				new NotificationCompat.Builder(context)
+					.setContentTitle("Synchronizing")
+					.setContentText("Progress: " + String.valueOf(progress) + "%")
+					.setContentIntent(notification.contentIntent)
+					.build();
 			}
 			nm.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notification);
 		}

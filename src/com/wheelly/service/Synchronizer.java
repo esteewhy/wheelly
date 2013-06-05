@@ -17,63 +17,42 @@ package com.wheelly.service;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
+import android.support.v4.app.FragmentManager;
 
 import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.io.sendtogoogle.PermissionCallback;
-import com.google.android.apps.mytracks.io.sendtogoogle.SendToGoogleUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
 import com.wheelly.activity.NoAccountsDialog;
 import com.wheelly.activity.SelectDialog;
-import com.wheelly.io.docs.ReportingSendAsyncTask;
 import com.wheelly.io.docs.SyncDocsAsyncTask;
 
 public class Synchronizer {
-	private final FragmentActivity activity;
+	private final Context context;
+	private final FragmentManager fm;
 	
-	public Synchronizer(FragmentActivity activity) {
-		this.activity = activity; 
-	}
-	
-	private void checkPermission(final Account account, final long id)
-	{
-		final PermissionCallback spreadsheetsCallback = new PermissionCallback() {
-			@Override
-			public void onSuccess() {
-				ReportingSendAsyncTask asyncTask = new SyncDocsAsyncTask(activity, id, account);
-				asyncTask.execute();
-			}
-			
-			@Override
-			public void onFailure() {
-				handleNoAccountPermission();
-			}
-		};
-		
-		SendToGoogleUtils.checkPermissionByActivity(activity, account.name,
-		          SendToGoogleUtils.SPREADSHEET_SCOPE,
-		          SendToGoogleUtils.SPREADSHEET_PERMISSION_REQUEST_CODE, spreadsheetsCallback);
+	public Synchronizer(Context context, FragmentManager fm) {
+		this.context = context;
+		this.fm = fm;
 	}
 	
 	public void execute(final long id) {
-		final Account[] accounts = AccountManager.get(activity).getAccountsByType(Constants.ACCOUNT_TYPE);
+		final Account[] accounts = AccountManager.get(context).getAccountsByType(Constants.ACCOUNT_TYPE);
 		
 		if(0 == accounts.length) {
-			new NoAccountsDialog().show(activity.getSupportFragmentManager(), "no_accounts");
+			new NoAccountsDialog().show(fm, "no_accounts");
 			return;
 		}
 		
 		if(1 == accounts.length) {
 			setPreferredAccountName(accounts[0].name);
-			checkPermission(accounts[0], id);
+			new SyncDocsAsyncTask(context, id, accounts[0]).execute();
 		} else {
 			final int selectedAccountIndex = getPreferredAccountIndex(accounts);
 			
 			if(selectedAccountIndex >= 0) {
-				checkPermission(accounts[selectedAccountIndex], id);
+				new SyncDocsAsyncTask(context, id, accounts[selectedAccountIndex]).execute();
 			} else {
 				new SelectDialog<Account>(accounts,
 						selectedAccountIndex,
@@ -87,15 +66,15 @@ public class Synchronizer {
 						@Override
 						public void onSelect(DialogInterface dialog, int which, Account account) {
 							setPreferredAccountName(account.name);
-							checkPermission(account, id);
+							new SyncDocsAsyncTask(context, id, account).execute();
 						}
-					}).show(activity.getSupportFragmentManager(), "select");
+					}).show(fm, "select");
 			}
 		}
 	}
 	
 	private int getPreferredAccountIndex(Account[] accounts) {
-		String preferredAccount = PreferencesUtils.getString(activity,
+		String preferredAccount = PreferencesUtils.getString(context,
 			R.string.preferred_account_key,
 			PreferencesUtils.GOOGLE_ACCOUNT_DEFAULT);
 
@@ -109,12 +88,8 @@ public class Synchronizer {
 	}
 	
 	private void setPreferredAccountName(String name) {
-		PreferencesUtils.setString(activity,
+		PreferencesUtils.setString(context,
 			R.string.preferred_account_key,
 			name);
 	}
-	
-  private void handleNoAccountPermission() {
-    Toast.makeText(activity, R.string.send_google_no_account_permission, Toast.LENGTH_LONG).show();
-  }
 }
