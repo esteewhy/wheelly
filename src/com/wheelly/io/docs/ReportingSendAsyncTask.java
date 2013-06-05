@@ -26,7 +26,7 @@ import android.os.AsyncTask;
  * but abstracted from AbstractSendActivity to use status bar notifications instead.
  */
 public abstract class ReportingSendAsyncTask extends AsyncTask<Long, Integer, Boolean> {
-	private final ProgressNotifier n; 
+	protected final ProgressNotifier n; 
 	
 /**
    * True if the AsyncTask result is success.

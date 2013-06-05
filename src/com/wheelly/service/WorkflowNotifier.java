@@ -36,7 +36,7 @@ public class WorkflowNotifier extends Notifier {
 				.setContentTitle("Mileage in progress")
 				.setContentText("Select to edit.")
 				.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
-				.getNotification();
+				.build();
 		nm.notify(NOTIFICATION_TAG, (int)id, n);
 	}
 	

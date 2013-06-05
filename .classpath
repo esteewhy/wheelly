@@ -8,8 +8,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r77lv1.14.2-beta"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/google-play-services_lib"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/gdata-core-1.0.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/guava-jdk5-13.0.jar"/>
 	<classpathentry kind="lib" path="/MyTracks/libs/gdata-client-meta-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/MyTracksRes/.google_apis/gdata-spreadsheet-2.1/gdata-spreadsheet-3.0/gdata-spreadsheet-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/gdata-core-1.0.jar"/>
