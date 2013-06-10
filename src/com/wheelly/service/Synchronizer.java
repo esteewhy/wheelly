@@ -26,6 +26,7 @@ import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
 import com.wheelly.activity.NoAccountsDialog;
 import com.wheelly.activity.SelectDialog;
+import com.wheelly.io.docs.SendSpreadsheetsAsyncTask;
 import com.wheelly.io.docs.SyncDocsAsyncTask;
 
 public class Synchronizer {
@@ -35,6 +36,10 @@ public class Synchronizer {
 	public Synchronizer(Context context, FragmentManager fm) {
 		this.context = context;
 		this.fm = fm;
+	}
+	
+	private SendSpreadsheetsAsyncTask getTask(final long id, Account account) {
+		return new SendSpreadsheetsAsyncTask(context, id, account);
 	}
 	
 	public void execute(final long id) {
@@ -47,12 +52,12 @@ public class Synchronizer {
 		
 		if(1 == accounts.length) {
 			setPreferredAccountName(accounts[0].name);
-			new SyncDocsAsyncTask(context, id, accounts[0]).execute();
+			getTask(id, accounts[0]).execute();
 		} else {
 			final int selectedAccountIndex = getPreferredAccountIndex(accounts);
 			
 			if(selectedAccountIndex >= 0) {
-				new SyncDocsAsyncTask(context, id, accounts[selectedAccountIndex]).execute();
+				getTask(id, accounts[selectedAccountIndex]).execute();
 			} else {
 				new SelectDialog<Account>(accounts,
 						selectedAccountIndex,
@@ -66,7 +71,7 @@ public class Synchronizer {
 						@Override
 						public void onSelect(DialogInterface dialog, int which, Account account) {
 							setPreferredAccountName(account.name);
-							new SyncDocsAsyncTask(context, id, account).execute();
+							getTask(id, account).execute();
 						}
 					}).show(fm, "select");
 			}

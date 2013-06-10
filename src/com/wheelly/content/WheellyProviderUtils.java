@@ -26,10 +26,10 @@ public class WheellyProviderUtils {
 		return
 			heartbeatId > 0
 				? cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
-						"h._id = ? AND sync_state != 3",
+						"h._id = ?",// AND sync_state != 3",
 						new String[] { Long.toString(heartbeatId) }, null)
 				: cr.query(Timeline.CONTENT_URI, Timeline.ListProjection,
-						"icons > 0 AND sync_state != 3",
+						"icons > 0",// AND sync_state != 3",
 						null,
 						"odometer ASC, h._created ASC");
 	}
