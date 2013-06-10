@@ -298,7 +298,7 @@ public final class DatabaseSchema {
 		static {
 			FilterExpr.put(F.LOCATION, "h.place_id = @location_id");
 			FilterExpr.put(F.PERIOD, "h._created BETWEEN @from AND @to");
-			FilterExpr.put(F.SORT_ORDER, "h._created");
+			FilterExpr.put(F.SORT_ORDER, "h.odometer DESC, h._created");
 		}
 		
 		public static final Uri CONTENT_URI =

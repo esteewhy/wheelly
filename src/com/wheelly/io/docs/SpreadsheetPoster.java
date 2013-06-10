@@ -2,6 +2,15 @@ package com.wheelly.io.docs;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.Assert;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,8 +20,11 @@ import android.util.Pair;
 
 import com.google.gdata.client.spreadsheet.ListQuery;
 import com.google.gdata.client.spreadsheet.SpreadsheetService;
+import com.google.gdata.data.spreadsheet.CustomElementCollection;
 import com.google.gdata.data.spreadsheet.ListEntry;
 import com.google.gdata.data.spreadsheet.ListFeed;
+import com.google.gdata.util.InvalidEntryException;
+import com.google.gdata.util.ResourceNotFoundException;
 import com.google.gdata.util.ServiceException;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
@@ -24,6 +36,8 @@ public class SpreadsheetPoster {
 	private final URL worksheetUrl;
 	private final SpreadsheetService spreadsheetService;
 	private final Context context;
+	
+	private final List<ListEntry> cache = new ArrayList<ListEntry>(20);
 	
 	public SpreadsheetPoster(Context context, URL worksheetUrl, SpreadsheetService spreadsheetService) {
 		this.context = context;
@@ -37,14 +51,10 @@ public class SpreadsheetPoster {
 	}
 
 	private void syncRow(Cursor track, Pair<String, String> idAndEtag) throws IOException, ServiceException {
-		final long syncState = track.getLong(track.getColumnIndexOrThrow("sync_state"));
+		//final long syncState = track.getLong(track.getColumnIndexOrThrow("sync_state"));
 		
-		EntryPostResult result = null;
-		
-		if(Timeline.SYNC_STATE_READY == syncState && null != idAndEtag.first) {
-			result = postRow(track, idAndEtag);
-			idAndEtag = getIdAndVersion(result.Entry);
-		}
+		EntryPostResult result = postRow(track, idAndEtag);
+		idAndEtag = getIdAndVersion(result.Entry);
 		
 		if(canAcceptResult(track, result)) {
 			new HeartbeatBroker(context).updateOrInsert(
@@ -55,12 +65,14 @@ public class SpreadsheetPoster {
 			// so re-iterating..
 			syncRow(track, new Pair<String, String>(null, null));
 		} else {
-			Log.e("GDocs", "Newly created record doesn't match original");
+			Log.e("WheellySync", "Newly created record doesn't match original");
 			//throw new IOException("Something bad..");
 		}
 	}
 	
 	private static boolean canAcceptResult(Cursor local, EntryPostResult result) {
+		
+		Assert.assertNotNull(result);
 		if(result.Status == EntryPostStatus.READ) {
 			final Pair<String, String> type = new Pair<String, String>(
 				DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndexOrThrow("icons"))),
@@ -75,12 +87,15 @@ public class SpreadsheetPoster {
 		if(null == result.Entry) {
 			return false;
 		}
-		
-		final Pair<Long, Long> odo = new Pair<Long, Long>(
+		Pair<Long, Long> odo = null;
+		try {
+		odo = new Pair<Long, Long>(
 			local.getLong(local.getColumnIndex("odometer")),
 			Long.parseLong(result.Entry.getCustomElements().getValue("odometer"))
 		);
-		
+		} catch(NumberFormatException e) {
+			Log.w("WheellySync", e);
+		}
 		final Pair<String, String> type = new Pair<String, String>(
 			DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndex("icons"))),
 			result.Entry.getCustomElements().getValue("type")
@@ -102,8 +117,9 @@ public class SpreadsheetPoster {
 			values.put("sync_id", idAndVersion.first);
 		}
 		
-		final String localEtag = local.getString(local.getColumnIndex("sync_etag")); 
-		if(!idAndVersion.second.equals(localEtag)) {
+		final String localEtag = local.getString(local.getColumnIndex("sync_etag"));
+		
+		if(null != idAndVersion.second && !idAndVersion.second.equals(localEtag)) {
 			values.put("sync_etag", idAndVersion.second);
 		}
 		
@@ -122,26 +138,32 @@ public class SpreadsheetPoster {
 	}
 	
 	private static Pair<String, String> getIdAndVersion(ListEntry entry) {
-		return new Pair<String, String>(entry.getId(), entry.getVersionId());
+		String id = entry.getId();
+		
+		if(id.contains("/")) {
+			id = id.substring(id.lastIndexOf("/") + 1);
+		}
+		
+		return new Pair<String, String>(id, entry.getVersionId());
 	}
 	
 	private static Pair<String, String> getIdAndVersion(Cursor track) {
+		String id = track.getString(track.getColumnIndex("sync_id"));
+		
+		if(null != id && id.contains("/")) {
+			id = id.substring(id.lastIndexOf("/") + 1);
+		}
+		
 		return
 			new Pair<String, String>(
-				track.getString(track.getColumnIndex("sync_id")),
+				id,
 				track.getString(track.getColumnIndex("sync_etag"))
 			);
 	}
 	
 	private EntryPostResult postRow(Cursor track, Pair<String, String> idAndVersion)
 			throws IOException, ServiceException {
-		ListEntry remote = null;
-		remote = null == idAndVersion.first
-			? resolveRow(track)
-			: null == idAndVersion.second
-				? load(idAndVersion.first)
-				: load(idAndVersion.first, idAndVersion.second);
-		
+		ListEntry remote = obtainRemoteEntry(idAndVersion, track);
 		ListEntry local = new ListEntry();
 		DocsHelper.assignEntityFromCursor(track, local);
 		
@@ -151,6 +173,47 @@ public class SpreadsheetPoster {
 		} else {
 			return new EntryPostResult(spreadsheetService.insert(worksheetUrl, local), EntryPostStatus.ADD);
 		}
+	}
+	
+	private ListEntry obtainRemoteEntry(Pair<String, String> idAndVersion, Cursor track) throws IOException, ServiceException {
+		ListEntry result = null;
+		boolean cacheUpdated = false;
+		
+		if(null != idAndVersion.first) {
+			result = loadFromCache(idAndVersion.first);
+			if(null != result) {
+				return result;
+			}
+			updateCache(makeKeyFromCursor(track));
+			cacheUpdated = true;
+			result = loadFromCache(idAndVersion.first);
+			if(null != result) {
+				return result;
+			}
+		}
+		
+		result = resolveFromCache(makeKeyFromCursor(track));
+		if(null != result) {
+			return result;
+		}
+		
+		if(!cacheUpdated) {
+			updateCache(makeKeyFromCursor(track));
+			
+			result = resolveFromCache(makeKeyFromCursor(track));
+			if(null != result) {
+				return result;
+			}
+		}
+		
+		Log.w("WheellySync", "Missed cache for: " + idAndVersion.first);
+		
+		return
+			null == idAndVersion.first
+				? resolveRow(makeKeyFromCursor(track))
+				: null == idAndVersion.second
+					? load(idAndVersion.first)
+					: load(idAndVersion.first, idAndVersion.second);
 	}
 	
 	private static enum EntryPostStatus {
@@ -168,37 +231,94 @@ public class SpreadsheetPoster {
 	}
 	
 	public ListEntry getLatestRow() throws IOException, ServiceException {
-		ListQuery query = new ListQuery(worksheetUrl);
-		query.setReverse(true);
-		query.setMaxResults(1);
+		final ListQuery query = new ListQuery(worksheetUrl) {{
+			setReverse(true);
+			setMaxResults(1);
+		}};
+		
 		ListFeed feed = spreadsheetService.query(query, ListFeed.class);
-		return feed.getEntries().get(0);
+		final List<ListEntry> result = feed.getEntries();
+		return result.isEmpty() ? null : result.get(0);
+	}
+	
+	private static Map<String, String> makeKeyFromCursor(final Cursor cursor) {
+		return new HashMap<String, String>() {{
+			put("odometer", Long.toString(cursor.getLong(cursor.getColumnIndex("odometer"))));
+			put("fuel", Integer.toString(cursor.getInt(cursor.getColumnIndex("fuel"))));
+			put("type", DocsHelper.iconFlagsToTypeString(cursor.getInt(cursor.getColumnIndex("icons"))));
+			put("date", new Date(cursor.getString(cursor.getColumnIndexOrThrow("_created"))).toString());
+			put("location", cursor.getString(cursor.getColumnIndex("place")));
+		}};
+	}
+	
+	private void updateCache(Map<String, String> values) throws IOException, ServiceException {
+		String sq = "odometer >=" + values.get("odometer")
+				+ " and date >=" + values.get("date");
+			
+		ListQuery query = new ListQuery(worksheetUrl);
+		query.setMaxResults(20);
+		query.setSpreadsheetQuery(sq);
+		Log.d("WheellySync", "Query: " + sq);
+		ListFeed feed = spreadsheetService.query(query, ListFeed.class);
+		final List<ListEntry> result = feed.getEntries();
+		
+		Log.i("WheellySync", "Updating cache with: " + result.size() + " entries, it still contains: " + cache.size());
+		
+		cache.addAll(result);
+	}
+	
+	private ListEntry resolveFromCache(Map<String, String> values) {
+		for(ListEntry le : cache) {
+			final CustomElementCollection cec = le.getCustomElements();
+			
+			boolean candidate = true;
+			for(String key : values.keySet()) {
+				if(null != values.get(key) && !values.get(key).equals("date".equals(key) ? new Date(cec.getValue(key)).toString() : cec.getValue(key))) {
+					candidate = false;
+					break;
+				}
+			}
+			
+			if(candidate) {
+				Log.i("WheellySync", "Cache hit by compound key: " + values.toString());
+				cache.remove(le);
+				return le;
+			}
+		}
+		
+		return null;
 	}
 	
 	/**
 	 * Attempts to locate remote record by non-key values.
 	 * @throws ServiceException 
 	 */
-	private ListEntry resolveRow(Cursor local) throws IOException, ServiceException {
-		String sq = "odometer="
-			+ Long.toString(local.getLong(local.getColumnIndex("odometer")))
-			+ " and "
-			+ "fuel="
-			+ Integer.toString(local.getInt(local.getColumnIndex("fuel")))
-			+ " and "
-			+ "type="
-			+ DocsHelper.iconFlagsToTypeString(local.getInt(local.getColumnIndex("icons")));
-		
-		final String location = local.getString(local.getColumnIndex("place"));
-		if(null != location) {
-			sq += " and location=\"" + location + "\"";
-		}
+	private ListEntry resolveRow(Map<String, String> values) throws IOException, ServiceException {
+		String sq = "odometer=" + values.get("odometer")
+			+ " and fuel=" + values.get("fuel")
+			+ " and type=" + values.get("type")
+			+ (null != values.get("location") ? " and location=\"" + values.get("location") + "\"" : "");
 		
 		ListQuery query = new ListQuery(worksheetUrl);
 		query.setMaxResults(1);
 		query.setSpreadsheetQuery(sq);
+		Log.d("WheellySync", "Query: " + sq);
 		ListFeed feed = spreadsheetService.query(query, ListFeed.class);
-		return feed.getEntries().get(0);
+		final List<ListEntry> result = feed.getEntries(); 
+		return result.isEmpty() ? null : result.get(0);
+	}
+	
+	private ListEntry loadFromCache(String id) {
+		for(ListEntry le : cache) {
+			String remoteId = getIdAndVersion(le).first;
+			if(remoteId.equals(id)) {
+				Log.i("WheellySync", "Cache hit by ID: " + id);
+				cache.remove(le);
+				return le;
+			}
+		}
+		
+		return null;
 	}
 	
 	private ListEntry load(String id) throws IOException, ServiceException {
@@ -209,9 +329,22 @@ public class SpreadsheetPoster {
 	}
 	
 	private ListEntry load(String id, String version) throws IOException, ServiceException {
-		return spreadsheetService.getEntry(
-			new URL(worksheetUrl.toString() + "/" + id + "/" + version),
-			ListEntry.class
-		);
+		try {
+			try {
+				return spreadsheetService.getEntry(
+					new URL(worksheetUrl.toString() + "/" + id),
+					ListEntry.class,
+					version
+				);
+			} catch(InvalidEntryException e) {
+				Log.e("WheellySync", "Invalid version: " + id + "/" + version);
+				Log.w("WheellySync", e);
+				return load(id);
+			}
+		} catch(ResourceNotFoundException e) {
+			Log.e("WheellySync", "Nonexisting entry: " + id);
+			Log.w("WheellySync", e);
+			return null;
+		}
 	}
 }
