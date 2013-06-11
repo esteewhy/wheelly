@@ -67,7 +67,9 @@ public class TrackMapFragment extends SupportMapFragment {
 		final PolylineOptions path = new PolylineOptions();
 		
 		for(Location l : t.getLocations()) {
-			path.add(POINT(l));
+			if(LocationUtils.isValidLocation(l)) {
+				path.add(POINT(l));
+			}
 		}
 		
 		return path;
