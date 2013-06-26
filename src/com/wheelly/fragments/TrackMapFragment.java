@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.squareup.otto.Subscribe;
-import com.wheelly.bus.BusProvider;
+import com.squareup.otto.sample.BusProvider;
 import com.wheelly.bus.TrackChangedEvent;
 
 public class TrackMapFragment extends SupportMapFragment {

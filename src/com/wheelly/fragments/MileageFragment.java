@@ -12,12 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+
+import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
 import com.wheelly.app.LocationInput;
 import com.wheelly.app.TrackInput;
 import com.wheelly.app.TrackInput.OnTrackChangedListener;
 import com.wheelly.app.TripControlBar;
-import com.wheelly.bus.BusProvider;
 import com.wheelly.bus.TrackChangedEvent;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
