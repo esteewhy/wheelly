@@ -62,8 +62,9 @@
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
 			android:taskAffinity=".activity.Refuel"
 			android:launchMode="singleTop" />
+		
 		<activity android:name=".activity.HeartbeatDialog"
-			android:theme="@android:style/Theme.Dialog"
+			android:theme="@style/Theme.Dialog"
 			android:launchMode="singleTop" />
 		
 		<activity android:name=".activity.Mileage"
@@ -77,15 +78,11 @@
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
 			android:taskAffinity=".activity.Refuel"
 			android:launchMode="singleTop" />
-		<activity android:name=".widget.QuickMultiNumberInput"
-			android:label="@string/amount"
-			android:theme="@android:style/Theme.Dialog"
-			android:launchMode="singleTop" />
 		
 		<activity
 			android:name	="ru.orangesoftware.financisto.activity.DateFilterActivity"
 			android:label	="@string/filter"
-			android:theme	="@android:style/Theme.Dialog"
+			android:theme	="@style/Theme.Dialog"
 			android:configChanges="orientation|keyboardHidden"
 			android:launchMode="singleTop" />
 		
@@ -95,23 +92,26 @@
 		
 		<activity android:name="ru.orangesoftware.financisto.widget.QuickAmountInput"
 			android:label="@string/amount"
-			android:theme="@android:style/Theme.Dialog"
+			android:theme="@style/Theme.Dialog"
 			android:launchMode="singleTop" />
 		
 		<activity android:name="ru.orangesoftware.financisto.widget.CalculatorInput"
 			android:label="@string/calculator"
-			android:theme="@android:style/Theme.Dialog"
+			android:theme="@style/Theme.Dialog"
 			android:launchMode="singleTop" />
 		
 		<activity android:name="ru.orangesoftware.financisto.activity.LocationActivity"
 			android:label="@string/location"
 			android:launchMode="singleTop" />
+		
 		<activity android:name="ru.orangesoftware.financisto.activity.LocationsListActivity"
 			android:label="@string/locations"
 			android:launchMode="singleTop" />
+		
 		<activity android:name="com.wheelly.activity.LocationsList"
 			android:label="@string/locations"
 			android:launchMode="singleTop" />
+		
 		<activity android:name=".io.docs.SyncDocsActivity"
 			android:launchMode="singleTop"/>
 		

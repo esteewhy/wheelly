@@ -7,10 +7,7 @@ import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
-import android.widget.*;
-
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
 import com.wheelly.db.HeartbeatBroker;
@@ -27,7 +24,6 @@ public class Refuel extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		super.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.setContentView(R.layout.refuel_edit);
 		
 		//components
@@ -93,8 +89,8 @@ public class Refuel extends FragmentActivity {
 		final AmountInput Amount;
 		final AmountInput Price;
 		final AmountInput Cost;
-		final Button Save;
-		final Button Cancel;
+		final View Save;
+		final View Cancel;
 		final FinancistoButton Financisto;
 		
 		public Controls(FragmentActivity view) {
@@ -104,8 +100,8 @@ public class Refuel extends FragmentActivity {
 			Amount		= (AmountInput)fm.findFragmentById(R.id.amount);
 			Price		= (AmountInput)fm.findFragmentById(R.id.price);
 			Cost		= (AmountInput)fm.findFragmentById(R.id.cost);
-			Save		= (Button)view.findViewById(R.id.bSave);
-			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
+			Save		= (View)view.findViewById(R.id.bSave);
+			Cancel		= (View)view.findViewById(R.id.bSaveAndNew);
 			Financisto	= (FinancistoButton)fm.findFragmentById(R.id.financisto);
 		}
 	}

@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.*;
-
 import com.wheelly.R;
 import com.wheelly.app.LocationInput;
 import com.wheelly.app.TrackInput;
@@ -176,8 +174,8 @@ public class MileageFragment extends Fragment {
 		final LocationInput Destination;
 		final TrackInput Track;
 		final TripControlBar Heartbeats; 
-		final Button Save;
-		final Button Cancel;
+		final View Save;
+		final View Cancel;
 		
 		public Controls(Fragment fragment) {
 			final FragmentManager fm = fragment.getFragmentManager();
@@ -187,8 +185,8 @@ public class MileageFragment extends Fragment {
 			Destination	= (LocationInput)fm.findFragmentById(R.id.place);
 			Track		= (TrackInput)fm.findFragmentById(R.id.track);
 			Heartbeats	= (TripControlBar)fm.findFragmentById(R.id.heartbeats);
-			Save		= (Button)view.findViewById(R.id.bSave);
-			Cancel		= (Button)view.findViewById(R.id.bSaveAndNew);
+			Save		= (View)view.findViewById(R.id.bSave);
+			Cancel		= (View)view.findViewById(R.id.bSaveAndNew);
 		}
 	}
 }
