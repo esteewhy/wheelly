@@ -56,7 +56,8 @@
     
     
     <string name="fuel_input_label"><b>Fuel</b>, <i>litres</i></string>
-    <string name="fuel_consumption"><b>Fuel consumption</b>, <i>litres</i></string>
+    <string name="fuel_burnt"><b>Fuel burnt</b>, <i>litres</i></string>
+    <string name="fuel_consumption"><b>Fuel consumption</b>, <i>l/100km</i></string>
     <string name="location_input_label"><b>Location</b></string>
     <string name="odometer_input_label"><b>Odometer</b>, <i>km</i></string>
     <string name="mileage_input_label"><b>Mileage</b>, <i>km</i></string>

@@ -5,12 +5,33 @@
 	android:layout_height	="64dp"
 	android:paddingRight	="12dp">
 	
-	<TextView android:id="@+id/indicator" style="@style/Indicator" />
-	<TextView android:id="@+id/date" style="@style/Date" />
+	<TextView
+	    android:id="@+id/indicator"
+	    style="@style/Indicator" />
+
+	<TextView
+	    android:id="@+id/date"
+	    style="@style/Date"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" />
 	
-	<ImageView android:id="@+id/icon_refuel" style="@style/HeartbeatTypeIcon.Refuel" />
-	<ImageView android:id="@+id/icon_stop" style="@style/HeartbeatTypeIcon.Stop" />
-	<ImageView android:id="@+id/icon_start" style="@style/HeartbeatTypeIcon.Start" />
+	<ImageView
+	    android:id="@+id/icon_refuel"
+	    style="@style/HeartbeatTypeIcon.Refuel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" />
+
+	<ImageView
+	    android:id="@+id/icon_stop"
+	    style="@style/HeartbeatTypeIcon.Stop"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" />
+
+	<ImageView
+	    android:id="@+id/icon_start"
+	    style="@style/HeartbeatTypeIcon.Start"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" />
 	
 	<ProgressBar android:id		="@+id/fuelGauge"
 		android:max				="60"
@@ -46,10 +67,14 @@
 		android:text			="25.4"
 		android:textColor		="@color/fuel"/>
 	
-	<TextView android:id="@+id/place"
-		style				="@style/LocationText"
-		android:gravity			="bottom"
-		android:layout_above	="@id/fuelGauge"
-		android:layout_toLeftOf	="@id/fuelAmt"
-		android:layout_toRightOf="@id/odometer" />
+	<TextView
+	    android:id="@+id/place"
+	    style="@style/LocationText"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@id/fuelGauge"
+	    android:layout_toLeftOf="@id/fuelAmt"
+	    android:layout_toRightOf="@id/odometer"
+	    android:gravity="bottom" />
+
 </RelativeLayout>

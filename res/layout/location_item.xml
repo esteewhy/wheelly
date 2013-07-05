@@ -13,7 +13,8 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:minHeight="?android:attr/listPreferredItemHeight"
-	android:mode="twoLine">
+	android:mode="twoLine"
+	android:background="@drawable/widget_bg_vector">
 
 	<TextView
 	    android:id="@android:id/text1"

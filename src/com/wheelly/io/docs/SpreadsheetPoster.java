@@ -2,9 +2,11 @@ package com.wheelly.io.docs;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,19 +243,31 @@ public class SpreadsheetPoster {
 		return result.isEmpty() ? null : result.get(0);
 	}
 	
+	private static final DateFormat FORMAT_TIMESTAMP_ISO_8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static Date parseTimeStamp(String s) {
+		try {
+			return FORMAT_TIMESTAMP_ISO_8601.parse(s);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+	
 	private static Map<String, String> makeKeyFromCursor(final Cursor cursor) {
 		return new HashMap<String, String>() {{
 			put("odometer", Long.toString(cursor.getLong(cursor.getColumnIndex("odometer"))));
 			put("fuel", Integer.toString(cursor.getInt(cursor.getColumnIndex("fuel"))));
 			put("type", DocsHelper.iconFlagsToTypeString(cursor.getInt(cursor.getColumnIndex("icons"))));
-			put("date", new Date(cursor.getString(cursor.getColumnIndexOrThrow("_created"))).toString());
+			String d = cursor.getString(cursor.getColumnIndexOrThrow("_created"));
+			put("date", d);
 			put("location", cursor.getString(cursor.getColumnIndex("place")));
 		}};
 	}
 	
 	private void updateCache(Map<String, String> values) throws IOException, ServiceException {
+	//	String d = FORMAT_TIMESTAMP_ISO_8601.format(new Date(values.get("date")));
+		String d = values.get("date");
 		String sq = "odometer >=" + values.get("odometer")
-				+ " and date >=" + values.get("date");
+				+ " and date >=" + d;
 			
 		ListQuery query = new ListQuery(worksheetUrl);
 		query.setMaxResults(20);
@@ -273,7 +287,12 @@ public class SpreadsheetPoster {
 			
 			boolean candidate = true;
 			for(String key : values.keySet()) {
-				if(null != values.get(key) && !values.get(key).equals("date".equals(key) ? new Date(cec.getValue(key)).toString() : cec.getValue(key))) {
+				if(null != values.get(key)
+						&& !values.get(key).equals(
+							"date".equals(key)
+								? FORMAT_TIMESTAMP_ISO_8601.format(new Date(cec.getValue(key)))
+								: cec.getValue(key)
+						)) {
 					candidate = false;
 					break;
 				}

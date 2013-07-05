@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 6);
+		super(context, "wheelly.db", null, 8);
 		
 	}
 
@@ -22,6 +22,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(Refuels.Create);
 		db.execSQL(Heartbeats.Create);
 		db.execSQL(Locations.Create);
+		
+		db.execSQL(Mileages.NextMileageView);
 	}
 
 	@Override
@@ -53,6 +55,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 +" LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h._id"
 +" LEFT JOIN refuels r ON r.heartbeat_id = h._id"
 +" WHERE heartbeats._id == h._id)");
+			break;
+		case 6:
+			db.execSQL(Mileages.NextMileageView);
+			break;
+		case 7:
+			db.execSQL("DROP VIEW next_mileages;");
+			db.execSQL(Mileages.NextMileageView);
 		}
 	}
 }

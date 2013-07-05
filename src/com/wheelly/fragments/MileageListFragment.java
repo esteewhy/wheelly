@@ -69,6 +69,14 @@ public class MileageListFragment extends ConfigurableListFragment {
 						final int status = Integer.parseInt(text);
 						v.setBackgroundColor(getResources().getColor(getStatusColor(status)));
 						break;
+					/*case R.id.stop_place:
+						if("^".equals(text)) {
+							v.setBackgroundDrawable(null);
+							v.setCompoundDrawables(null, null, null, null);
+						} else {
+							super.setViewText(v, text);
+						}
+						break;*/
 					default: super.setViewText(v, text);
 					}
 				}
@@ -81,10 +89,11 @@ public class MileageListFragment extends ConfigurableListFragment {
 			new InfoDialogFragment.Options() {{
 				
 				fields.put(R.string.mileage_input_label, "mileage");
-				fields.put(R.string.fuel_consumption, "fuel");
+				fields.put(R.string.fuel_burnt, "fuel");
 				fields.put(R.string.departure, "start_time");
 				fields.put(R.string.origin, "start_place");
 				fields.put(R.string.finish, "stop_place");
+				fields.put(R.string.fuel_consumption, "consumption");
 				
 				titleField = "destination";
 				dataField = "_created";
