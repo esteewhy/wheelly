@@ -45,14 +45,25 @@
 		android:layout_height	="wrap_content"
 		android:layout_width	="wrap_content"/>
 	
-	<TextView style="@style/LocationText"
-		android:id				="@+id/place"
-		android:layout_toRightOf="@id/mileage"
-		android:layout_toLeftOf="@id/fuel"
-		android:gravity="center_vertical"
-		android:text="УкрНафта АЗС 10, Столичне шосе"
+	<TextView
+	    android:id="@+id/place"
+	    style="@style/LocationText"
+	    android:layout_width="wrap_content"
+	    android:layout_height="fill_parent"
+	    android:layout_alignBottom="@id/mileage"
+	    android:layout_toLeftOf="@id/fuel"
+	    android:layout_toRightOf="@id/mileage"
+	    android:gravity="center_vertical"
+	    android:text="УкрНафта АЗС 10, Столичне шосе" />
+	
+	<TextView android:id		="@+id/fuel_uom"
+		android:layout_alignParentRight="true"
 		android:layout_alignBottom="@id/mileage"
-		android:layout_height	="fill_parent"/>
+		android:layout_width	="wrap_content"
+		android:layout_height	="wrap_content"
+		android:textAppearance	="?android:attr/textAppearanceLarge"
+		android:textColor		="#ccc"
+		android:text			="L"/>
 	
 	<TextView android:id		="@+id/fuel"
 		android:layout_marginLeft	="5dip"
@@ -65,14 +76,4 @@
 		android:singleLine		="true"
 		android:text			="+32.22"
 		android:textColor		="@color/positive_amount"/>
-		
-	<TextView android:id		="@+id/fuel_uom"
-		android:layout_alignParentRight="true"
-		android:layout_alignBottom="@id/mileage"
-		android:layout_width	="wrap_content"
-		android:layout_height	="wrap_content"
-		android:textAppearance	="?android:attr/textAppearanceLarge"
-		android:textColor		="#ccc"
-		android:text			="L"/>
-	
 </RelativeLayout>

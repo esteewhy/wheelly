@@ -71,17 +71,20 @@ public final class DatabaseSchema {
 			+" ELSE 0"
 			+" END)";
 		
+		private static final String FuelField =
+			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount)";
+		
 		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
 			"m.mileage",
 			"m.calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount) fuel",
+			FuelField + " fuel",
 			"start_place.name start_place",
-			"stop_place.name stop_place",
+			"CASE WHEN n." + BaseColumns._ID + " IS NULL THEN stop_place.name ELSE '^' END stop_place",
 			"dest.name destination",
-			StateColumnExpression + " state"
+			StateColumnExpression + " state",
 		};
 		
 		public static final String Tables = "mileages m"
@@ -94,19 +97,35 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations stop_place"
 			+ "		ON stop.place_id = stop_place." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations dest"
-			+ "		ON m.location_id = dest." + BaseColumns._ID;
+			+ "		ON m.location_id = dest." + BaseColumns._ID
+			+ " LEFT OUTER JOIN next_mileages n"
+			+ "		ON n.mileage_id = m." + BaseColumns._ID;
+		
+		public static final String NextMileageView =
+			"CREATE VIEW next_mileages AS"
+			+ " SELECT m." + BaseColumns._ID + " mileage_id, next.*"
+			+ " FROM mileages m"
+			+ " INNER JOIN heartbeats stop"
+			+ " 	ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+			+ " INNER JOIN heartbeats next_start"
+			+ " 	ON stop.odometer = next_start.odometer"
+			+ "			AND stop.place_id = next_start.place_id"
+			+ " 		AND stop." + BaseColumns._ID + " != next_start." + BaseColumns._ID
+			+ " INNER JOIN mileages next"
+			+ " 	ON next.start_heartbeat_id = next_start." + BaseColumns._ID;
 		
 		public static final String[] SINGLE_VIEW_PROJECTION = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
-			"mileage",
-			"calc_cost cost",
+			"m.mileage",
+			"m.calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
+			FuelField + " fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
 			"start._created start_time",
-			"dest.name destination"
+			"dest.name destination",
+			"CASE WHEN m.mileage > 0 THEN -100.0 * " + FuelField + " / m.mileage ELSE 0 END consumption"
 		};
 		
 		public static final String[] SingleEditProjection = {
@@ -127,7 +146,7 @@ public final class DatabaseSchema {
 			"-1 " + BaseColumns._ID,
 			"0 mileage",
 			"CURRENT_TIMESTAMP _created",
-			"MAX(amount) amount",
+			"MAX(m.amount) amount",
 			"0 location_id",
 			"NULL track_id",
 			"NULL start_heartbeat_id",

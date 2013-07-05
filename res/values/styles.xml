@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="Indicator">
 		<item name="android:background">@color/sync_unknown</item>/
 		<item name="android:layout_alignParentLeft">true</item>
-		<item name="android:layout_height">fill_parent</item>
+		<item name="android:layout_height">match_parent</item>
 		<item name="android:layout_width">3dp</item>
 		<item name="android:layout_marginBottom">3dp</item>
 		<item name="android:layout_marginTop">3dp</item>
@@ -75,16 +75,20 @@
 	<style name="LocationString">
 		<item name="android:drawableLeft">@drawable/hb_dest</item>"
 		<item name="android:ellipsize">marquee</item>
-		<item name="android:layout_width">wrap_content</item>
-		<item name="android:layout_height">wrap_content</item>
 	</style>
 	
 	<style name="LocationText" parent="@style/LocationString">
-		<item name="android:layout_weight">.5</item>
 		<item name="android:text">Суми, Червоногвардійська</item>
-		<item name="android:layout_width">fill_parent</item>
-		<item name="android:layout_height">wrap_content</item>
 		<item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+	</style>
+	
+	<style name="Place">
+		<item name="android:layout_width">0dp</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:background">@drawable/widget_bg_vector</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">marquee</item>
+		<item name="android:padding">5dp</item>
 	</style>
 	
 	<style name="ThemeSelector" parent="android:Theme" />

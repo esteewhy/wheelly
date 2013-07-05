@@ -108,7 +108,6 @@ public final class LocationInput extends Fragment {
 		});
 		
 		c = new Controls(v);
-		c.labelView.setText(R.string.location_input_label);
 		c.locationAdd.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -171,6 +170,7 @@ public final class LocationInput extends Fragment {
 	
 	public void setValue(long locationId) {
 		if (locationId <= 0) {
+			c.labelView.setText(R.string.location_input_label);
 			c.locationText.setText(R.string.no_fix);
 			
 			LocationUtils.obtainLocation(getActivity(), new com.google.android.gms.location.LocationListener() {
@@ -197,7 +197,8 @@ public final class LocationInput extends Fragment {
 			ContentValues location = new LocationBroker(getActivity()).loadOrCreate(locationId);
 			
 			if(location.size() > 0) {
-				c.locationText.setText(location.getAsString("name"));
+				c.labelView.setText(location.getAsString("name"));
+				c.locationText.setText(location.getAsString("resolved_address"));
 				selectedLocationId = locationId;
 			}
 		}
