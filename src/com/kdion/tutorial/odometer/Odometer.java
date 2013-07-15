@@ -117,7 +117,6 @@ public class Odometer extends TableLayout
 		int wSpec = MeasureSpec.getSize(widthMeasureSpec);
 		
 		int hSpec = MeasureSpec.getSize(heightMeasureSpec);
-		int hMode = MeasureSpec.getMode(heightMeasureSpec);
 		
 		// calculate max height from width
 		float contentHeight = ((float)wSpec / NUM_DIGITS) 

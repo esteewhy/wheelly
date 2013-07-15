@@ -18,7 +18,11 @@ import com.squareup.otto.sample.BusProvider;
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.gms.location.LocationListener;
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
+import com.wheelly.app.ColorInput;
+import com.wheelly.app.ColorInput.OnSelectColorListener;
+import com.wheelly.app.LocationViewBinder;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
 import com.wheelly.db.LocationBroker;
@@ -28,8 +32,10 @@ import com.wheelly.util.LocationUtils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -55,10 +61,11 @@ import android.widget.Toast;
 @SuppressLint({ "NewApi", "InlinedApi" })
 public class LocationsListFragment extends ListFragment {
 	
-	private static final int MENU_ADD = Menu.FIRST+1;
-	private static final int MENU_EDIT = Menu.FIRST+2;
-	private static final int MENU_DELETE = Menu.FIRST+3;
+	private static final int MENU_ADD = Menu.FIRST + 1;
+	private static final int MENU_EDIT = Menu.FIRST + 2;
+	private static final int MENU_DELETE = Menu.FIRST + 3;
 	private static final int MENU_RESOLVE = Menu.FIRST + 5;
+	private static final int MENU_COLOR = Menu.FIRST + 6;
 	
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
@@ -79,6 +86,7 @@ public class LocationsListFragment extends ListFragment {
 			menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
 			menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
 			menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete);
+			menu.add(1, MENU_COLOR, 6, R.string.color).setIcon(android.R.drawable.ic_menu_slideshow);
 		}
 
 		@Override
@@ -108,7 +116,20 @@ public class LocationsListFragment extends ListFragment {
 				new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_single_choice, null,
 					new String[] { "name" },
 					new int[] { android.R.id.text1 }, 0
-				);
+				) {{
+					setViewBinder(new ViewBinder() {
+						@Override
+						public boolean setViewValue(View view, Cursor cursor, int paramInt) {
+							if(android.R.id.text1 == view.getId()) {
+								final String argb = cursor.getString(cursor.getColumnIndex("color"));
+								if(!Strings.isNullOrEmpty(argb)) {
+									view.setBackgroundColor(Color.parseColor(argb));
+								}
+							}
+							return false;
+						}
+					});
+				}};
 		}
 		
 		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.location_item, null,
@@ -129,33 +150,6 @@ public class LocationsListFragment extends ListFragment {
 		return adapter;
 	}
 	
-	private static class LocationViewBinder implements ViewBinder {
-		public Location location;
-		
-		public LocationViewBinder(Location location) {
-			this.location = location;
-		}
-		
-		@Override
-		public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-			switch(view.getId()) {
-			case android.R.id.text2:
-				((TextView)view).setText(LocationUtils.locationToText(cursor));
-				return true;
-			case R.id.text3:
-				if(null != location) {
-					Location dest = new Location(location);
-					dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
-					dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
-					((TextView)view.findViewById(R.id.text3)).setText(LocationUtils.formatDistance(location.distanceTo(dest)));
-				}
-				
-				return true;
-			}
-			return false;
-		}
-	}
-	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -174,7 +168,7 @@ public class LocationsListFragment extends ListFragment {
 
 	}
 	
-	private boolean handleContextItem(int itemId, long id) {
+	private boolean handleContextItem(int itemId, final long id) {
 		switch(itemId) {
 		case MENU_RESOLVE:
 			startGeocode(new LocationBroker(getActivity()).loadOrCreate(id));
@@ -188,6 +182,21 @@ public class LocationsListFragment extends ListFragment {
 				BaseColumns._ID + " = ?",
 				new String[] { Long.toString(id) }
 			);
+			return true;
+		case MENU_COLOR:
+			new ColorInput(new OnSelectColorListener() {
+				@Override
+				public void onSelect(DialogInterface dialog, int which, int color,
+						String argb) {
+					final LocationBroker broker = new LocationBroker(getActivity());
+					final ContentValues location = broker.loadOrCreate(id);
+					
+					if(location.size() > 0) {
+						location.put("color", argb);
+						broker.updateOrInsert(location);
+					}
+				}
+			}).show(getFragmentManager(), null);
 			return true;
 		};
 		return false;
@@ -248,12 +257,6 @@ public class LocationsListFragment extends ListFragment {
 		private GeocoderTask(ContentValues location) {
 			this.geocoder = new AddressGeocoder(getActivity());
 			this.location = location;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			Log.d("Geocoder", "About to enter from onPreExecute");
-			Log.d("Geocoder", "About to exit from onPreExecute");
 		}
 		
 		@Override
