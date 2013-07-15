@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="colors">
-		<item>#ffFF7C00</item>
-		<item>#ffA97039</item>
-		<item>#ff864100</item>
-		<item>#ffFF8D20</item>
-		<item>#ffFF9A3A</item>
-		<item>#ffFFA500</item>
-		<item>#ffA98139</item>
-		<item>#ff865700</item>
-		<item>#ffFFB120</item>
-		<item>#ffFFBA3A</item>
-		<item>#ffFF3900</item>
-		<item>#ffA95239</item>
-		<item>#ff861E00</item>
-		<item>#ffFF5220</item>
-		<item>#ffFF673A</item>
-		<item>#ff02C7EC</item>
-		<item>#ff368C9C</item>
-		<item>#ff00697C</item>
-		<item>#ff20D0F1</item>
-		<item>#ff39D4F1</item>
+		<!--  http://colorschemedesigner.com/#0041ThWs0g0g0  -->
+		<item>#ffDF6262</item>
+		<item>#ffC36464</item>
+		<item>#ffB83D3D</item>
+		<item>#ffE77676</item>
+		<item>#ffE78383</item>
+		<item>#ffDF9B62</item>
+		<item>#ffC38F64</item>
+		<item>#ffB8753D</item>
+		<item>#ffE7A976</item>
+		<item>#ffE7B083</item>
+		<item>#ff3B8686</item>
+		<item>#ff3C7575</item>
+		<item>#ff246E6E</item>
+		<item>#ff54A4A4</item>
+		<item>#ff5DA4A4</item>
+		<item>#ff4FB34F</item>
+		<item>#ff509C50</item>
+		<item>#ff319331</item>
+		<item>#ff65C665</item>
+		<item>#ff70C670</item>
+		<item>#ff724896</item>
+		<item>#ff684883</item>
+		<item>#ff572C7C</item>
+		<item>#ff8B60B0</item>
+		<item>#ff8F69B0</item>
+		<item>#ffDFDA62</item>
+		<item>#ffC3BF64</item>
+		<item>#ffB8B33D</item>
+		<item>#ffE7E276</item>
+		<item>#ffE7E383</item>
 	</array>
 </resources>

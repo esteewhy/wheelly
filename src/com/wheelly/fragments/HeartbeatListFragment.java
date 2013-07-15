@@ -22,7 +22,6 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;
-import com.wheelly.content.WheellyProviderUtils;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
