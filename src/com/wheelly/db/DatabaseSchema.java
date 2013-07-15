@@ -237,6 +237,7 @@ public final class DatabaseSchema {
 			"f.amount",
 			"IFNULL(h._created, f._created) _created",
 			"l.name place",
+			"l.color color",
 		};
 		
 		public static final String Tables = "refuels f"

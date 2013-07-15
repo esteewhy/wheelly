@@ -1,6 +1,8 @@
 package com.wheelly.fragments;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
@@ -11,10 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Refuel;
 import com.wheelly.app.ListConfiguration;
@@ -41,13 +45,13 @@ public class RefuelListFragment extends ConfigurableListFragment {
 	
 	@Override
 	public SimpleCursorAdapter createListAdapter() {
-		return
+		final SimpleCursorAdapter adapter =
 			new SimpleCursorAdapter(getActivity(), R.layout.refuel_list_item, null,
 				new String[] {
-					"name", "mileage", "cost", "_created", "amount", "place"
+					"name", "mileage", "cost", "_created", "amount", "place",
 				},
 				new int[] {
-					R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.place
+					R.id.place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.place,
 				},
 				0
 			) {
@@ -65,6 +69,19 @@ public class RefuelListFragment extends ConfigurableListFragment {
 					}
 				}
 			};
+		
+		adapter.setViewBinder(new ViewBinder() {
+			@Override
+			public boolean setViewValue(View v, Cursor c, int arg2) {
+				if(R.id.place == v.getId()) {
+					final String argb = c.getString(c.getColumnIndex("color"));
+					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+				}
+				return false;
+			}
+		});
+		
+		return adapter;
 	}
 	
 	@Override
