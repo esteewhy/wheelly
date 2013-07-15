@@ -85,7 +85,6 @@
 	<style name="Place">
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="android:background">@drawable/widget_bg_vector</item>
 		<item name="android:singleLine">true</item>
 		<item name="android:ellipsize">marquee</item>
 		<item name="android:padding">5dp</item>

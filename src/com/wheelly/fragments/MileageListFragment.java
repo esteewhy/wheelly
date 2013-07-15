@@ -2,6 +2,7 @@ package com.wheelly.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -14,9 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Mileage;
 import com.wheelly.app.ListConfiguration;
@@ -46,13 +51,13 @@ public class MileageListFragment extends ConfigurableListFragment {
 	
 	@Override
 	public SimpleCursorAdapter createListAdapter() {
-		return
+		final SimpleCursorAdapter adapter =
 			new SimpleCursorAdapter(getActivity(), R.layout.mileage_list_item, null,
 				new String[] {
-					"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination", "state"
+					"start_place", "stop_place", "mileage", "cost", "_created", "fuel", "destination", "state", "leg",
 				},
 				new int[] {
-					R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination, R.id.indicator
+					R.id.start_place, R.id.stop_place, R.id.mileage, R.id.cost, R.id.date, R.id.fuel, R.id.destination, R.id.indicator, R.id.leg
 				},
 				0//CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
 			) {
@@ -69,18 +74,38 @@ public class MileageListFragment extends ConfigurableListFragment {
 						final int status = Integer.parseInt(text);
 						v.setBackgroundColor(getResources().getColor(getStatusColor(status)));
 						break;
-					/*case R.id.stop_place:
-						if("^".equals(text)) {
-							v.setBackgroundDrawable(null);
-							v.setCompoundDrawables(null, null, null, null);
-						} else {
-							super.setViewText(v, text);
-						}
-						break;*/
 					default: super.setViewText(v, text);
 					}
 				}
 			};
+		
+		adapter.setViewBinder(new ViewBinder() {
+			@Override
+			public boolean setViewValue(View v, Cursor c, int arg2) {
+				switch(v.getId()) {
+				case R.id.leg:
+					final int[] res = new int[] { R.drawable.leg0, R.drawable.leg1, R.drawable.leg2, R.drawable.leg3 };
+					int legType = c.getInt(c.getColumnIndex("leg"));
+					if(legType <= 3) {
+						((ImageView)v).setImageResource(res[legType]);
+					}
+					return true;
+				case R.id.start_place: {
+					final String argb = c.getString(c.getColumnIndex("start_color"));
+					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+					break;
+				}
+				case R.id.stop_place: {
+					final String argb = c.getString(c.getColumnIndex("stop_color"));
+					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+					break;
+				}
+				}
+				
+				return false;
+			}
+		});
+		return adapter;
 	}
 	
 	@Override

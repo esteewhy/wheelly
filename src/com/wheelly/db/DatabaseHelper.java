@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 9);
+		super(context, "wheelly.db", null, 10);
 		
 	}
 
@@ -64,6 +64,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			db.execSQL(Mileages.NextMileageView);
 		case 8:
 			db.execSQL("ALTER TABLE locations ADD COLUMN color TEXT;");
+			break;
+		case 9:
+			db.execSQL(Mileages.PrevMileageView);
+			break;
 		}
 	}
 }

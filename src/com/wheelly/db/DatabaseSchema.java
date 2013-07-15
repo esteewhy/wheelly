@@ -74,6 +74,13 @@ public final class DatabaseSchema {
 		private static final String FuelField =
 			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount)";
 		
+		private static final String LegTypeField =
+			"(CASE"
+			+ " WHEN n." + BaseColumns._ID + " IS NULL AND p." + BaseColumns._ID + " IS NOT NULL THEN 1"
+			+ " WHEN n." + BaseColumns._ID + " IS NOT NULL AND p." + BaseColumns._ID + " IS NULL THEN 2"
+			+ " WHEN n." + BaseColumns._ID + " IS NOT NULL AND p." + BaseColumns._ID + " IS NOT NULL THEN 3"
+			+ " ELSE 0 END)";
+		
 		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
@@ -82,9 +89,12 @@ public final class DatabaseSchema {
 			//TODO Calculate in a scheduled async. job
 			FuelField + " fuel",
 			"start_place.name start_place",
-			"CASE WHEN n." + BaseColumns._ID + " IS NULL THEN stop_place.name ELSE '^' END stop_place",
+			"stop_place.name stop_place",
+			"start_place.color start_color",
+			"stop_place.color stop_color",
 			"dest.name destination",
 			StateColumnExpression + " state",
+			LegTypeField + " leg",
 		};
 		
 		public static final String Tables = "mileages m"
@@ -99,7 +109,22 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations dest"
 			+ "		ON m.location_id = dest." + BaseColumns._ID
 			+ " LEFT OUTER JOIN next_mileages n"
-			+ "		ON n.mileage_id = m." + BaseColumns._ID;
+			+ "		ON n.mileage_id = m." + BaseColumns._ID
+			+ " LEFT OUTER JOIN prev_mileages p"
+			+ "		ON p.mileage_id = m." + BaseColumns._ID;
+		
+		public static final String PrevMileageView =
+				"CREATE VIEW prev_mileages AS"
+				+ " SELECT m." + BaseColumns._ID + " mileage_id, prev.*"
+				+ " FROM mileages m"
+				+ " INNER JOIN heartbeats start"
+				+ " 	ON m.start_heartbeat_id = start." + BaseColumns._ID
+				+ " INNER JOIN heartbeats prev_stop"
+				+ " 	ON start.odometer = prev_stop.odometer"
+				+ "			AND start.place_id = prev_stop.place_id"
+				+ " 		AND start." + BaseColumns._ID + " != prev_stop." + BaseColumns._ID
+				+ " INNER JOIN mileages prev"
+				+ " 	ON prev.stop_heartbeat_id = prev_stop." + BaseColumns._ID;
 		
 		public static final String NextMileageView =
 			"CREATE VIEW next_mileages AS"
