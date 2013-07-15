@@ -43,7 +43,7 @@ public class UnderlinedTextView extends TextView{
 	protected void onDraw(Canvas canvas) {
 		int height = getHeight();
 		int width = getWidth();
-		canvas.drawLine(5, height - 5, width - 5, height - 5, paint); //draw underline
+		canvas.drawLine(0, height - 5, width, height - 5, paint); //draw underline
 		super.onDraw(canvas);
 	}
 }
