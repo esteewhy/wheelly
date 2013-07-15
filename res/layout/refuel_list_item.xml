@@ -45,9 +45,10 @@
 		android:layout_height	="wrap_content"
 		android:layout_width	="wrap_content"/>
 	
-	<TextView
+	<UnderlinedTextView
 	    android:id="@+id/place"
 	    style="@style/LocationText"
+	    android:drawableLeft="@drawable/hb_refuel"
 	    android:layout_width="wrap_content"
 	    android:layout_height="fill_parent"
 	    android:layout_alignBottom="@id/mileage"
