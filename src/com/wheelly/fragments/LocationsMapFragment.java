@@ -22,11 +22,13 @@ import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.api.client.util.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
@@ -40,6 +42,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -275,6 +278,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 			final int lonIdx = event.cursor.getColumnIndex("longitude");
 			final int nameIdx = event.cursor.getColumnIndex("name");
 			final int idIdx = event.cursor.getColumnIndex(BaseColumns._ID);
+			final int colorIdx = event.cursor.getColumnIndex("color");
 			
 			final Aggregate delegate = buildCameraUpdateDelegate();
 				
@@ -282,14 +286,22 @@ public class LocationsMapFragment extends SupportMapFragment {
 				final LatLng l = new LatLng(event.cursor.getDouble(latIdx), event.cursor.getDouble(lonIdx));
 				final long id = event.cursor.getLong(idIdx);
 				final MarkerOptions markerOptions = new MarkerOptions()
-		        	.position(l)
-		        	.title(event.cursor.getString(nameIdx))
-		        	.snippet(Long.toString(id))
-		        	.draggable(true);
-		        
-		        // Adding marker on the Google Map
-		        googleMap.addMarker(markerOptions);
-		        delegate.seed(l, id);
+					.position(l)
+					.title(event.cursor.getString(nameIdx))
+					.snippet(Long.toString(id))
+					.draggable(true);
+				
+				final String argb = event.cursor.getString(colorIdx);
+				
+				if(!Strings.isNullOrEmpty(argb)) {
+					float[] hsv = new float[3];
+					Color.colorToHSV(Color.parseColor(argb), hsv);
+					markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+				}
+				
+				// Adding marker on the Google Map
+				googleMap.addMarker(markerOptions);
+				delegate.seed(l, id);
 			} while(event.cursor.moveToNext());
 			
 			//googleMap.animateCamera(delegate.result());

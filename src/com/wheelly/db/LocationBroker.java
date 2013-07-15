@@ -93,6 +93,7 @@ public class LocationBroker {
 		values.put("longitude", cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
 		values.put("is_payee", cursor.getInt(cursor.getColumnIndexOrThrow("is_payee")));
 		values.put("resolved_address", cursor.getString(cursor.getColumnIndexOrThrow("resolved_address")));
+		values.put("color", cursor.getString(cursor.getColumnIndexOrThrow("color")));
 		
 		return values;
 	}

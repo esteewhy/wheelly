@@ -58,7 +58,7 @@ public final class TrackInput extends Fragment {
 			Bundle savedInstanceState) {
 		final Activity ctx = getActivity();
 		
-		final View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		final View v = inflater.inflate(R.layout.select_location, container, true);
 		
 		// prepend MyTracks icon
 		((ViewGroup)v).addView(new ImageView(ctx) {{

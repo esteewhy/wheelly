@@ -4,6 +4,7 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.db.DatabaseSchema.Locations;
@@ -13,10 +14,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -24,13 +25,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 /**
@@ -51,7 +53,7 @@ public final class LocationInput extends Fragment {
 		final Activity ctx = getActivity();
 
 		
-		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		View v = inflater.inflate(R.layout.select_location, container, true);
 		
 		v.setOnLongClickListener(new OnLongClickListener() {
 			@Override
@@ -74,19 +76,8 @@ public final class LocationInput extends Fragment {
 					
 					@Override
 					public void onLoadFinished(Loader<Cursor> arg0, final Cursor locationCursor) {
-						
-						final LocationCursorAdapter adapter = new LocationCursorAdapter(getActivity(), locationCursor, cachedLocation);
-						
-						LocationUtils.obtainLocation(getActivity(), new LocationListener() {
-							@Override
-							public void onLocationChanged(Location paramLocation) {
-								cachedLocation = adapter.location = paramLocation;
-								adapter.notifyDataSetChanged();
-							}
-						});
-						
 						new AlertDialog.Builder(getActivity())
-							.setSingleChoiceItems(adapter,
+							.setSingleChoiceItems(buildAdapter(locationCursor),
 								Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
 								new DialogInterface.OnClickListener(){
 									@Override
@@ -119,33 +110,26 @@ public final class LocationInput extends Fragment {
 		return v;
 	}
 	
-	private static class LocationCursorAdapter extends SimpleCursorAdapter {
-		public Location location;
+	@SuppressLint("NewApi")
+	private ListAdapter buildAdapter(Cursor c) {
+		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+			R.layout.location_item,
+			c,
+			new String[] {"name", "resolved_address", "name" },
+			new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 },
+			0);
 		
-		@SuppressLint("NewApi")
-		public LocationCursorAdapter(Context context, Cursor c, Location location) {
-			super(context,
-				R.layout.location_item,
-				c,
-				new String[] {"name", "resolved_address" },
-				new int[] { android.R.id.text1, android.R.id.text2 },
-				0);
-			
-			this.location = location;
-		}
+		adapter.setViewBinder(new LocationViewBinder(cachedLocation));
 		
-		@Override
-		public void bindView(View view, Context context, Cursor cursor) {
-			super.bindView(view, context, cursor);
-			
-			if(null != location) {
-				Location dest = new Location(location);
-				dest.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
-				dest.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
-				((TextView)view.findViewById(R.id.text3))
-					.setText(LocationUtils.formatDistance(location.distanceTo(dest)));
+		LocationUtils.obtainLocation(getActivity(), new LocationListener() {
+			@Override
+			public void onLocationChanged(Location paramLocation) {
+				cachedLocation = ((LocationViewBinder)adapter.getViewBinder()).location = paramLocation;
+				adapter.notifyDataSetChanged();
 			}
-		}
+		});
+		
+		return adapter;
 	}
 	
 	@Override
@@ -169,6 +153,8 @@ public final class LocationInput extends Fragment {
 	}
 	
 	public void setValue(long locationId) {
+		c.labelView.setBackgroundColor(Color.TRANSPARENT);
+		
 		if (locationId <= 0) {
 			c.labelView.setText(R.string.location_input_label);
 			c.locationText.setText(R.string.no_fix);
@@ -199,6 +185,13 @@ public final class LocationInput extends Fragment {
 			if(location.size() > 0) {
 				c.labelView.setText(location.getAsString("name"));
 				c.locationText.setText(location.getAsString("resolved_address"));
+				
+				final String argb = location.getAsString("color");
+				
+				if(!Strings.isNullOrEmpty(argb)) {
+					c.labelView.setBackgroundColor(Color.parseColor(argb));
+				}
+				
 				selectedLocationId = locationId;
 			}
 		}

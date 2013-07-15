@@ -379,7 +379,8 @@ public final class DatabaseSchema {
 			+"		latitude double,"
 			+"		longitude double,"
 			+"		is_payee integer not null default 0,"
-			+"		resolved_address text"
+			+"		resolved_address text,"
+			+"		color TEXT"
 			+"	)";
 		
 		public static final String Select =

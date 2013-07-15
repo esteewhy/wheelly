@@ -16,7 +16,7 @@
 	android:background="?android:attr/activatedBackgroundIndicator"
 	android:mode="twoLine">
 
-	<TextView
+	<UnderlinedTextView
 	    android:id="@android:id/text1"
 	    android:layout_width="match_parent"
 		android:layout_height="wrap_content"
