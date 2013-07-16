@@ -15,24 +15,6 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content" />
 	
-	<ImageView
-	    android:id="@+id/icon_refuel"
-	    style="@style/HeartbeatTypeIcon.Refuel"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" />
-
-	<ImageView
-	    android:id="@+id/icon_stop"
-	    style="@style/HeartbeatTypeIcon.Stop"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" />
-
-	<ImageView
-	    android:id="@+id/icon_start"
-	    style="@style/HeartbeatTypeIcon.Start"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" />
-	
 	<ProgressBar android:id		="@+id/fuelGauge"
 		android:max				="60"
 		android:layout_width	="fill_parent"
@@ -67,9 +49,9 @@
 		android:text			="25.4"
 		android:textColor		="@color/fuel"/>
 	
-	<TextView
+	<UnderlinedTextView
 	    android:id="@+id/place"
-	    style="@style/LocationText"
+	    style="@style/Place"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_above="@id/fuelGauge"

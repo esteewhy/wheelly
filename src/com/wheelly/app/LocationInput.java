@@ -203,7 +203,8 @@ public final class LocationInput extends Fragment {
 	private void setLocationFromCursor(Cursor locationCursor) {
 		ContentValues location = LocationBroker.deserialize(locationCursor);
 		//c.locationText.setText(LocationUtils.locationToText(location));
-		c.locationText.setText(location.getAsString("name"));
+		c.labelView.setText(location.getAsString("name"));
+		c.locationText.setText(location.getAsString("resolved_address"));
 		selectedLocationId = location.getAsLong(BaseColumns._ID);
 	}
 	

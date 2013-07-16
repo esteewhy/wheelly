@@ -3,6 +3,7 @@ package com.wheelly.fragments;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
@@ -19,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;
@@ -51,10 +53,10 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 		return
 			new SimpleCursorAdapter(getActivity(), R.layout.heartbeat_list_item, null,
 				new String[] {
-					"odometer", "_created", "fuel", "fuel", "place", "icons", "sync_state"
+					"odometer", "_created", "fuel", "fuel", "place", "sync_state"
 				},
 				new int[] {
-					R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.icon_refuel, R.id.indicator
+					R.id.odometer, R.id.date, R.id.fuelAmt, R.id.fuelGauge, R.id.place, R.id.indicator
 				},
 				0
 			) {{
@@ -62,6 +64,16 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 					@Override
 					public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 						switch(view.getId()) {
+						case R.id.place: {
+							final String argb = cursor.getString(cursor.getColumnIndex("color"));
+							final TextView tv = (TextView)view; 
+							tv.setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+							
+							final int[] icons = new int[] { R.drawable.hb_stop, R.drawable.hb_start, R.drawable.hb_refuel, };
+							final int iconIndex = new StringBuilder(Integer.toString(cursor.getInt(cursor.getColumnIndex("icons")), 2)).reverse().indexOf("1");
+							tv.setCompoundDrawablesWithIntrinsicBounds(0 <= iconIndex && iconIndex < icons.length ? icons[iconIndex] : 0, 0, 0, 0);
+							return false;
+						}
 						case R.id.date:
 							((TextView)view).setText(com.wheelly.util.DateUtils.formatVarying(cursor.getString(columnIndex)));
 							return true;
@@ -70,17 +82,9 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 							pb.setProgress(cursor.getInt(columnIndex));
 							pb.setMax(fuelCapacity);
 							return true;
-						case R.id.icon_refuel:
-							int mask = cursor.getInt(columnIndex);
-							final View v = (View)view.getParent();
-							v.findViewById(R.id.icon_refuel).setVisibility((mask & 4) > 0 ? View.VISIBLE : View.GONE);
-							v.findViewById(R.id.icon_start).setVisibility((mask & 2) > 0 ? View.VISIBLE : View.GONE);
-							v.findViewById(R.id.icon_stop).setVisibility((mask & 1) > 0 ? View.VISIBLE : View.GONE);
-							return true;
 						case R.id.indicator:
 							final int status = cursor.getInt(columnIndex);
 							view.setBackgroundColor(getResources().getColor(getStatusColor(status)));
-							//((RelativeLayout)view.getParent()).setb;
 							return true;
 						}
 						return false;

@@ -81,11 +81,11 @@ public class MileageListFragment extends ConfigurableListFragment {
 		
 		adapter.setViewBinder(new ViewBinder() {
 			@Override
-			public boolean setViewValue(View v, Cursor c, int arg2) {
+			public boolean setViewValue(View v, Cursor c, int columnIndex) {
 				switch(v.getId()) {
 				case R.id.leg:
 					final int[] res = new int[] { R.drawable.leg0, R.drawable.leg1, R.drawable.leg2, R.drawable.leg3 };
-					int legType = c.getInt(c.getColumnIndex("leg"));
+					int legType = c.getInt(columnIndex);
 					if(legType <= 3) {
 						((ImageView)v).setImageResource(res[legType]);
 					}

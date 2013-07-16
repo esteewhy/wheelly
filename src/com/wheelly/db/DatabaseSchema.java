@@ -321,7 +321,8 @@ public final class DatabaseSchema {
 			"h.fuel",
 			"l.name place",
 			"h.sync_state",
-			IconColumnExpression + " icons"
+			IconColumnExpression + " icons",
+			"l.color color",
 		};
 		
 		public static final String Tables = "heartbeats h"
