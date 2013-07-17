@@ -45,6 +45,7 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int LOCATIONS_ID = 401;
 	private static final int LOCATIONS_MILEAGES = 402;
 	private static final int LOCATIONS_REFUELS = 403;
+	private static final int LOCATIONS_HEARTBEATS = 404;
 	
 	private static final SparseArray<String[]> DataSchemaLookup = new SparseArray<String[]>();
 	private static final SparseArray<Uri> UriMap = new SparseArray<Uri>();
@@ -73,6 +74,7 @@ public class ChronologyProvider extends ContentProvider {
 			
 			addURI(a, "locations/mileages", LOCATIONS_MILEAGES);
 			addURI(a, "locations/refuels", LOCATIONS_REFUELS);
+			addURI(a, "locations/heartbeats", LOCATIONS);
 			
 			addURI(a, "mileages/defaults", MILEAGES_DEFAULTS);
 			addURI(a, "refuels/defaults", REFUELS_DEFAULTS);
@@ -87,6 +89,7 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
 		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
+		//DataSchemaLookup.put(LOCATIONS_HEARTBEATS, new String[] { Locations.CONTENT_ITEM_TYPE, "locations", "locations" });
 		DataSchemaLookup.put(LOCATIONS, new String[] { Locations.CONTENT_TYPE, "locations", "locations" });
 		DataSchemaLookup.put(LOCATIONS_ID, new String[] { Locations.CONTENT_ITEM_TYPE, "locations", "locations" });
 		

@@ -6,12 +6,11 @@ import org.openintents.calendarpicker.contract.CalendarPickerConstants;
 
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
-import com.wheelly.activity.FilterDialog;
-import com.wheelly.activity.FilterDialog.OnFilterChangedListener;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.activity.Preferences;
 import com.wheelly.app.ListConfiguration;
 import com.wheelly.db.DatabaseHelper;
+import com.wheelly.fragments.FilterDialog.OnFilterChangedListener;
 import com.wheelly.util.BackupUtils;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
@@ -182,8 +181,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 							filter.remove(F.LOCATION_CONSTRAINT);
 							setFilter(value);
 						}
-						
-						
 					}
 				});
 				fd.setOnCancelListener(new OnCancelListener() {
