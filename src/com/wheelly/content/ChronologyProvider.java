@@ -43,6 +43,8 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int TIMELINE_ID = 307;
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
+	private static final int LOCATIONS_MILEAGES = 402;
+	private static final int LOCATIONS_REFUELS = 403;
 	
 	private static final SparseArray<String[]> DataSchemaLookup = new SparseArray<String[]>();
 	private static final SparseArray<Uri> UriMap = new SparseArray<Uri>();
@@ -68,6 +70,9 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
+			
+			addURI(a, "locations/mileages", LOCATIONS_MILEAGES);
+			addURI(a, "locations/refuels", LOCATIONS_REFUELS);
 			
 			addURI(a, "mileages/defaults", MILEAGES_DEFAULTS);
 			addURI(a, "refuels/defaults", REFUELS_DEFAULTS);
@@ -186,7 +191,12 @@ public class ChronologyProvider extends ContentProvider {
 			return dbHelper.getReadableDatabase()
 				.rawQuery(DatabaseSchema.Heartbeats.ReferenceCount,
 					new String[] { Long.toString(ContentUris.parseId(uri)) });
-		
+		case LOCATIONS_MILEAGES:
+			return dbHelper.getReadableDatabase()
+				.rawQuery(DatabaseSchema.Locations.SelectByMileages, null);
+		case LOCATIONS_REFUELS:
+			return dbHelper.getReadableDatabase()
+				.rawQuery(DatabaseSchema.Locations.SelectByRefuels, null);
 		case MILEAGES_ID:
 		case REFUELS_ID:
 		case HEARTBEATS_ID:

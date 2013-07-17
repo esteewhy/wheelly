@@ -38,7 +38,6 @@ public class LocationBroker {
 		} finally {
 			cursor.close();
 		}
-
 	}
 	
 	public long getNearest(Location location, float minDistance) {
