@@ -14,10 +14,11 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
-import com.wheelly.db.DatabaseHelper;
+import com.wheelly.app.LocationViewBinder;
 import com.wheelly.db.LocationBroker;
-import com.wheelly.db.LocationRepository;
+import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
 
@@ -26,7 +27,6 @@ import ru.orangesoftware.financisto.activity.ActivityLayoutListener;
 import ru.orangesoftware.financisto.activity.DateFilterActivity;
 import ru.orangesoftware.financisto.model.*;
 import ru.orangesoftware.financisto.datetime.DateUtils;
-import ru.orangesoftware.financisto.utils.Utils;
 import ru.orangesoftware.financisto.datetime.PeriodType;
 import ru.orangesoftware.financisto.view.NodeInflater;
 import android.app.Activity;
@@ -38,10 +38,13 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +52,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class FilterDialog extends DialogFragment {	
@@ -63,8 +65,6 @@ public class FilterDialog extends DialogFragment {
 	private String filterValueNotFound;
 	private ActivityLayout x;
 	private Controls c;
-	private SQLiteDatabase db;
-	private Cursor locationCursor;
 	
 	public FilterDialog(ContentValues filter, OnFilterChangedListener listener) {
 		this.filter = filter;
@@ -82,22 +82,16 @@ public class FilterDialog extends DialogFragment {
 		View v = layoutInflater.inflate(R.layout.blotter_filter, null);
 		final Activity ctx = this.getActivity();
 		
-		locationCursor = new LocationRepository(
-			db = new DatabaseHelper(ctx).getReadableDatabase())
-				.list(filter.containsKey(F.LOCATION_CONSTRAINT)
-					? filter.getAsString(F.LOCATION_CONSTRAINT)
-					: "");
+		final SimpleCursorAdapter adapter =
+				new SimpleCursorAdapter(ctx,
+						R.layout.location_item,
+						null, 
+						new String[] {"name", "resolved_address", "name" },
+						new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 },
+						0
+				);
 		
-		//ctx.startManagingCursor(locationCursor);
-		
-		final ListAdapter adapter =
-			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_spinner_dropdown_item,
-					null, 
-					new String[] {"name"},
-					new int[] { android.R.id.text1 },
-					0
-			);
+		adapter.setViewBinder(new LocationViewBinder(null));
 		
 		x = new ActivityLayout(new NodeInflater(layoutInflater),
 			new ActivityLayoutListener() {
@@ -115,15 +109,39 @@ public class FilterDialog extends DialogFragment {
 						break;
 					case R.id.location: {
 						long locationId = filter.containsKey(F.LOCATION) ? filter.getAsLong(F.LOCATION) : -1;
-						long selectedId = c != null ? locationId : -1;
+						final long selectedId = c != null ? locationId : -1;
 						
-						x.select(ctx,
-							R.id.location,
-							R.string.location,
-							locationCursor,
-							adapter,
-							BaseColumns._ID,
-							selectedId);
+						getActivity().getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+							@Override
+							public Loader<Cursor> onCreateLoader(int arg0,
+									Bundle arg1) {
+								final String entityType = filter.getAsString(F.LOCATION_CONSTRAINT);
+								
+								return
+									new CursorLoader(getActivity(),
+										Strings.isNullOrEmpty(entityType)
+											? Uri.withAppendedPath(Locations.CONTENT_URI, entityType)
+											: Locations.CONTENT_URI,
+										null, null, null, null);
+							}
+							
+							@Override
+							public void onLoadFinished(Loader<Cursor> loader,
+									Cursor locationCursor) {
+								adapter.changeCursor(locationCursor);
+								
+								x.select(ctx,
+										R.id.location,
+										R.string.location,
+										locationCursor,
+										adapter,
+										BaseColumns._ID,
+										selectedId);
+							}
+							
+							@Override
+							public void onLoaderReset(Loader<Cursor> arg0) { }
+						});
 					} break;
 					case R.id.location_clear:
 						filter.remove(F.LOCATION);
@@ -137,7 +155,7 @@ public class FilterDialog extends DialogFragment {
 					switch (id) {
 					case R.id.location:
 						filter.put(F.LOCATION, selectedId);
-						updateLocationFromFilter(filter, locationCursor);
+						updateLocationFromFilter(filter);
 						break;
 					}
 				}
@@ -189,28 +207,19 @@ public class FilterDialog extends DialogFragment {
 		
 		if(null != filter) {
 			updatePeriodFromFilter(filter);
-			updateLocationFromFilter(filter, locationCursor);
+			updateLocationFromFilter(filter);
 		}
 		
 		return d;
 	}
 	
-	@Override
-	public void onDestroy() {
-		if(!locationCursor.isClosed()) {
-			locationCursor.close();
-		}
-		
-		db.close();
-		super.onDestroy();
-	}
-
-	private void updateLocationFromFilter(ContentValues filter, final Cursor locationCursor) {
+	private void updateLocationFromFilter(ContentValues filter) {
 		long locationId = filter.containsKey(F.LOCATION)
 			? filter.getAsLong(F.LOCATION)
 			: 0;
-		if (locationId > 0 && Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
-			final ContentValues location = LocationBroker.deserialize(locationCursor);
+		
+		if (locationId > 0) {
+			final ContentValues location = new LocationBroker(getActivity()).loadOrCreate(locationId);
 			c.location.setText(location != null ? location.getAsString("name") : filterValueNotFound);
 		} else {
 			c.location.setText(R.string.no_filter);
