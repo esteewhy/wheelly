@@ -8,7 +8,7 @@
  * Contributors:
  *     Denis Solonenko - initial API and implementation
  ******************************************************************************/
-package com.wheelly.activity;
+package com.wheelly.fragments;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -80,16 +80,15 @@ public class FilterDialog extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		View v = layoutInflater.inflate(R.layout.blotter_filter, null);
-		final Activity ctx = this.getActivity();
 		
 		final SimpleCursorAdapter adapter =
-				new SimpleCursorAdapter(ctx,
-						R.layout.location_item,
-						null, 
-						new String[] {"name", "resolved_address", "name" },
-						new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 },
-						0
-				);
+			new SimpleCursorAdapter(getActivity(),
+				R.layout.location_item,
+				null, 
+				new String[] {"name", "resolved_address", "name" },
+				new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 },
+				0
+			);
 		
 		adapter.setViewBinder(new LocationViewBinder(null));
 		
@@ -99,7 +98,7 @@ public class FilterDialog extends DialogFragment {
 				public void onClick(View v) {
 					switch (v.getId()) {
 					case R.id.period:
-						Intent intent = new Intent(ctx, DateFilterActivity.class);
+						Intent intent = new Intent(getActivity(), DateFilterActivity.class);
 						FilterUtils.filterToIntent(filter, intent);
 						startActivityForResult(intent, PERIOD_REQUEST);
 						break;
@@ -110,38 +109,37 @@ public class FilterDialog extends DialogFragment {
 					case R.id.location: {
 						long locationId = filter.containsKey(F.LOCATION) ? filter.getAsLong(F.LOCATION) : -1;
 						final long selectedId = c != null ? locationId : -1;
+						final String entityType = filter.getAsString(F.LOCATION_CONSTRAINT);
 						
-						getActivity().getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
-							@Override
-							public Loader<Cursor> onCreateLoader(int arg0,
-									Bundle arg1) {
-								final String entityType = filter.getAsString(F.LOCATION_CONSTRAINT);
+						getActivity().getSupportLoaderManager().initLoader(
+							Strings.isNullOrEmpty(entityType) ? 0 : entityType.hashCode(), null,
+							new LoaderCallbacks<Cursor>() {
+								@Override
+								public Loader<Cursor> onCreateLoader(int arg0,
+										Bundle arg1) {
+									return
+										new CursorLoader(getActivity(),
+											Uri.withAppendedPath(Locations.CONTENT_URI, entityType),
+											null, null, null, null);
+								}
 								
-								return
-									new CursorLoader(getActivity(),
-										Strings.isNullOrEmpty(entityType)
-											? Uri.withAppendedPath(Locations.CONTENT_URI, entityType)
-											: Locations.CONTENT_URI,
-										null, null, null, null);
-							}
-							
-							@Override
-							public void onLoadFinished(Loader<Cursor> loader,
-									Cursor locationCursor) {
-								adapter.changeCursor(locationCursor);
+								@Override
+								public void onLoadFinished(Loader<Cursor> loader,
+										Cursor locationCursor) {
+									adapter.changeCursor(locationCursor);
+									
+									x.select(getActivity(),
+											R.id.location,
+											R.string.location,
+											locationCursor,
+											adapter,
+											BaseColumns._ID,
+											selectedId);
+								}
 								
-								x.select(ctx,
-										R.id.location,
-										R.string.location,
-										locationCursor,
-										adapter,
-										BaseColumns._ID,
-										selectedId);
-							}
-							
-							@Override
-							public void onLoaderReset(Loader<Cursor> arg0) { }
-						});
+								@Override
+								public void onLoaderReset(Loader<Cursor> arg0) { }
+							});
 					} break;
 					case R.id.location_clear:
 						filter.remove(F.LOCATION);
@@ -174,7 +172,7 @@ public class FilterDialog extends DialogFragment {
 		
 		c = new Controls(x, v);
 		
-		df = DateUtils.getShortDateFormat(ctx);
+		df = DateUtils.getShortDateFormat(getActivity());
 		filterValueNotFound = getString(R.string.filter_value_not_found);
 
 		final Dialog d = new AlertDialog.Builder(getActivity())
