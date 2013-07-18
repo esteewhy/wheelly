@@ -140,10 +140,7 @@ public class TrackMapFragment extends SupportMapFragment {
 		@Override
 		protected void onPostExecute(PolylineOptions result) {
 			super.onPostExecute(result);
-			
 			googleMap.addPolyline(result);
-			
-			
 		}
 	}
 	
