@@ -43,10 +43,13 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Address;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -279,45 +282,67 @@ public class LocationsMapFragment extends SupportMapFragment {
 	public void onLoadFinished(LocationsLoadedEvent event) {
 		googleMap.clear();
 		
-		if(null != event.cursor && event.cursor.moveToFirst()) {
-			final int latIdx = event.cursor.getColumnIndex("latitude");
-			final int lonIdx = event.cursor.getColumnIndex("longitude");
-			final int nameIdx = event.cursor.getColumnIndex("name");
-			final int idIdx = event.cursor.getColumnIndex(BaseColumns._ID);
-			final int colorIdx = event.cursor.getColumnIndex("color");
+		if(null != event.cursor) {
+			final FragmentActivity ctx = getActivity();
 			
-			final Aggregate delegate = buildCameraUpdateDelegate();
-				
-			do {
-				final LatLng l = new LatLng(event.cursor.getDouble(latIdx), event.cursor.getDouble(lonIdx));
-				final long id = event.cursor.getLong(idIdx);
-				final MarkerOptions markerOptions = new MarkerOptions()
-					.position(l)
-					.title(event.cursor.getString(nameIdx))
-					.snippet(Long.toString(id))
-					.draggable(true);
-				
-				final String argb = event.cursor.getString(colorIdx);
-				
-				if(!Strings.isNullOrEmpty(argb)) {
-					float[] hsv = new float[3];
-					Color.colorToHSV(Color.parseColor(argb), hsv);
-					markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
-				}
-				
-				// Adding marker on the Google Map
-				googleMap.addMarker(markerOptions);
-				delegate.seed(l, id);
-			} while(event.cursor.moveToNext());
-			
-			//googleMap.animateCamera(delegate.result());
-			googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+			new AsyncTask<Cursor, Void, Aggregate>() {
 				@Override
-				public void onCameraChange(CameraPosition paramCameraPosition) {
-					googleMap.animateCamera(delegate.result());
-					googleMap.setOnCameraChangeListener(null);
+				protected Aggregate doInBackground(Cursor... params) {
+					final Cursor c = params[0];
+					
+					if(c.moveToFirst()) {
+						final int latIdx = c.getColumnIndex("latitude");
+						final int lonIdx = c.getColumnIndex("longitude");
+						final int nameIdx = c.getColumnIndex("name");
+						final int idIdx = c.getColumnIndex(BaseColumns._ID);
+						final int colorIdx = c.getColumnIndex("color");
+						final Aggregate delegate = buildCameraUpdateDelegate();
+						
+						do {
+							final LatLng l = new LatLng(c.getDouble(latIdx), c.getDouble(lonIdx));
+							final long id = c.getLong(idIdx);
+							final MarkerOptions markerOptions = new MarkerOptions()
+								.position(l)
+								.title(c.getString(nameIdx))
+								.snippet(Long.toString(id))
+								.draggable(true);
+							
+							final String argb = c.getString(colorIdx);
+							
+							if(!Strings.isNullOrEmpty(argb)) {
+								float[] hsv = new float[3];
+								Color.colorToHSV(Color.parseColor(argb), hsv);
+								markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+							}
+							
+							ctx.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									googleMap.addMarker(markerOptions);
+								}
+							});
+							
+							delegate.seed(l, id);
+						} while(c.moveToNext());
+						
+						return delegate;
+					}
+					return null;
 				}
-			});
+				
+				@Override
+				protected void onPostExecute(final Aggregate delegate) {
+					googleMap.animateCamera(delegate.result());
+					//TODO above might sometimes give an IllegalStateEx ..
+					/*googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+						@Override
+						public void onCameraChange(CameraPosition paramCameraPosition) {
+							googleMap.animateCamera(delegate.result());
+							googleMap.setOnCameraChangeListener(null);
+						}
+					})*/;
+				};
+			}.execute(event.cursor);
 		}
 	}
 	
