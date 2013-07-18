@@ -75,6 +75,7 @@ public class TrackMapFragment extends SupportMapFragment {
 		return path;
 	}
 	
+	@SuppressWarnings("unused")
 	private static PolylineOptions PATH2(MyTracksProviderUtils utils, long id) {
 		final Cursor locations = utils.getTrackPointCursor(id, -1, -1, false);
 		final PolylineOptions path = new PolylineOptions();

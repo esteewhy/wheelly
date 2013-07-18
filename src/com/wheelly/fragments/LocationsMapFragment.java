@@ -32,6 +32,7 @@ import com.google.api.client.util.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
+import com.wheelly.bus.LocationChoosenEvent;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
 import com.wheelly.db.LocationBroker;
@@ -98,12 +99,17 @@ public class LocationsMapFragment extends SupportMapFragment {
 				public void onInfoWindowClick(Marker marker) {
 					final long id = Long.parseLong(marker.getSnippet());
 					if (isResumed()) {
-						startActivityForResult(
+						
+						if(inSelectMode) {
+							BusProvider.getInstance().post(new LocationChoosenEvent(id));
+						} else {
+							startActivityForResult(
 								new Intent(getActivity(), LocationActivity.class) {{
 									putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
 								}},
 								EDIT_LOCATION_REQUEST
 							);
+						}
 					}
 				}
 			});

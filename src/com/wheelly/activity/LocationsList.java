@@ -3,8 +3,10 @@ package com.wheelly.activity;
 import ru.orangesoftware.financisto.activity.LocationActivity;
 
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
+import com.wheelly.bus.LocationChoosenEvent;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
 import com.wheelly.db.DatabaseSchema.Locations;
@@ -13,7 +15,9 @@ import com.wheelly.fragments.LocationsMapFragment;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -53,6 +57,8 @@ public class LocationsList extends FragmentActivity {
 		} else {
 			bar.setSelectedNavigationItem(getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0));
 		}
+		
+		BusProvider.getInstance().register(this);
 	}
 	
 	@Override
@@ -109,5 +115,12 @@ public class LocationsList extends FragmentActivity {
 			});
 		}
 		super.onResume();
+	}
+	
+	@Subscribe public void onLocationChoosen(LocationChoosenEvent event) {
+		final Intent intent = new Intent();
+		intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, event.id);
+		setResult(Activity.RESULT_OK, intent);
+		finish();
 	}
 }

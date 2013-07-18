@@ -23,6 +23,7 @@ import com.wheelly.R;
 import com.wheelly.app.ColorInput;
 import com.wheelly.app.ColorInput.OnSelectColorListener;
 import com.wheelly.app.LocationViewBinder;
+import com.wheelly.bus.LocationChoosenEvent;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
 import com.wheelly.db.LocationBroker;
@@ -30,7 +31,6 @@ import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.util.LocationUtils;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,7 +44,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -228,10 +227,7 @@ public class LocationsListFragment extends ListFragment {
 		
 		if(inSelectMode) {
 			l.setItemChecked(position, true);
-			final Intent intent = new Intent();
-			intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, id);
-			getActivity().setResult(Activity.RESULT_OK, intent);
-			getActivity().finish();
+			BusProvider.getInstance().post(new LocationChoosenEvent(id));
 		} else {
 			startActivityForResult(
 				new Intent(getActivity(), LocationActivity.class) {{
