@@ -1,15 +1,15 @@
-/*******************************************************************************
- * Copyright (c) 2010 Denis Solonenko.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v2.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * 
- * Contributors:
- *     Denis Solonenko - initial API and implementation
- ******************************************************************************/
 package com.wheelly.fragments;
 
+import java.util.List;
+
+import pl.mg6.android.maps.extensions.GoogleMap;
+import pl.mg6.android.maps.extensions.GoogleMap.OnCameraChangeListener;
+import pl.mg6.android.maps.extensions.GoogleMap.OnInfoWindowClickListener;
+import pl.mg6.android.maps.extensions.GoogleMap.OnMarkerClickListener;
+import pl.mg6.android.maps.extensions.ClusteringSettings;
+import pl.mg6.android.maps.extensions.Marker;
+import pl.mg6.android.maps.extensions.SupportMapFragment;
+import pl.mg6.android.maps.extensions.demo.DemoIconProvider;
 import ru.orangesoftware.financisto.activity.LocationActivity;
 import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
@@ -17,17 +17,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLngBounds.Builder;
 import com.google.api.client.util.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
@@ -80,7 +75,11 @@ public class LocationsMapFragment extends SupportMapFragment {
 		 * googleMap once, when it is null.
 		 */
 		if (googleMap == null) {
-			googleMap = getMap();
+			googleMap = getExtendedMap();
+			googleMap.setClustering(new ClusteringSettings()
+				.iconDataProvider(new DemoIconProvider(getResources()))
+				.addMarkersDynamically(true)
+			);
 			googleMap.setMyLocationEnabled(true);
 
 			googleMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -90,9 +89,20 @@ public class LocationsMapFragment extends SupportMapFragment {
 			googleMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 				@Override
 				public boolean onMarkerClick(Marker marker) {
-					final long id = Long.parseLong(marker.getSnippet());
-					BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsMapFragment.this));
-					return false;
+					if(!marker.isCluster()) {
+						final long id = (Long)marker.getData();
+						BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsMapFragment.this));
+						return false;
+					} else {
+						List<Marker> markers = marker.getMarkers();
+						Builder builder = LatLngBounds.builder();
+						for (Marker m : markers) {
+							builder.include(m.getPosition());
+						}
+						LatLngBounds bounds = builder.build();
+						googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, getResources().getDimensionPixelSize(R.dimen.padding)));
+						return true;
+					}
 				}
 			});
 			
@@ -100,7 +110,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 				
 				@Override
 				public void onInfoWindowClick(Marker marker) {
-					final long id = Long.parseLong(marker.getSnippet());
+					final long id = (Long)marker.getData();
 					if (isResumed()) {
 						
 						if(inSelectMode) {
@@ -154,11 +164,20 @@ public class LocationsMapFragment extends SupportMapFragment {
         } else { // Google Play Services are available
  
             // Getting GoogleMap object from the fragment
-            googleMap = getMap();
+            googleMap = getExtendedMap();
         }
         
         ApiAdapterFactory.getApiAdapter().configureMapViewContextualMenu(this, new MapContextActionCallback() {
 			private EditText editText; 
+			
+			@Override
+			public void onResetMarker(Marker marker) {
+				final long id = (Long)marker.getData();
+				final ContentValues location = new LocationBroker(getActivity()).loadOrCreate(id);
+				final LatLng l = new LatLng(location.getAsDouble("latitude"), location.getAsDouble("longitude"));
+				marker.setPosition(l);
+			}
+			
 			@Override
 			public void onPrepare(Menu menu, Marker marker) {
 				configureTitleWidget(marker);
@@ -180,10 +199,10 @@ public class LocationsMapFragment extends SupportMapFragment {
 			
 			private void configureTitleWidget(Marker marker) {
 				if(null != marker && null != editText) {
-					try {
-						final long id = Long.parseLong(marker.getSnippet());
+					if(null != marker.getData()) {
+						final long id = (Long)marker.getData();
 						editText.setText(new LocationBroker(getActivity()).loadOrCreate(id).getAsString("name"));
-					} catch(NumberFormatException nfex) {
+					} else {
 						LocationUtils.resolveAddress(getActivity(), marker.getPosition(), "", new AddressResolveCallback() {
 							@Override
 							public void onResolved(Address address) {
@@ -198,11 +217,11 @@ public class LocationsMapFragment extends SupportMapFragment {
 			
 			@Override
 			public boolean onClick(MenuItem item, Marker marker) {
-				if(null != marker) {
+				if(null != marker && !marker.isCluster()) {
 					final ContentValues myLocation = new ContentValues();
 					
 					try {
-						final long id = Long.parseLong(marker.getSnippet());
+						final long id = (Long)marker.getData();
 						myLocation.put(BaseColumns._ID, id);
 					} catch(NumberFormatException nfex) {
 						myLocation.put("provider", "fusion");
@@ -278,71 +297,86 @@ public class LocationsMapFragment extends SupportMapFragment {
 		BusProvider.getInstance().unregister(this);
 	}
 	
+	private Aggregate plotMarkers(Cursor c) {
+		final FragmentActivity ctx = getActivity();
+		
+		if(c.moveToFirst()) {
+			final int latIdx = c.getColumnIndex("latitude");
+			final int lonIdx = c.getColumnIndex("longitude");
+			final int nameIdx = c.getColumnIndex("name");
+			final int addressIdx = c.getColumnIndex("resolved_address");
+			final int idIdx = c.getColumnIndex(BaseColumns._ID);
+			final int colorIdx = c.getColumnIndex("color");
+			final Aggregate delegate = buildCameraUpdateDelegate();
+			
+			do {
+				final LatLng l = new LatLng(c.getDouble(latIdx), c.getDouble(lonIdx));
+				final long id = c.getLong(idIdx);
+				final MarkerOptions markerOptions = new MarkerOptions()
+					.position(l)
+					.title(c.getString(nameIdx))
+					.snippet(c.getString(addressIdx))
+					.draggable(true);
+				
+				final String argb = c.getString(colorIdx);
+				
+				if(!Strings.isNullOrEmpty(argb)) {
+					float[] hsv = new float[3];
+					Color.colorToHSV(Color.parseColor(argb), hsv);
+					markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
+				}
+				
+				ctx.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						googleMap.addMarker(markerOptions).setData(id);
+					}
+				});
+				
+				delegate.seed(l, id);
+			} while(c.moveToNext());
+			
+			return delegate;
+		}
+		return null;
+	}
+	
+	private void focusMarkers(final Aggregate delegate, boolean delay) {
+		if(null != delegate) {
+			if(!delay) {
+				googleMap.animateCamera(delegate.result());
+			} else {
+				//TODO above might sometimes give an IllegalStateEx ..
+				googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+					@Override
+					public void onCameraChange(CameraPosition paramCameraPosition) {
+						googleMap.animateCamera(delegate.result());
+						googleMap.setOnCameraChangeListener(null);
+					}
+				});
+			}
+		}
+	}
+	
 	@Subscribe
 	public void onLoadFinished(LocationsLoadedEvent event) {
 		googleMap.clear();
 		
 		if(null != event.cursor) {
-			final FragmentActivity ctx = getActivity();
-			
+			/*
 			new AsyncTask<Cursor, Void, Aggregate>() {
 				@Override
 				protected Aggregate doInBackground(Cursor... params) {
-					final Cursor c = params[0];
-					
-					if(c.moveToFirst()) {
-						final int latIdx = c.getColumnIndex("latitude");
-						final int lonIdx = c.getColumnIndex("longitude");
-						final int nameIdx = c.getColumnIndex("name");
-						final int idIdx = c.getColumnIndex(BaseColumns._ID);
-						final int colorIdx = c.getColumnIndex("color");
-						final Aggregate delegate = buildCameraUpdateDelegate();
-						
-						do {
-							final LatLng l = new LatLng(c.getDouble(latIdx), c.getDouble(lonIdx));
-							final long id = c.getLong(idIdx);
-							final MarkerOptions markerOptions = new MarkerOptions()
-								.position(l)
-								.title(c.getString(nameIdx))
-								.snippet(Long.toString(id))
-								.draggable(true);
-							
-							final String argb = c.getString(colorIdx);
-							
-							if(!Strings.isNullOrEmpty(argb)) {
-								float[] hsv = new float[3];
-								Color.colorToHSV(Color.parseColor(argb), hsv);
-								markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
-							}
-							
-							ctx.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									googleMap.addMarker(markerOptions);
-								}
-							});
-							
-							delegate.seed(l, id);
-						} while(c.moveToNext());
-						
-						return delegate;
-					}
-					return null;
+					return plotMarkers(params[0]);
 				}
 				
 				@Override
 				protected void onPostExecute(final Aggregate delegate) {
-					googleMap.animateCamera(delegate.result());
-					//TODO above might sometimes give an IllegalStateEx ..
-					/*googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
-						@Override
-						public void onCameraChange(CameraPosition paramCameraPosition) {
-							googleMap.animateCamera(delegate.result());
-							googleMap.setOnCameraChangeListener(null);
-						}
-					})*/;
+					focusMarkers(delegate, false);
 				};
 			}.execute(event.cursor);
+			*/
+			focusMarkers(plotMarkers(event.cursor), true);
 		}
 	}
 	

@@ -20,7 +20,6 @@ import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.apps.mytracks.services.sensors.BluetoothConnectionManager;
 import com.google.android.apps.mytracks.widgets.TrackWidgetProvider;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.ApacheHttpTransport;
 
@@ -38,6 +37,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+
+import pl.mg6.android.maps.extensions.SupportMapFragment;
 
 /**
  * API level 8 specific implementation of the {@link ApiAdapter}.
