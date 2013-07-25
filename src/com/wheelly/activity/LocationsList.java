@@ -2,6 +2,7 @@ package com.wheelly.activity;
 
 import ru.orangesoftware.financisto.activity.LocationActivity;
 
+import com.google.android.apps.mytracks.TabManager;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
@@ -26,39 +27,57 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
+import android.widget.TabHost;
 
 @SuppressLint("NewApi")
 public class LocationsList extends FragmentActivity {
-	ViewPager mViewPager;
-	TabsAdapter mTabsAdapter;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		mViewPager = new ViewPager(this);
+		initUIAsViewPager(savedInstanceState);
+		BusProvider.getInstance().register(this);
+	}
+	
+	private void initUIAsViewPager(Bundle savedInstanceState) {
+		ViewPager mViewPager = new ViewPager(this);
 		mViewPager.setId(R.id.pager);
-
+		
 		setContentView(mViewPager);
-
+		
 		final ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
 		ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
-
-		mTabsAdapter = new TabsAdapter(this, mViewPager);
+		
+		TabsAdapter mTabsAdapter = new TabsAdapter(this, mViewPager);
 		mTabsAdapter.addTab(bar.newTab().setText("List"),
-				LocationsListFragment.class, null);
+			LocationsListFragment.class, null);
 		mTabsAdapter.addTab(bar.newTab().setText("Map"),
-				LocationsMapFragment.class, null);
+			LocationsMapFragment.class, null);
+		
+		bar.setSelectedNavigationItem(
+			savedInstanceState != null
+				? savedInstanceState.getInt("tab", 0)
+				: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
+		);
+	}
+	
+	private void initUIAsTabHost(Bundle savedInstanceState) {
+		TabHost tabHost = new TabHost(this);
+		tabHost.setId(android.R.id.tabhost);
+		tabHost.setup();
+		
+		TabManager tabManager = new TabManager(this, tabHost, android.R.id.tabcontent);
+		tabManager.addTab(tabHost.newTabSpec("List").setIndicator("List"), LocationsListFragment.class, null);
+		tabManager.addTab(tabHost.newTabSpec("Map").setIndicator("Map"), LocationsMapFragment.class, null);
 		
 		if (savedInstanceState != null) {
-			bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
-		} else {
-			bar.setSelectedNavigationItem(getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0));
+			tabHost.setCurrentTab(
+				savedInstanceState != null
+					? savedInstanceState.getInt("tab", 0)
+					: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
+			);
 		}
-		
-		BusProvider.getInstance().register(this);
 	}
 	
 	@Override
@@ -73,6 +92,8 @@ public class LocationsList extends FragmentActivity {
 			.edit()
 			.putInt("locations_selected_tab", getActionBar().getSelectedNavigationIndex())
 			.commit();
+		
+		BusProvider.getInstance().unregister(this);
 		
 		super.onDestroy();
 	}

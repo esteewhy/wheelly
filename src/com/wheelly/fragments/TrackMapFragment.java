@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
+import com.wheelly.R;
 import com.wheelly.bus.TrackChangedEvent;
 
 public class TrackMapFragment extends SupportMapFragment {
@@ -81,8 +82,6 @@ public class TrackMapFragment extends SupportMapFragment {
 		final PolylineOptions path = new PolylineOptions();
 		try {
 			if(locations.moveToFirst()) {
-				
-				
 				final int latIdx = locations.getColumnIndex("latitude");
 				final int lonIdx = locations.getColumnIndex("longitude");
 				
@@ -125,7 +124,7 @@ public class TrackMapFragment extends SupportMapFragment {
 				googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
 					@Override
 					public void onCameraChange(CameraPosition arg0) {
-						googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 15));
+						googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, getResources().getDimensionPixelSize(R.dimen.padding)));
 						googleMap.setOnCameraChangeListener(null);
 					}
 				});

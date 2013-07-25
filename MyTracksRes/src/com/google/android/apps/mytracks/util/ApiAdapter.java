@@ -17,7 +17,6 @@ package com.google.android.apps.mytracks.util;
 
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.MapContextActionCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.api.client.http.HttpTransport;
 
 import android.app.Activity;
@@ -30,6 +29,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import java.io.IOException;
 import java.util.List;
+
+import pl.mg6.android.maps.extensions.SupportMapFragment;
 
 /**
  * A set of methods that may be implemented differently depending on the Android
