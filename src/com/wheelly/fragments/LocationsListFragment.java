@@ -84,7 +84,7 @@ public class LocationsListFragment extends ListFragment {
 		public void onCreate(Menu menu) {
 			menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
 			menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
-			menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete);
+			menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete).setVisible(!inSelectMode);
 			menu.add(1, MENU_COLOR, 6, R.string.color).setIcon(android.R.drawable.ic_menu_slideshow);
 		}
 

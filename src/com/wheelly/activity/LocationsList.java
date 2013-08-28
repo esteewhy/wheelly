@@ -2,7 +2,6 @@ package com.wheelly.activity;
 
 import ru.orangesoftware.financisto.activity.LocationActivity;
 
-import com.google.android.apps.mytracks.TabManager;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
@@ -17,6 +16,7 @@ import com.wheelly.fragments.LocationsMapFragment;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,7 +27,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
-import android.widget.TabHost;
 
 @SuppressLint("NewApi")
 public class LocationsList extends FragmentActivity {
@@ -61,7 +60,7 @@ public class LocationsList extends FragmentActivity {
 				: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
 		);
 	}
-	
+	/*
 	private void initUIAsTabHost(Bundle savedInstanceState) {
 		TabHost tabHost = new TabHost(this);
 		tabHost.setId(android.R.id.tabhost);
@@ -78,7 +77,7 @@ public class LocationsList extends FragmentActivity {
 					: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
 			);
 		}
-	}
+	}*/
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -125,7 +124,12 @@ public class LocationsList extends FragmentActivity {
 					
 					if(getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA)) {
 						final long id = getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
-						BusProvider.getInstance().post(new LocationSelectedEvent(id, this));
+						
+						if(id >= 0 && getContentResolver().query(ContentUris.withAppendedId(Locations.CONTENT_URI, id), null, null, null, null).moveToFirst()) {
+							BusProvider.getInstance().post(new LocationSelectedEvent(id, this));
+						} else {
+							getIntent().putExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
+						}
 					}
 				}
 				

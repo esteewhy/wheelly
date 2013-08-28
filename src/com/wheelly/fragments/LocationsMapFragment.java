@@ -193,8 +193,9 @@ public class LocationsMapFragment extends SupportMapFragment {
 						.getActionView()
 						.findViewById(R.id.location_name);
 				
-				menu.add(0, 1, 0, R.string.item_add)
-					.setIcon(android.R.drawable.ic_menu_save);
+				menu.add(0, 1, 0, R.string.save)
+					.setIcon(android.R.drawable.ic_menu_save)
+					.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 			
 			private void configureTitleWidget(Marker marker) {
@@ -220,10 +221,11 @@ public class LocationsMapFragment extends SupportMapFragment {
 				if(null != marker && !marker.isCluster()) {
 					final ContentValues myLocation = new ContentValues();
 					
-					try {
-						final long id = (Long)marker.getData();
+					Long id = (Long)marker.getData();
+					
+					if(null != id) {
 						myLocation.put(BaseColumns._ID, id);
-					} catch(NumberFormatException nfex) {
+					} else {
 						myLocation.put("provider", "fusion");
 					}
 					
@@ -234,6 +236,10 @@ public class LocationsMapFragment extends SupportMapFragment {
 					myLocation.put("latitude", marker.getPosition().latitude);
 					myLocation.put("longitude", marker.getPosition().longitude);
 					myLocation.put("datetime", System.currentTimeMillis());
+					id = new LocationBroker(getActivity()).updateOrInsert(myLocation);
+					myLocation.put(BaseColumns._ID, id);
+					
+					BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsMapFragment.this));
 					
 					LocationUtils.resolveAddress(getActivity(), marker.getPosition(), myLocation.getAsString("name"),
 						new AddressResolveCallback() {
@@ -286,7 +292,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 					
 					@Override
 					public CameraUpdate result() {
-						return CameraUpdateFactory.newLatLngZoom(selected, 17);
+						return null != selected ? CameraUpdateFactory.newLatLngZoom(selected, 17) : null;
 					}
 				};
 	}
@@ -343,17 +349,21 @@ public class LocationsMapFragment extends SupportMapFragment {
 	
 	private void focusMarkers(final Aggregate delegate, boolean delay) {
 		if(null != delegate) {
-			if(!delay) {
-				googleMap.animateCamera(delegate.result());
-			} else {
-				//TODO above might sometimes give an IllegalStateEx ..
-				googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
-					@Override
-					public void onCameraChange(CameraPosition paramCameraPosition) {
-						googleMap.animateCamera(delegate.result());
-						googleMap.setOnCameraChangeListener(null);
-					}
-				});
+			final CameraUpdate update = delegate.result();
+			
+			if(null != update) {
+				if(!delay) {
+					googleMap.animateCamera(update);
+				} else {
+					//TODO above might sometimes give an IllegalStateEx ..
+					googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+						@Override
+						public void onCameraChange(CameraPosition paramCameraPosition) {
+							googleMap.animateCamera(update);
+							googleMap.setOnCameraChangeListener(null);
+						}
+					});
+				}
 			}
 		}
 	}
@@ -384,8 +394,11 @@ public class LocationsMapFragment extends SupportMapFragment {
 	public void onSelectionChanged(final LocationSelectedEvent event) {
 		if(this != event.sender) {
 			final ContentValues c = new LocationBroker(getActivity()).loadOrCreate(event.id);
-			final LatLng selected = new LatLng(c.getAsDouble("latitude"), c.getAsDouble("longitude"));
-			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selected, 17));
+			
+			if(c.containsKey("latitude") && c.containsKey("longitude")) {
+				final LatLng selected = new LatLng(c.getAsDouble("latitude"), c.getAsDouble("longitude"));
+				googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selected, 17));
+			}
 		}
 	}
 }

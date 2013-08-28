@@ -78,7 +78,7 @@ public final class R {
     }
     public static final class drawable {
         public static int failure=0x7f020000;
-        public static int my_tracks_icon=0x7f020001;
+        public static int ic_launcher_my_tracks=0x7f020001;
         public static int success=0x7f020002;
     }
     public static final class id {
