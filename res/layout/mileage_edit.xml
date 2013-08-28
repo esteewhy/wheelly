@@ -1,31 +1,18 @@
-<!--
-  Copyright (c) 2010 Denis Solonenko.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v2.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-  
-  Contributors:
-      Denis Solonenko - initial API and implementation
-	
-	2011-02-27: Adapted for Wheelly by esteewhy.
--->
 <LinearLayout
-	xmlns:android			="http://schemas.android.com/apk/res/android"
+	xmlns:android	="http://schemas.android.com/apk/res/android"
+	xmlns:wheelly	="http://schemas.android.com/apk/res/com.wheelly"
 	android:layout_width	="fill_parent"
 	android:layout_height	="fill_parent"
 	android:orientation		="vertical">
 	
 	<ScrollView
 		android:layout_width	="fill_parent"
-		android:layout_height	="wrap_content"
-		android:layout_weight	="1"
-		android:scrollbarStyle	="outsideInset">
+		android:layout_height	="0dp"
+		android:layout_weight	="1">
 		
 		<LinearLayout
-			xmlns:android			="http://schemas.android.com/apk/res/android"
 			android:layout_width	="fill_parent"
-			android:layout_height	="fill_parent"
+			android:layout_height	="wrap_content"
 			android:orientation		="vertical"
 			android:id				="@+id/list">
 			
@@ -34,6 +21,37 @@
 				android:id				="@+id/heartbeats"
 				android:layout_height	="wrap_content"
 				android:layout_width	="fill_parent" /> 
+			
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="@string/location">
+			
+				<fragment
+					class					="com.wheelly.app.LocationInput"
+					android:id				="@+id/place"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+			
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="@string/mileage_input_label">
+				
+				<com.wheelly.widget.MileageInput
+					android:id				="@+id/mileage"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+				
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout	="@layout/edit_divider" />
 			
 			<fragment
 				class					="com.wheelly.app.TrackInput"
@@ -45,26 +63,11 @@
 				layout	="@layout/edit_divider" />
 			
 			<fragment
-				class					="com.wheelly.app.LocationInput"
-				android:id				="@+id/place"
-				android:layout_height	="wrap_content"
-				android:layout_width	="fill_parent" />
+				android:layout_width="fill_parent"
+				android:layout_height="175dp"
+				class="com.wheelly.fragments.TrackMapFragment"
+				android:tag="map" />
 			
-			<include
-				layout	="@layout/edit_divider" />
-			
-			<com.wheelly.widget.LabeledLayout
-				xmlns:wheelly="http://schemas.android.com/apk/res/com.wheelly"
-				android:layout_width	="fill_parent"
-				android:layout_height	="wrap_content"
-				wheelly:label			="@string/mileage_input_label">
-				
-				<com.wheelly.widget.MileageInput
-					android:id				="@+id/mileage"
-					android:layout_height	="wrap_content"
-					android:layout_width	="fill_parent" />
-				
-			</com.wheelly.widget.LabeledLayout>
 		</LinearLayout>
 	</ScrollView>
 	

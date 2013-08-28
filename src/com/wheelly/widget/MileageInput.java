@@ -13,9 +13,11 @@ package com.wheelly.widget;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.widget.*;
+
+import com.kdion.tutorial.odometer.Odometer;
+import com.kdion.tutorial.odometer.Odometer.OnValueChangeListener;
 import com.wheelly.R;
 import ru.orangesoftware.financisto.widget.AmountInput;
-import ru.orangesoftware.financisto.widget.CalculatorInput;
 import ru.orangesoftware.financisto.widget.MultiNumberPicker;
 import ru.orangesoftware.financisto.widget.MultiNumberPicker.OnChangedListener;
 import android.app.Activity;
@@ -23,6 +25,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spanned;
@@ -33,10 +37,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 public class MileageInput extends LinearLayout {
+	private final int GUI_MODE_TEXTVIEW = 0;
+	private final int GUI_MODE_ODOMETER = 1;
 
 	private static final AtomicInteger EDIT_AMOUNT_REQUEST = new AtomicInteger(2000);
 
 	private EditText primary;
+	private Odometer odometer;
 	
 	private int requestId;
 	private OnAmountChangedListener onAmountChangedListener;
@@ -62,13 +69,14 @@ public class MileageInput extends LinearLayout {
 
 	private final TextWatcher textWatcher = new TextWatcher() {
 		private long oldAmount;
-
+		
 		@Override
 		public void afterTextChanged(Editable s) {
 			if (onAmountChangedListener != null) {
 				long amount = getAmount();
 				onAmountChangedListener.onAmountChanged(oldAmount, amount);
 				oldAmount = amount;
+				odometer.setValue((int)amount);
 			}
 		}
 
@@ -83,12 +91,27 @@ public class MileageInput extends LinearLayout {
 				int count) {
 		}
 	};
-
+	
 	private void initialize(Context context, AttributeSet attrs) {
 		requestId = EDIT_AMOUNT_REQUEST.incrementAndGet();
 		LayoutInflater.from(context).inflate(R.layout.mileage_input, this, true);
 		
-		findViewById(R.id.amount_input).setOnClickListener(new OnClickListener() {
+		final View btn = findViewById(R.id.amount_input);
+		btn.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View paramView) {
+				final int guiMode = primary.getVisibility() == View.VISIBLE
+						? GUI_MODE_ODOMETER
+						: GUI_MODE_TEXTVIEW;
+				configureGuiForOdometer(guiMode);
+				final Editor editor = getContext().getSharedPreferences("gui", Activity.MODE_PRIVATE).edit();
+				editor.putInt("odometer", guiMode);
+				editor.commit();
+				return true;
+			}
+		});
+		
+		btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				final Context ctx = getContext();
@@ -147,19 +170,10 @@ public class MileageInput extends LinearLayout {
 							}
 						});
 					}}, lpWrapWrap);
-				}}, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				}}, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 				
 				d.setCanceledOnTouchOutside(true);
 				d.show();
-			}
-		});
-		
-		findViewById(R.id.calculator).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getContext(), CalculatorInput.class);
-				intent.putExtra(AmountInput.EXTRA_AMOUNT, getAmount());
-				((Activity)getContext()).startActivityForResult(intent, requestId);	
 			}
 		});
 		
@@ -167,6 +181,30 @@ public class MileageInput extends LinearLayout {
 		primary.setKeyListener(keyListener);
 		primary.addTextChangedListener(textWatcher);
 		primary.setOnFocusChangeListener(selectAllOnFocusListener);
+		
+		odometer = (Odometer) findViewById(R.id.odo);
+		odometer.setOnValueChangeListener(new OnValueChangeListener() {
+			@Override
+			public void onValueChange(Odometer sender, int newValue) {
+				setAmount(newValue);
+			}
+		});
+		
+		SharedPreferences settings = context.getSharedPreferences("gui",Context.MODE_PRIVATE);
+		configureGuiForOdometer(settings.getInt("odometer", GUI_MODE_ODOMETER));
+	}
+	
+	void configureGuiForOdometer(int guiOdometer) {
+		switch(guiOdometer) {
+		case GUI_MODE_TEXTVIEW:
+			primary.setVisibility(View.VISIBLE);
+			odometer.setVisibility(View.GONE);
+			break;
+		case GUI_MODE_ODOMETER:
+			primary.setVisibility(View.GONE);
+			odometer.setVisibility(View.VISIBLE);
+			odometer.setValue((int)getAmount());
+		}
 	}
 	
 	private static final char[] acceptedChars = new char[]{'0','1','2','3','4','5','6','7','8','9'};
@@ -210,6 +248,7 @@ public class MileageInput extends LinearLayout {
 
 	public void setAmount(long amount) {
 		primary.setText(String.valueOf(amount));
+		odometer.setValue((int)amount);
 	}
 
 	public long getAmount() {

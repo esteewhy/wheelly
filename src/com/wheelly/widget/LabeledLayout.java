@@ -21,7 +21,7 @@ public final class LabeledLayout extends LinearLayout {
 		
 		CharSequence text = array.getText(R.styleable.LabeledLayout_label);
 		
-		if (text == null) text = getResources().getText(R.string.mileage_input_label);
+		if (text == null) text = getResources().getString(android.R.string.unknownName);
 		label = text;
 		
 		array.recycle();

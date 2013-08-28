@@ -2,11 +2,16 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/MyTracksLib/libs/protobuf-java-2.3.0-lite.jar"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK/MyTracksLib"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" path="MyTracksLib_src"/>
-	<classpathentry kind="lib" path="C:/Program Files/Android/android-sdk-windows/android-compatibility/v13/android-support-v13.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksLib"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/gdata-client-meta-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/MyTracksRes/.google_apis/gdata-spreadsheet-2.1/gdata-spreadsheet-3.0/gdata-spreadsheet-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/gdata-core-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/guava-jdk5-13.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/android-maps-extensions"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksRes"/>
+	<classpathentry exported="true" kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r93lv1.15.0-rc"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

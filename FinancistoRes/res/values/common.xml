@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2010 Denis Solonenko.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the GNU Public License v2.0
+  which accompanies this distribution, and is available at
+  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  
+  Contributors:
+      Denis Solonenko - initial API and implementation
+-->
+<resources>
+	<dimen name="picker_width">62dp</dimen>
+	<dimen name="calculator_button_width">50dp</dimen>
+	<dimen name="calculator_button_height">50dp</dimen>
+	<dimen name="select_entry_height">51dp</dimen>
+	<dimen name="select_entry_height_no_label">45dp</dimen>
+	<dimen name="title_entry_height">25dp</dimen>
+	<dimen name="amount_picker_width">47dp</dimen>
+	<string-array name="numbers">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+	</string-array>
+	<string-array name="decimals">
+		<!-- <item>3</item> -->
+		<item>2</item>
+		<item>1</item>
+		<item>0</item>		
+	</string-array>
+	<string-array name="decimal_separators">
+		<item>\'.\'</item>
+		<item>\',\'</item>
+		<item>\' \'</item>		
+	</string-array>
+	<string-array name="group_separators">
+		<item>\'.\'</item>
+		<item>\',\'</item>
+		<item>\' \'</item>		
+		<item>\'\'</item>
+	</string-array>
+	<string-array name="field_separators">
+		<item>\',\'</item>
+		<item>\';\'</item>
+		<item>\'\t\'</item>
+	</string-array>
+	<string-array name="sort_order_entities">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>		
+		<item>4</item>
+		<item>5</item>
+	</string-array>
+	<string-array name="sort_accounts_values">
+		<item>SORT_ORDER_ASC</item>
+		<item>SORT_ORDER_DESC</item>
+		<item>NAME</item>
+	</string-array>
+	<string-array name="sort_locations_values">
+		<item>NAME</item>
+		<item>FREQUENCY</item>
+	</string-array>
+	<string-array name="sort_blotter_values">
+		<item>DESC</item>
+		<item>ASC</item>
+	</string-array>
+</resources>

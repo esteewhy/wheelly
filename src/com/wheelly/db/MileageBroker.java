@@ -7,6 +7,8 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDoneException;
 import android.provider.BaseColumns;
 
 /**
@@ -69,6 +71,20 @@ public class MileageBroker {
 		} else {
 			values.remove(BaseColumns._ID);
 			return ContentUris.parseId(cr.insert(Mileages.CONTENT_URI, values));
+		}
+	}
+	
+	public long getLastPendingId() {
+		SQLiteDatabase db = null;
+		try {
+			db = new DatabaseHelper(this.context).getReadableDatabase();
+			return db.compileStatement(Mileages.LastPendingIdSql).simpleQueryForLong();
+		} catch(SQLiteDoneException e) {
+			return -1;
+		} finally {
+			if(null != db) {
+				db.close();
+			}
 		}
 	}
 	

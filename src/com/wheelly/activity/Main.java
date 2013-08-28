@@ -1,66 +1,77 @@
 package com.wheelly.activity;
 
-import ru.orangesoftware.financisto.activity.LocationsListActivity;
-
 import com.wheelly.R;
 import com.wheelly.app.AndiCarImporter;
+import com.wheelly.fragments.HeartbeatListFragment;
+import com.wheelly.fragments.MileageListFragment;
+import com.wheelly.fragments.RefuelListFragment;
+import com.wheelly.service.WorkflowNotifier;
 
-import android.app.TabActivity;
-import android.content.Intent;
-import android.content.res.Resources;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.Window;
-import android.widget.TabHost;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 
-public class Main extends TabActivity implements TabHost.OnTabChangeListener {
-
+@SuppressLint("NewApi")
+public class Main extends FragmentActivity {
+	private ViewPager mViewPager;
+	private TabsAdapter mTabsAdapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		final TabHost tabHost = getTabHost();
-		final Resources res = getResources();
+		mViewPager = new ViewPager(this);
+        mViewPager.setId(R.id.pager);
+        setContentView(mViewPager);
 		
-		tabHost.addTab(tabHost.newTabSpec("mileages")
-			.setIndicator(getString(R.string.mileages), res.getDrawable(R.drawable.ic_tab_jet))
-			.setContent(new Intent(this, MileageList.class))
-		);
+		final ActionBar bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+        
+		mTabsAdapter = new TabsAdapter(this, mViewPager);
+		mTabsAdapter.addTab(bar.newTab()
+				.setText(R.string.mileages)
+				.setIcon(R.drawable.ic_tab_jet),
+			MileageListFragment.class, null);
 		
-		tabHost.addTab(tabHost.newTabSpec("refuels")
-			.setIndicator(getString(R.string.refuels), res.getDrawable(R.drawable.ic_tab_utensils))
-			.setContent(new Intent(this, RefuelList.class))
-		);
+		mTabsAdapter.addTab(bar.newTab()
+				.setText(R.string.refuels)
+				.setIcon(R.drawable.ic_tab_utensils),
+			RefuelListFragment.class, null);
 		
-		tabHost.addTab(tabHost.newTabSpec("heartbeats")
-			.setIndicator(getString(R.string.heartbeats), res.getDrawable(R.drawable.ic_tab_cam))
-			.setContent(new Intent(this, HeartbeatList.class))
-		);
+		mTabsAdapter.addTab(bar.newTab()
+				.setText(R.string.heartbeats)
+				.setIcon(R.drawable.ic_tab_cam),
+			HeartbeatListFragment.class, null);
 		
-		tabHost.setOnTabChangedListener(this);
+		if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+        } else {
+        	bar.setSelectedNavigationItem(
+        		getSharedPreferences("gui", Context.MODE_PRIVATE)
+        			.getInt("main_selected_tab", 0));
+        }
 		
 		new AndiCarImporter(this).attemptImporting();
+		new WorkflowNotifier(this).notifyAboutPendingMileages();
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		
-		menu.add(Menu.NONE, 1, Menu.NONE, R.string.locations)
-			.setIcon(R.drawable.menu_entities_locations)
-			.setIntent(new Intent(this, LocationsListActivity.class));
-		
-		menu.add(Menu.NONE, 2, Menu.NONE, R.string.preferences)
-			.setIcon(android.R.drawable.ic_menu_preferences)
-			.setIntent(new Intent(this, Preferences.class));
-		
-		return true;
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
 	}
 	
 	@Override
-	public void onTabChanged(String arg0) {
-		// TODO Auto-generated method stub
+	protected void onDestroy() {
+		getSharedPreferences("gui", Context.MODE_PRIVATE)
+			.edit()
+			.putInt("main_selected_tab", getActionBar().getSelectedNavigationIndex())
+			.commit();
 		
+		super.onDestroy();
 	}
 }

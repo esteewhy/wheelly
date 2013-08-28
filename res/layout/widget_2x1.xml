@@ -10,21 +10,50 @@
       Denis Solonenko - initial API and implementation
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="?android:attr/listPreferredItemHeight"
-	android:background="@drawable/widget_background_gray" android:id="@+id/layout">
-
-	<ImageView android:id="@+id/account_icon"
-		android:layout_width="wrap_content" android:layout_height="fill_parent"
-		android:src="@drawable/wallet_open" android:layout_marginRight="3dp" android:layout_toRightOf="@+id/financisto_icon"/>
-
-	<TextView android:id="@+id/line1" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:singleLine="true" android:layout_alignParentTop="true"
-		android:textColor="#ffffff" android:textStyle="bold"
-		android:ellipsize="end" android:gravity="right" android:textSize="14dp" android:layout_marginTop="3dp" android:layout_toRightOf="@+id/account_icon" android:layout_alignParentRight="true"/>
-
-	<TextView android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:id="@+id/note"
-		android:layout_toRightOf="@+id/account_icon" android:layout_alignParentBottom="true"
-		android:gravity="right"
-		android:layout_below="@id/line1" android:textSize="12dp" android:layout_alignParentRight="true"/>
+	android:layout_width="fill_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight"
+	android:background="@drawable/widget_background_gray"
+	android:minHeight="40dp"
+	android:minWidth="120dp"
+	android:padding="10dp"
+	android:layout_margin="3dp"
+	android:id="@+id/layout">
+	
+	<ImageView android:id="@+id/wheelly_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/icon"
+		android:layout_marginRight="3dp"/>
+	
+	<ProgressBar android:id		="@+id/fuel_gauge"
+		android:max				="60"
+		android:layout_width	="fill_parent"
+		android:progress		="40"
+		android:layout_height	="10dp"
+		style					="@style/ProgressBarFuel"
+		android:layout_toRightOf="@id/wheelly_icon"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentTop="true" />
+	
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@id/fuel_gauge"
+	    android:layout_centerInParent="true"
+	    android:layout_toRightOf="@id/wheelly_icon"
+	    android:gravity="center" >
+	
+	<TextView
+		android:id="@+id/odometer"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:typeface="monospace"
+		android:gravity="center"
+		android:singleLine="true"
+		android:text="213456"
+		android:textSize="15dp"
+		android:textScaleX="1.1"
+		/>
+	</LinearLayout>
 </RelativeLayout>

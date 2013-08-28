@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (c) 2010 Denis Solonenko.
   All rights reserved. This program and the accompanying materials
@@ -17,7 +18,7 @@
 			android:layout_weight="1" android:layout_width="fill_parent" 
 			android:orientation="vertical"/>
 	</ScrollView>
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
 		android:layout_height="wrap_content" android:layout_width="fill_parent"
 		style="@style/ButtonBar">
 		<Button android:layout_weight="1" android:id="@+id/bOK" android:text="@string/ok"
