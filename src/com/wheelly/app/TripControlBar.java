@@ -7,7 +7,7 @@ import com.wheelly.activity.HeartbeatDialog;
 import com.wheelly.content.TrackRepository;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.HeartbeatBroker;
-import com.wheelly.service.Tracker;
+import com.wheelly.service.MyTracksTracker;
 import com.wheelly.service.Tracker.TrackListener;
 import com.wheelly.util.DateUtils;
 
@@ -18,9 +18,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuCompat;
+import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -32,6 +35,8 @@ import android.widget.Button;
  * Widget with 2 buttons to launch editing/creating of start or stop heartbeats.
  */
 public class TripControlBar extends Fragment {
+	
+	public static final int UI_STOP = 1;
 	
 	private Controls c;
 	private static final AtomicInteger MILEAGE_CONTROL_REQUEST = new AtomicInteger(3000);
@@ -117,7 +122,7 @@ public class TripControlBar extends Fragment {
 							"h." + BaseColumns._ID,
 							"odometer",
 							"fuel",
-							"_created"
+							"h._created"
 						},
 						Heartbeats.IconColumnExpression + " = 0",
 						null,
@@ -184,7 +189,7 @@ public class TripControlBar extends Fragment {
 		
 		if(val.TrackId < 0) {
 			val.TrackId = val.TrackId * -1;
-			new Tracker(getActivity())
+			new MyTracksTracker(getActivity())
 				.setStartTrackListener(new TrackListener() {
 					@Override
 					public void onTrackStopped() {
@@ -206,9 +211,9 @@ public class TripControlBar extends Fragment {
 	 * Calculate final mileage in case track length is known.
 	 */
 	private void presetStopMileage(Value val) {
-		float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
-		
 		if(val.StartHeartbeat != null) {
+			float distance = new TrackRepository(getActivity()).getDistance(val.TrackId);
+			
 			// On new mileage there might be no stop heartbeat until after [stop]
 			// button been clicked and heartbeat form submitted,
 			// so we have to create default heartbeat values in advance
@@ -219,14 +224,14 @@ public class TripControlBar extends Fragment {
 			
 			val.StopHeartbeat.put("odometer",
 				val.StartHeartbeat.getAsLong("odometer")
-				+ (long)Math.ceil(distance));
+				+ (long)FloatMath.ceil(distance));
 		}
 	}
 	
 	private void start(final View v) {
 		final Value val = getValue();
 		
-		if(new Tracker(getActivity())
+		if(new MyTracksTracker(getActivity())
 			.setStartTrackListener(new TrackListener() {
 				@Override
 				public void onStartTrack(long trackId) {
@@ -348,7 +353,7 @@ public class TripControlBar extends Fragment {
 		this.canStartTracking = startId > 0
 			&& value.TrackId == 0
 			&& stopId <= 0
-			&& new Tracker(getActivity()).checkAvailability();
+			&& new MyTracksTracker(getActivity()).checkAvailability();
 		
 		// Store temp values into controls.
 		initButton(c.StartButton, startId,  value.StartHeartbeat,
@@ -369,6 +374,43 @@ public class TripControlBar extends Fragment {
 			c.StartButton.setText(R.string.record);
 		}
 	}
+	
+	public void performUICommand(int command) {
+		if(UI_STOP == command) {
+			c.StopButton.performClick();
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		
+		MenuCompat.setShowAsAction(menu
+				.add(0, R.id.bStart, 1, R.string.start)
+				.setIcon(R.drawable.btn_start),
+			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+		MenuCompat.setShowAsAction(menu
+				.add(0, R.id.bStop, 2, R.string.stop)
+				.setIcon(R.drawable.btn_stop)
+				.setEnabled(false),
+			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		super.onPrepareOptionsMenu(menu);
+		//menu.findItem(R.id.bStart).set
+	}
+	
+	/* stop the madness (for now)
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		setHasOptionsMenu(true);
+	}*/
 	
 	/**
 	 * Encapsulates UI objects.

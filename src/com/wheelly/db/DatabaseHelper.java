@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 3);
+		super(context, "wheelly.db", null, 10);
 		
 	}
 
@@ -22,6 +22,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(Refuels.Create);
 		db.execSQL(Heartbeats.Create);
 		db.execSQL(Locations.Create);
+		
+		db.execSQL(Mileages.NextMileageView);
 	}
 
 	@Override
@@ -32,6 +34,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			break;
 		case 2:
 			db.execSQL("ALTER TABLE mileages ADD location_id LONG;");
+			break;
+		case 3:
+			db.execSQL("ALTER TABLE heartbeats ADD sync_id TEXT;");
+			db.execSQL("ALTER TABLE heartbeats ADD sync_date TIMESTAMP;");
+			break;
+		case 4:
+			db.execSQL("ALTER TABLE heartbeats ADD sync_etag TEXT;");
+			break;
+		case 5:
+			db.execSQL("ALTER TABLE heartbeats ADD sync_state LONG NOT NULL DEFAULT 0;");
+			db.execSQL("update heartbeats SET sync_state=(SELECT CASE"
++" WHEN DATETIME(COALESCE(m1._modified, m2._modified, r._modified)) >"
++" DATETIME(sync_date) AND sync_id IS NOT NULL AND sync_etag IS NOT NULL THEN 2"
++" WHEN sync_etag IS NOT NULL THEN 1"
++" WHEN sync_id IS NOT NULL THEN 3"
++" ELSE 0"
++" END FROM heartbeats h"
++" LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h._id"
++" LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h._id"
++" LEFT JOIN refuels r ON r.heartbeat_id = h._id"
++" WHERE heartbeats._id == h._id)");
+			break;
+		case 6:
+			db.execSQL(Mileages.NextMileageView);
+			break;
+		case 7:
+			db.execSQL("DROP VIEW next_mileages;");
+			db.execSQL(Mileages.NextMileageView);
+		case 8:
+			db.execSQL("ALTER TABLE locations ADD COLUMN color TEXT;");
+			break;
+		case 9:
+			db.execSQL(Mileages.PrevMileageView);
 			break;
 		}
 	}

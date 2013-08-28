@@ -17,6 +17,8 @@ public final class DatabaseSchema {
 	private static final String PATH_MILEAGES = "mileages";
 	private static final String PATH_REFUELS = "refuels";
 	private static final String PATH_HEARTBEATS = "heartbeats";
+	private static final String PATH_TIMELINE = "timeline";
+	private static final String PATH_LOCATIONS = "locations";
 	
 	public static final class Mileages {
 		public static final String Create = 
@@ -42,6 +44,17 @@ public final class DatabaseSchema {
 			//+ ",FOREIGN KEY stop_heartbeat_id REFERENCES heartbeats(_id)"
 			+ ")";
 		
+		public static final String LastPendingIdSql =
+			"SELECT m." + BaseColumns._ID + ""
+				+ " FROM mileages m"
+				+ " LEFT OUTER JOIN heartbeats start"
+				+ "		ON m.start_heartbeat_id = start." + BaseColumns._ID
+				+ " LEFT OUTER JOIN heartbeats stop"
+				+ "		ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+				+ " WHERE start." + BaseColumns._ID + " IS NULL"
+				+ "		OR stop." + BaseColumns._ID + " IS NULL"
+				+ " LIMIT 1";
+		
 		//Calculates amount of refuels occurred in progress of a given trip.
 		private static final String EnRouteRefuelAmount =
 			"SELECT Sum(r.amount)"
@@ -52,16 +65,36 @@ public final class DatabaseSchema {
 			//not strictly necessary, but to reassure order
 			;//+ "  AND rh.odometer BETWEEN start.odometer AND stop.odometer";
 		
+		private static final String StateColumnExpression =
+			"(CASE WHEN m.track_id < 0 THEN 2"
+			+" WHEN stop." + BaseColumns._ID + " IS NULL THEN 1"
+			+" ELSE 0"
+			+" END)";
+		
+		private static final String FuelField =
+			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount)";
+		
+		private static final String LegTypeField =
+			"(CASE"
+			+ " WHEN n." + BaseColumns._ID + " IS NULL AND p." + BaseColumns._ID + " IS NOT NULL THEN 1"
+			+ " WHEN n." + BaseColumns._ID + " IS NOT NULL AND p." + BaseColumns._ID + " IS NULL THEN 2"
+			+ " WHEN n." + BaseColumns._ID + " IS NOT NULL AND p." + BaseColumns._ID + " IS NOT NULL THEN 3"
+			+ " ELSE 0 END)";
+		
 		public static final String[] ListProjection = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
 			"m.mileage",
 			"m.calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount) fuel",
+			FuelField + " fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
-			"dest.name destination"
+			"start_place.color start_color",
+			"stop_place.color stop_color",
+			"dest.name destination",
+			StateColumnExpression + " state",
+			LegTypeField + " leg",
 		};
 		
 		public static final String Tables = "mileages m"
@@ -74,19 +107,50 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN locations stop_place"
 			+ "		ON stop.place_id = stop_place." + BaseColumns._ID
 			+ " LEFT OUTER JOIN locations dest"
-			+ "		ON m.location_id = dest." + BaseColumns._ID;
+			+ "		ON m.location_id = dest." + BaseColumns._ID
+			+ " LEFT OUTER JOIN next_mileages n"
+			+ "		ON n.mileage_id = m." + BaseColumns._ID
+			+ " LEFT OUTER JOIN prev_mileages p"
+			+ "		ON p.mileage_id = m." + BaseColumns._ID;
+		
+		public static final String PrevMileageView =
+				"CREATE VIEW prev_mileages AS"
+				+ " SELECT m." + BaseColumns._ID + " mileage_id, prev.*"
+				+ " FROM mileages m"
+				+ " INNER JOIN heartbeats start"
+				+ " 	ON m.start_heartbeat_id = start." + BaseColumns._ID
+				+ " INNER JOIN heartbeats prev_stop"
+				+ " 	ON start.odometer = prev_stop.odometer"
+				+ "			AND start.place_id = prev_stop.place_id"
+				+ " 		AND start." + BaseColumns._ID + " != prev_stop." + BaseColumns._ID
+				+ " INNER JOIN mileages prev"
+				+ " 	ON prev.stop_heartbeat_id = prev_stop." + BaseColumns._ID;
+		
+		public static final String NextMileageView =
+			"CREATE VIEW next_mileages AS"
+			+ " SELECT m." + BaseColumns._ID + " mileage_id, next.*"
+			+ " FROM mileages m"
+			+ " INNER JOIN heartbeats stop"
+			+ " 	ON m.stop_heartbeat_id = stop." + BaseColumns._ID
+			+ " INNER JOIN heartbeats next_start"
+			+ " 	ON stop.odometer = next_start.odometer"
+			+ "			AND stop.place_id = next_start.place_id"
+			+ " 		AND stop." + BaseColumns._ID + " != next_start." + BaseColumns._ID
+			+ " INNER JOIN mileages next"
+			+ " 	ON next.start_heartbeat_id = next_start." + BaseColumns._ID;
 		
 		public static final String[] SINGLE_VIEW_PROJECTION = {
 			"m." + BaseColumns._ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
-			"mileage",
-			"calc_cost cost",
+			"m.mileage",
+			"m.calc_cost cost",
 			//TODO Calculate in a scheduled async. job
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), calc_amount) fuel",
+			FuelField + " fuel",
 			"start_place.name start_place",
 			"stop_place.name stop_place",
 			"start._created start_time",
-			"dest.name destination"
+			"dest.name destination",
+			"CASE WHEN m.mileage > 0 THEN -100.0 * " + FuelField + " / m.mileage ELSE 0 END consumption"
 		};
 		
 		public static final String[] SingleEditProjection = {
@@ -107,7 +171,7 @@ public final class DatabaseSchema {
 			"-1 " + BaseColumns._ID,
 			"0 mileage",
 			"CURRENT_TIMESTAMP _created",
-			"MAX(amount) amount",
+			"MAX(m.amount) amount",
 			"0 location_id",
 			"NULL track_id",
 			"NULL start_heartbeat_id",
@@ -130,6 +194,10 @@ public final class DatabaseSchema {
 			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.mileage";
 		public static final String CONTENT_TYPE =
 			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.mileages";
+		
+		public static final int STATE_NONE = 0;
+		public static final int STATE_ACTIVE = 1;
+		public static final int STATE_TRACKING = 2;
 	}
 	
 	public static final class Refuels {
@@ -169,6 +237,7 @@ public final class DatabaseSchema {
 			"f.amount",
 			"IFNULL(h._created, f._created) _created",
 			"l.name place",
+			"l.color color",
 		};
 		
 		public static final String Tables = "refuels f"
@@ -233,13 +302,17 @@ public final class DatabaseSchema {
 			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			+ "odometer		NUMERIC NOT NULL,"
 			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG)";
+			+ "place_id		LONG,"
+			+ "sync_id		TEXT,"
+			+ "sync_etag	TEXT,"
+			+ "sync_state	LONG NOT NULL DEFAULT 0,"
+			+ "sync_date	TIMESTAMP)";
 		
 		// reverse links detection
 		public static final String IconColumnExpression =
-			"(EXISTS(SELECT 1 FROM refuels WHERE heartbeat_id = h._id) * 4"
-			+ "	| EXISTS(SELECT 1 FROM mileages WHERE start_heartbeat_id = h._id) * 2"
-			+ "	| EXISTS(SELECT 1 FROM mileages WHERE stop_heartbeat_id = h._id))";
+				"((r._id IS NOT NULL) * 4"
+				+ "	| (m1._id IS NOT NULL) * 2"
+				+ "	| (m2._id IS NOT NULL))";
 		
 		public static final String[] ListProjection = {
 			"h." + BaseColumns._ID,
@@ -247,11 +320,16 @@ public final class DatabaseSchema {
 			"h.odometer",
 			"h.fuel",
 			"l.name place",
-			IconColumnExpression + "  icons"
+			"h.sync_state",
+			IconColumnExpression + " icons",
+			"l.color color",
 		};
 		
 		public static final String Tables = "heartbeats h"
-			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID;
+			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID
+			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + BaseColumns._ID;
 		
 		public static final String ReferenceCount =
 			"SELECT SUM(cnt) FROM ("
@@ -266,7 +344,7 @@ public final class DatabaseSchema {
 		static {
 			FilterExpr.put(F.LOCATION, "h.place_id = @location_id");
 			FilterExpr.put(F.PERIOD, "h._created BETWEEN @from AND @to");
-			FilterExpr.put(F.SORT_ORDER, "h._created");
+			FilterExpr.put(F.SORT_ORDER, "h.odometer DESC, h._created");
 		}
 		
 		public static final Uri CONTENT_URI =
@@ -277,6 +355,46 @@ public final class DatabaseSchema {
 			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.heartbeats";
 	}
 
+	public static final class Timeline {
+		
+		public static final long SYNC_STATE_NONE = 0;
+		public static final long SYNC_STATE_READY = 1;
+		public static final long SYNC_STATE_CHANGED = 2;
+		public static final long SYNC_STATE_CONFLICT = 3;
+		
+		public static final String[] ListProjection = {
+			"h." + BaseColumns._ID + " " + BaseColumns._ID,
+			"h._created",
+			"h.odometer",
+			"h.fuel",
+			"l.name place",
+			"m2.mileage distance",
+			"ls.name destination",
+			"r.cost",
+			"r.amount",
+			"r.transaction_id",
+			Heartbeats.IconColumnExpression + " icons",
+			"h.sync_id",
+			"h.sync_etag",
+			"h.sync_date",
+			"h.sync_state"
+		};
+		
+		public static final String Tables = "heartbeats h"
+			+ " LEFT JOIN locations l ON h.place_id = l." + BaseColumns._ID
+			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + BaseColumns._ID
+			+ " LEFT JOIN locations ls ON m2.location_id = ls." + BaseColumns._ID
+			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + BaseColumns._ID;
+		
+		public static final Uri CONTENT_URI =
+			BASE_CONTENT_URI.buildUpon().appendPath(PATH_TIMELINE).build();
+		public static final String CONTENT_ITEM_TYPE =
+			ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.timeline_entry";
+		public static final String CONTENT_TYPE =
+			ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.timeline";
+	}
+	
 	public static final class Locations {
 		public static String Create =
 			"create table if not exists locations ("
@@ -288,7 +406,8 @@ public final class DatabaseSchema {
 			+"		latitude double,"
 			+"		longitude double,"
 			+"		is_payee integer not null default 0,"
-			+"		resolved_address text"
+			+"		resolved_address text,"
+			+"		color TEXT"
 			+"	)";
 		
 		public static final String Select =
@@ -319,5 +438,12 @@ public final class DatabaseSchema {
 			+ "  GROUP BY h.place_id"
 			+ " ) rl ON rl.place_id = l." + BaseColumns._ID
 			+ " ORDER BY rl.cnt DESC";
+		
+		public static final Uri CONTENT_URI =
+				BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATIONS).build();
+		public static final String CONTENT_ITEM_TYPE =
+				ContentResolver.CURSOR_ITEM_BASE_TYPE + "/com.wheelly.location";
+		public static final String CONTENT_TYPE =
+				ContentResolver.CURSOR_DIR_BASE_TYPE + "/com.wheelly.locations";
 	}
 }

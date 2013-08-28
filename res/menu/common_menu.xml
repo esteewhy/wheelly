@@ -1,0 +1,34 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id		="@+id/opt_menu_add"
+		android:icon	="@android:drawable/ic_menu_add"
+		android:title	="@string/item_add"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_filter"
+		android:icon	="@drawable/ic_menu_filter_off"
+		android:title	="@string/filter"
+		android:showAsAction="ifRoom" />
+	
+	<item android:id	="@+id/opt_menu_locations"
+		android:title	="@string/locations"
+		android:icon	="@android:drawable/ic_menu_myplaces" />
+	
+	<item android:id	="@+id/opt_menu_preferences"
+		android:title	="@string/preferences"
+		android:icon	="@android:drawable/ic_menu_preferences" />
+	
+	<item
+		android:id		="@+id/opt_menu_backup"
+		android:icon	="@android:drawable/ic_menu_save"
+		android:title	="SD Backup" />
+	<item
+		android:id		="@+id/opt_menu_restore"
+		android:icon	="@drawable/ic_menu_archive"
+		android:title	="SD Restore" />
+	
+	<item
+		android:id		="@+id/opt_menu_calendar"
+		android:icon	="@android:drawable/ic_menu_today"
+		android:title	="Calendar" />
+</menu>

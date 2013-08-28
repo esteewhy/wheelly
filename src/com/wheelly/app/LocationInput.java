@@ -3,36 +3,37 @@ package com.wheelly.app;
 import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
+import com.google.android.gms.location.LocationListener;
+import com.google.api.client.util.Strings;
 import com.wheelly.R;
-import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.LocationRepository;
+import com.wheelly.activity.LocationsList;
+import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.location.Criteria;
+import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Location selection and creation control.
@@ -40,52 +41,64 @@ import android.widget.Toast;
 public final class LocationInput extends Fragment {
 	
 	private static final int NEW_LOCATION_REQUEST = 4002;
+	private static final int EDIT_LOCATION_REQUEST = 4003;
 	
 	private long selectedLocationId = 0;
-	private boolean setCurrentLocation;
-	private LocationManager locationManager;
-	private Location lastFix;
 	private Controls c;
-	private Cursor locationCursor;
-	private SQLiteDatabase db;
+	private Location cachedLocation;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final Activity ctx = getActivity();  
-		locationCursor = new LocationRepository(db = new DatabaseHelper(ctx).getReadableDatabase()).list();
-		ctx.startManagingCursor(locationCursor);
-		final ListAdapter adapter =
-			new SimpleCursorAdapter(ctx,
-					android.R.layout.simple_spinner_dropdown_item,
-					locationCursor, 
-					new String[] {"name"},
-					new int[] { android.R.id.text1 }
-			);
+		final Activity ctx = getActivity();
+
 		
-		View v = inflater.inflate(R.layout.select_entry_plus, container, true);
+		View v = inflater.inflate(R.layout.select_location, container, true);
+		
+		v.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View paramView) {
+				Intent intent = new Intent(ctx, LocationsList.class);
+				intent.putExtra(LocationActivity.LOCATION_ID_EXTRA, selectedLocationId);
+				startActivityForResult(intent, EDIT_LOCATION_REQUEST);
+				return true;
+			}
+		});
+		
 		v.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(ctx)
-					.setSingleChoiceItems(adapter,
-						Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
-						new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-								locationCursor.moveToPosition(which);
-								setLocationFromCursor();
-							}
-						}
-					)
-					.setTitle(R.string.location)
-					.show();
+				getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
+					@Override
+					public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+						return new CursorLoader(getActivity(), Locations.CONTENT_URI, null, null, null, null);
+					}
+					
+					@Override
+					public void onLoadFinished(Loader<Cursor> arg0, final Cursor locationCursor) {
+						new AlertDialog.Builder(getActivity())
+							.setSingleChoiceItems(buildAdapter(locationCursor),
+								Utils.moveCursor(locationCursor, BaseColumns._ID, selectedLocationId),
+								new DialogInterface.OnClickListener(){
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.cancel();
+										locationCursor.moveToPosition(which);
+										setLocationFromCursor(locationCursor);
+									}
+								}
+							)
+							.setTitle(R.string.location)
+							.show();
+					}
+					
+					@Override
+					public void onLoaderReset(Loader<Cursor> arg0) { }
+				});
 			}
 		});
 		
 		c = new Controls(v);
-		c.labelView.setText(R.string.location_input_label);
 		c.locationAdd.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -97,10 +110,26 @@ public final class LocationInput extends Fragment {
 		return v;
 	}
 	
-	@Override
-	public void onDestroyView() {
-		db.close();
-		super.onDestroyView();
+	@SuppressLint("NewApi")
+	private ListAdapter buildAdapter(Cursor c) {
+		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+			R.layout.location_item,
+			c,
+			new String[] {"name", "resolved_address", "name" },
+			new int[] { android.R.id.text1, android.R.id.text2, R.id.text3 },
+			0);
+		
+		adapter.setViewBinder(new LocationViewBinder(cachedLocation));
+		
+		LocationUtils.obtainLocation(getActivity(), new LocationListener() {
+			@Override
+			public void onLocationChanged(Location paramLocation) {
+				cachedLocation = ((LocationViewBinder)adapter.getViewBinder()).location = paramLocation;
+				adapter.notifyDataSetChanged();
+			}
+		});
+		
+		return adapter;
 	}
 	
 	@Override
@@ -109,14 +138,13 @@ public final class LocationInput extends Fragment {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case NEW_LOCATION_REQUEST:
-					locationCursor.requery();
+				case EDIT_LOCATION_REQUEST:
 					long locationId = data.getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
 					if (locationId > 0) {
 						setValue(locationId);
 					}
 					break;
 			}
-		} else {
 		}
 	}
 	
@@ -125,188 +153,59 @@ public final class LocationInput extends Fragment {
 	}
 	
 	public void setValue(long locationId) {
+		c.labelView.setBackgroundColor(Color.TRANSPARENT);
+		
 		if (locationId <= 0) {
-			if(!selectNearestExistingLocation()) { 
-				selectCurrentLocation(false);
-			}
-		} else {
-			if (Utils.moveCursor(locationCursor, BaseColumns._ID, locationId) != -1) {
-				setLocationFromCursor();
-			}
-		}
-	}
-	
-	private boolean selectNearestExistingLocation() {
-		LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-		
-		Criteria criteria = new Criteria(); 
-		criteria.setPowerRequirement(Criteria.POWER_LOW); 
-		criteria.setAccuracy(Criteria.ACCURACY_COARSE); 
-		criteria.setAltitudeRequired(false); 
-		criteria.setBearingRequired(false); 
-		criteria.setSpeedRequired(false); 
-		criteria.setCostAllowed(false); 
-		String provider = lm.getBestProvider(criteria, true);
-		
-		if(provider != null) {
-			final Location mLocation = lm.getLastKnownLocation(provider);
+			c.labelView.setText(R.string.location_input_label);
+			c.locationText.setText(R.string.no_fix);
 			
-			if(null!= mLocation) {
-				Toast.makeText(getActivity(), "Obtained location", 5).show();
-				long locationId = resolveLocation(mLocation);
-				
-				if(locationId > 0) {
-					Toast.makeText(getActivity(), "Resolved location id: " + locationId, 5).show();
-					setValue(locationId);
-					return true;
+			LocationUtils.obtainLocation(getActivity(), new com.google.android.gms.location.LocationListener() {
+				@Override
+				public void onLocationChanged(Location lastFix) {
+					cachedLocation = lastFix;
+					final long locationId = new LocationBroker(getActivity()).getNearest(lastFix, 10e+9f);
+					
+					if(locationId > 0) {
+						setValue(locationId);
+					} else {
+						c.locationText.setText(LocationUtils.locationToText(
+							lastFix.getProvider(), 
+							lastFix.getLatitude(),
+							lastFix.getLongitude(), 
+							lastFix.hasAccuracy() ? lastFix.getAccuracy() : 0,
+							null)
+						);
+					}
+
 				}
+			});
+		} else {
+			ContentValues location = new LocationBroker(getActivity()).loadOrCreate(locationId);
+			
+			if(location.size() > 0) {
+				c.labelView.setText(location.getAsString("name"));
+				c.locationText.setText(location.getAsString("resolved_address"));
+				
+				final String argb = location.getAsString("color");
+				
+				if(!Strings.isNullOrEmpty(argb)) {
+					c.labelView.setBackgroundColor(Color.parseColor(argb));
+				}
+				
+				selectedLocationId = locationId;
 			}
 		}
-		
-		return false;
-	}
-	
-	/**
-	 * Attempts to find a closest to given location among existing in the db.
-	 */
-	private long resolveLocation(Location location) {
-		long locationId = -1;
-		float minDistance = 10e+9f;
-		
-		if(locationCursor.moveToFirst()) {
-			do {
-				final float distance = location.distanceTo(new Location("existing") {{
-					setLongitude(locationCursor.getDouble(locationCursor.getColumnIndex("longitude")));
-					setLatitude(locationCursor.getDouble(locationCursor.getColumnIndex("latitude")));
-				}});
-				
-				if(minDistance >= distance) {
-					minDistance = distance;
-					locationId = locationCursor.getLong(locationCursor.getColumnIndex(BaseColumns._ID)); 
-				}
-			} while(locationCursor.moveToNext());
-		}
-		
-		return locationId;
 	}
 	
 	/**
 	 * Attempts to select location from current cursor position.
 	 */
-	private void setLocationFromCursor() {
-		ContentValues location = LocationRepository.deserialize(locationCursor);
+	private void setLocationFromCursor(Cursor locationCursor) {
+		ContentValues location = LocationBroker.deserialize(locationCursor);
 		//c.locationText.setText(LocationUtils.locationToText(location));
-		c.locationText.setText(location.getAsString("name"));
+		c.labelView.setText(location.getAsString("name"));
+		c.locationText.setText(location.getAsString("resolved_address"));
 		selectedLocationId = location.getAsLong(BaseColumns._ID);
-		setCurrentLocation = false;
-	}
-	
-	protected void selectCurrentLocation(boolean forceUseGps) {
-		setCurrentLocation = true;
-		selectedLocationId = 0;
-		
-		// Start listener to find current location
-		locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-		String provider = locationManager.getBestProvider(new Criteria(), true);
-		
-		if (provider != null) {
-			lastFix = locationManager.getLastKnownLocation(provider);
-		}
-		
-		if (lastFix != null) {
-			setLocation(lastFix);
-			connectGps(forceUseGps);
-		} else {
-			// No enabled providers found, so disable option
-			c.locationText.setText(R.string.no_fix);
-		}
-	}
-	
-	private class DefaultLocationListener implements LocationListener {
-
-		@Override
-		public void onLocationChanged(Location location) {
-			Log.i(">>>>>>>>>", "onLocationChanged "+location.toString());
-			lastFix = location;
-			if (setCurrentLocation) {
-				setLocation(location);
-			}
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	}
-
-	private final LocationListener networkLocationListener = new DefaultLocationListener() {
-		@Override
-		public void onLocationChanged(Location location) {
-			super.onLocationChanged(location);
-			locationManager.removeUpdates(networkLocationListener);
-		}
-	};
-	
-	private final LocationListener gpsLocationListener = new DefaultLocationListener();
-	
-	private void setLocation(Location lastFix) {
-		if (lastFix.getProvider() == null) {
-			c.locationText.setText(R.string.no_fix);
-		} else {
-			c.locationText.setText(LocationUtils.locationToText(
-				lastFix.getProvider(), 
-				lastFix.getLatitude(),
-				lastFix.getLongitude(), 
-				lastFix.hasAccuracy() ? lastFix.getAccuracy() : 0,
-				null)
-			);
-		}
-	}
-	
-	private void connectGps(boolean forceUseGps) {
-		if (locationManager != null) {
-			boolean useGps = forceUseGps;
-			
-			if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-				locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0,
-					networkLocationListener
-				);
-			}
-			
-			if (useGps && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 1000, 0,
-					gpsLocationListener
-				);
-			}
-		}
-	}
-
-	private void disconnectGPS() {
-		if (locationManager != null) {
-			locationManager.removeUpdates(networkLocationListener);
-			locationManager.removeUpdates(gpsLocationListener);
-		}
-	}
-	
-	@Override
-	public void onDestroy() {
-		disconnectGPS();
-		super.onDestroy();
-	}
-	
-	@Override
-	public void onPause() {
-		disconnectGPS();
-		super.onPause();
 	}
 	
 	private static class Controls {

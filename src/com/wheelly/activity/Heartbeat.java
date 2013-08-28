@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
 import com.wheelly.db.HeartbeatBroker;
@@ -17,10 +16,6 @@ import com.wheelly.db.HeartbeatBroker;
  * Complete heartbeat editing UI.
  */
 public class Heartbeat extends FragmentActivity {
-	
-	/**
-	 * Construct UI and wire up events.
-	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,13 +62,13 @@ public class Heartbeat extends FragmentActivity {
 	 */
 	private static class Controls {
 		final HeartbeatInput Heartbeat;
-		final Button SaveButton;
-		final Button CancelButton;
+		final View SaveButton;
+		final View CancelButton;
 		
 		public Controls(FragmentActivity view) {
 			Heartbeat		= (HeartbeatInput)view.getSupportFragmentManager().findFragmentById(R.id.heartbeat);
-			SaveButton		= (Button)view.findViewById(R.id.bSave);
-			CancelButton	= (Button)view.findViewById(R.id.bSaveAndNew);
+			SaveButton		= (View)view.findViewById(R.id.bSave);
+			CancelButton	= (View)view.findViewById(R.id.bSaveAndNew);
 		}
 	}
 }

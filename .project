@@ -3,7 +3,10 @@
 	<name>Wheelly</name>
 	<comment></comment>
 	<projects>
+		<project>FinancistoRes</project>
+		<project>google-play-services_lib</project>
 		<project>MyTracksLib</project>
+		<project>MyTracksRes</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

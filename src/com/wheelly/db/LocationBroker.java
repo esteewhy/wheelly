@@ -1,8 +1,12 @@
 package com.wheelly.db;
 
+import com.wheelly.db.DatabaseSchema.Locations;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.location.Location;
 import android.provider.BaseColumns;
 
 /**
@@ -19,38 +23,77 @@ public class LocationBroker {
 	}
 	
 	public ContentValues loadOrCreate(long id) {
-		SQLiteDatabase db = null;
+		final ContentResolver cr = context.getContentResolver();
+		
+		final Cursor cursor =
+				cr.query(
+					ContentUris.withAppendedId(Locations.CONTENT_URI, id),
+					null, null, null, null);
+		
 		try {
-			db = new DatabaseHelper(this.context).getReadableDatabase();
-			final IRepository repository = new LocationRepository(db);
-			return id > 0 ? repository.load(id) : repository.getDefaults();
+			return
+				cursor.moveToFirst()
+					? deserialize(cursor)
+					: new ContentValues();
 		} finally {
-			if(null != db) {
-				db.close();
-			}
+			cursor.close();
 		}
 	}
 	
-	public long updateOrInsert(ContentValues values){
-		SQLiteDatabase db = null;
+	public long getNearest(Location location, float minDistance) {
+		final Cursor locationCursor = context.getContentResolver().query(Locations.CONTENT_URI, null, null, null, null);
+		long locationId = -1;
+		
+		try {
+			if(locationCursor.moveToFirst()) {
+				do {
+					final float distance = location.distanceTo(new Location("existing") {{
+						setLongitude(locationCursor.getDouble(locationCursor.getColumnIndex("longitude")));
+						setLatitude(locationCursor.getDouble(locationCursor.getColumnIndex("latitude")));
+					}});
+					
+					if(minDistance >= distance) {
+						minDistance = distance;
+						locationId = locationCursor.getLong(locationCursor.getColumnIndex(BaseColumns._ID)); 
+					}
+				} while(locationCursor.moveToNext());
+			}
+		} finally {
+			locationCursor.close();
+		}
+		
+		return locationId;
+	}
+	
+	public long updateOrInsert(ContentValues values) {
 		final long id = values.containsKey(BaseColumns._ID)
 			? values.getAsLong(BaseColumns._ID) : -1;
 		
-		try {
-			final IRepository repository = new LocationRepository(
-				db = new DatabaseHelper(this.context).getWritableDatabase()
-			);
-			
-			if(id > 0) {
-				repository.update(values);
-				return id;
-			} else {
-				return repository.insert(values);
-			}
-		} finally {
-			if(null != db) {
-				db.close();
-			}
+		final ContentResolver cr = context.getContentResolver();
+		
+		if(id > 0) {
+			cr.update(ContentUris.withAppendedId(Locations.CONTENT_URI, id), values, null, null);
+			return id;
+		} else {
+			values.remove(BaseColumns._ID);
+			return ContentUris.parseId(cr.insert(Locations.CONTENT_URI, values));
 		}
+	}
+	
+	public static ContentValues deserialize(Cursor cursor) {
+		ContentValues values = new ContentValues();
+		
+		values.put(BaseColumns._ID, cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)));
+		values.put("name", cursor.getString(cursor.getColumnIndexOrThrow("name"))); 	
+		values.put("datetime", cursor.getLong(cursor.getColumnIndexOrThrow("datetime")));
+		values.put("provider", cursor.getString(cursor.getColumnIndexOrThrow("provider")));
+		values.put("accuracy", cursor.getFloat(cursor.getColumnIndexOrThrow("accuracy")));
+		values.put("latitude", cursor.getDouble(cursor.getColumnIndexOrThrow("latitude")));
+		values.put("longitude", cursor.getDouble(cursor.getColumnIndexOrThrow("longitude")));
+		values.put("is_payee", cursor.getInt(cursor.getColumnIndexOrThrow("is_payee")));
+		values.put("resolved_address", cursor.getString(cursor.getColumnIndexOrThrow("resolved_address")));
+		values.put("color", cursor.getString(cursor.getColumnIndexOrThrow("color")));
+		
+		return values;
 	}
 }

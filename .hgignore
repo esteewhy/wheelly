@@ -1,1 +1,13 @@
 bin
+.orig
+resource-matrices
+gen
+libs
+R.java
+.google_apis
+syntax: regexp
+^FinancistoRes/gen$
+syntax: regexp
+^MyTracksRes/gen$
+syntax: regexp
+^MyTracksRes/gen$
