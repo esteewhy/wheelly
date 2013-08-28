@@ -138,14 +138,14 @@ public abstract class AbstractSendAsyncTask<EntityType> extends ReportingSendAsy
 			return false;
 		} catch (UserRecoverableAuthException e) {
 			SendToGoogleUtils.sendNotification(
-					context, account.name, e.getIntent(), SendToGoogleUtils.SPREADSHEET_NOTIFICATION_ID);
+					context, account.name, e.getIntent(), SendToGoogleUtils.SPREADSHEETS_NOTIFICATION_ID);
 			return false;
 		} catch (GoogleAuthException e) {
 			Log.e(TAG, "GoogleaAuthException", e);
 			return retryTask();
 		} catch (UserRecoverableAuthIOException e) {
 			SendToGoogleUtils.sendNotification(
-					context, account.name, e.getIntent(), SendToGoogleUtils.SPREADSHEET_NOTIFICATION_ID);
+					context, account.name, e.getIntent(), SendToGoogleUtils.SPREADSHEETS_NOTIFICATION_ID);
 			return false;
 		} catch (IOException e) {
 			Log.e(TAG, "IOException", e);
@@ -204,7 +204,7 @@ public abstract class AbstractSendAsyncTask<EntityType> extends ReportingSendAsy
 					GoogleAuthUtil.getTokenWithNotification(
 						context,
 						account.name,
-						"oauth2:" + SendToGoogleUtils.SPREADSHEET_SCOPE,
+						"oauth2:" + SendToGoogleUtils.SPREADSHEETS_SCOPE,
 						null
 					)
 				)

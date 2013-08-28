@@ -138,6 +138,10 @@ public class Api11Adapter extends Api10Adapter {
 			
 			@Override
 			public void onMarkerDragEnd(final Marker marker) {
+				if(marker.isCluster()) {
+					return;
+				}
+				
 				if (actionMode != null) {
 					if(null == currentMarker || !marker.equals(currentMarker)) {
 						actionMode.finish();
@@ -146,7 +150,7 @@ public class Api11Adapter extends Api10Adapter {
 						return;
 					}
 				}
-				((Vibrator)fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(new long[] { 0, 50, 100, 50, 100 }, -1);
+				
 				actionMode = fragment.getActivity().startActionMode(new ActionMode.Callback() {
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -222,20 +226,22 @@ public class Api11Adapter extends Api10Adapter {
 					@Override
 					public void onDestroyActionMode(ActionMode mode) {
 						actionMode = null;
+						
 						if(null != marker) {
 							marker.remove();
 						}
 					}
 					
-          @Override
-          public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            mode.finish();
-            return callback.onClick(item, marker);
-          }
-        });
-      }
-    });
-  };
+					@Override
+					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+						boolean result = callback.onClick(item, marker);
+						mode.finish();
+						return result;
+					}
+				});
+			}
+		});
+	};
   
   @Override
   public void configureSearchWidget(Activity activity, final MenuItem menuItem) {

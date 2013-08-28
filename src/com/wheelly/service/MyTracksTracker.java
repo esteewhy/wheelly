@@ -8,8 +8,9 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.RemoteException;
+
+import com.google.android.apps.mytracks.lib.R;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
-import com.wheelly.R;
 
 public class MyTracksTracker implements Tracker {
 	final Intent serviceIntent;
@@ -61,6 +62,7 @@ public class MyTracksTracker implements Tracker {
 							
 							//TODO investigate why the latter returns 0
 							if(trackId <= 0) {
+								svc.resumeCurrentTrack();
 								trackId = svc.getRecordingTrackId();
 							}
 							
