@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(Locations.Create);
 		
 		db.execSQL(Mileages.NextMileageView);
+		db.execSQL(Mileages.PrevMileageView);
 	}
 
 	@Override
