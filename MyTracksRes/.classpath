@@ -8,7 +8,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="MyTracks_src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/android-maps-extensions"/>
-	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r93lv1.15.0-rc"/>
-	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/fusiontables-v1r29lv1.15.0-rc"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/drive-v2r95lv1.15.0-rc"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/fusiontables-v1r30lv1.15.0-rc"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
