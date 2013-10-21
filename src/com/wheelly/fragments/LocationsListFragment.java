@@ -18,7 +18,7 @@ import com.squareup.otto.sample.BusProvider;
 import com.google.android.apps.mytracks.ContextualActionModeCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.gms.location.LocationListener;
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.app.ColorInput;
 import com.wheelly.app.ColorInput.OnSelectColorListener;

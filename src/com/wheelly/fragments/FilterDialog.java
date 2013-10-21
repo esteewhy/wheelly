@@ -14,7 +14,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.app.LocationViewBinder;
 import com.wheelly.db.LocationBroker;
