@@ -1,0 +1,7 @@
+.google_apis/*
+gen/*
+bin/*
+libs/*
+.orig
+resource-matrices
+R.java
