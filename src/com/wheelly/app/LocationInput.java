@@ -4,7 +4,7 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
 import com.google.android.gms.location.LocationListener;
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.db.DatabaseSchema.Locations;

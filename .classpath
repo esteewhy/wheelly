@@ -4,14 +4,19 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK/MyTracksLib"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/gdata-client-meta-1.0.jar"/>
-	<classpathentry kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/gdata-spreadsheet-3.0.jar"/>
-	<classpathentry kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/gdata-core-1.0.jar"/>
-	<classpathentry kind="lib" path="D:/usr/src/android/mytracks/MyTracks/libs/guava-jdk5-13.0.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/android-maps-extensions"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MyTracksRes"/>
 	<classpathentry exported="true" kind="lib" path="D:/usr/src/android/otto-1.3.4.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="/MyTracks/libs/guava-jdk5-13.0.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-api-services-drive-v2-rev30-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-oauth-client-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/gdata-spreadsheet-3.0.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-api-client-android-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-gson-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-android-1.12.0-beta.jar"/>
+	<classpathentry kind="lib" path="/MyTracks/libs/google-api-client-1.12.0-beta.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

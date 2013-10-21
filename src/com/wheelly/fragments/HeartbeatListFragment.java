@@ -20,7 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;

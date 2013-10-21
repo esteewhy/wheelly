@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.LatLngBounds.Builder;
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;

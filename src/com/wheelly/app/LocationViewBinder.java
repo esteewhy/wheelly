@@ -6,7 +6,7 @@ import android.location.Location;
 import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.view.View;
 import android.widget.TextView;
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.util.LocationUtils;
 

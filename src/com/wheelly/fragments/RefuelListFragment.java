@@ -18,7 +18,7 @@ import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Refuel;
 import com.wheelly.app.ListConfiguration;
