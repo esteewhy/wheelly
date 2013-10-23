@@ -4,38 +4,29 @@
 
 package com.wheelly.sync;
 
-import java.net.URISyntaxException;
-
 import org.mozilla.gecko.sync.CryptoRecord;
 import org.mozilla.gecko.sync.MetaGlobalException;
-import org.mozilla.gecko.sync.repositories.ConstrainedServer11Repository;
 import org.mozilla.gecko.sync.repositories.RecordFactory;
 import org.mozilla.gecko.sync.repositories.Repository;
 import org.mozilla.gecko.sync.repositories.domain.Record;
-import org.mozilla.gecko.sync.repositories.domain.VersionConstants;
 import org.mozilla.gecko.sync.stage.ServerSyncStage;
 
-public class MileageSyncStage extends ServerSyncStage {
-  protected static final String LOG_TAG = "HeartbeatsStage";
-
-  // Eventually this kind of sync stage will be data-driven,
-  // and all this hard-coding can go away.
-  private static final String MILEAGE_SORT          = "index";
-  private static final long   MILEAGE_REQUEST_LIMIT = 250;
+public class EventSyncStage extends ServerSyncStage {
+  protected static final String LOG_TAG = "EventSyncStage";
 
   @Override
   protected String getCollection() {
-    return "mileages";
+    return "events";
   }
 
   @Override
   protected String getEngineName() {
-    return "mileages";
+    return "events";
   }
 
   @Override
   public Integer getStorageVersion() {
-    return VersionConstants.HISTORY_ENGINE_VERSION;
+    return 1;
   }
 
   @Override
@@ -44,21 +35,11 @@ public class MileageSyncStage extends ServerSyncStage {
   }
 
   @Override
-  protected Repository getRemoteRepository() throws URISyntaxException {
-    return new ConstrainedServer11Repository(session.config.getClusterURLString(),
-                                             session.config.username,
-                                             getCollection(),
-                                             session,
-                                             MILEAGE_REQUEST_LIMIT,
-                                             MILEAGE_SORT);
-  }
-
-  @Override
   protected RecordFactory getRecordFactory() {
     return new RecordFactory() {
 		@Override
 		public Record createRecord(Record record) {
-		    MileageRecord r = new MileageRecord();
+		    EventRecord r = new EventRecord();
 		    r.initFromEnvelope((CryptoRecord) record);
 		    return r;
 		}

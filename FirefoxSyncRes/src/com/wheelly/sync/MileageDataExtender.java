@@ -105,12 +105,12 @@ public class MileageDataExtender extends CachedSQLiteOpenHelper {
   /**
    * Store (update or insert) visit data in a single database transaction.
    */
-  public void bulkInsert(ArrayList<MileageRecord> records) {
+  public void bulkInsert(ArrayList<EventRecord> records) {
     SQLiteDatabase db = this.getCachedWritableDatabase();
     try {
       db.beginTransaction();
 
-      for (MileageRecord record : records) {
+      for (EventRecord record : records) {
         store(db, record.guid, null);
       }
 
@@ -136,26 +136,6 @@ public class MileageDataExtender extends CachedSQLiteOpenHelper {
     Cursor cur = queryHelper.safeQuery(db, ".fetch",
         TBL_HISTORY_EXT, TBL_COLUMNS, GUID_IS, args);
     return cur;
-  }
-
-  public JSONArray visitsForGUID(String guid) throws NullCursorException {
-    if (guid == null) {
-      Logger.warn(LOG_TAG, "Asked for visits for null GUID.");
-      return new JSONArray();
-    }
-
-    Logger.debug(LOG_TAG, "Fetching visits for GUID " + guid);
-    Cursor visits = fetch(guid);
-    try {
-      if (!visits.moveToFirst()) {
-        // Cursor is empty.
-        return new JSONArray();
-      } else {
-        return RepoUtils.getJSONArrayFromCursor(visits, COL_VISITS);
-      }
-    } finally {
-      visits.close();
-    }
   }
 
   /**

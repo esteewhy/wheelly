@@ -6,53 +6,34 @@ package com.wheelly.sync;
 
 import java.util.ArrayList;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.mozilla.gecko.background.common.log.Logger;
-import org.mozilla.gecko.db.BrowserContract;
 import org.mozilla.gecko.sync.repositories.InactiveSessionException;
-import org.mozilla.gecko.sync.repositories.InvalidSessionTransitionException;
 import org.mozilla.gecko.sync.repositories.NoGuidForIdException;
 import org.mozilla.gecko.sync.repositories.NullCursorException;
 import org.mozilla.gecko.sync.repositories.ParentNotFoundException;
 import org.mozilla.gecko.sync.repositories.Repository;
 import org.mozilla.gecko.sync.repositories.android.AndroidBrowserRepositorySession;
 import org.mozilla.gecko.sync.repositories.android.RepoUtils;
-import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionBeginDelegate;
 import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionFinishDelegate;
-import org.mozilla.gecko.sync.repositories.domain.HistoryRecord;
 import org.mozilla.gecko.sync.repositories.domain.Record;
 
 import android.content.Context;
 import android.database.Cursor;
 
-public class MileageRepositorySession extends AndroidBrowserRepositorySession {
-  public static final String LOG_TAG = "MileageRepoSess";
+public class EventRepositorySession extends AndroidBrowserRepositorySession {
+  public static final String LOG_TAG = "EventRepoSess";
 
   public static final String KEY_DATE = "date";
   public static final String KEY_TYPE = "type";
-  public static final long DEFAULT_VISIT_TYPE = 1;
 
   /**
    * The number of records to queue for insertion before writing to databases.
    */
   public static int INSERT_RECORD_THRESHOLD = 50;
 
-  public MileageRepositorySession(Repository repository, Context context) {
+  public EventRepositorySession(Repository repository, Context context) {
     super(repository);
     dbHelper = new MileageDataAccessor(context);
-  }
-
-  @Override
-  public void begin(RepositorySessionBeginDelegate delegate) throws InvalidSessionTransitionException {
-    // HACK: Fennec creates history records without a GUID. Mercilessly drop
-    // them on the floor. See Bug 739514.
-    try {
-      dbHelper.delete(BrowserContract.History.GUID + " IS NULL", null);
-    } catch (Exception e) {
-      // Ignore.
-    }
-    super.begin(delegate);
   }
 
   @Override
@@ -67,8 +48,8 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
 
   @Override
   protected String buildRecordString(Record record) {
-    HistoryRecord hist = (HistoryRecord) record;
-    return hist.histURI;
+    EventRecord hist = (EventRecord) record;
+    return hist.guid;
   }
 
   @Override
@@ -76,61 +57,10 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
     if (super.shouldIgnore(record)) {
       return true;
     }
-    if (!(record instanceof HistoryRecord)) {
+    if (!(record instanceof EventRecord)) {
       return true;
     }
-    HistoryRecord r = (HistoryRecord) record;
-    return !RepoUtils.isValidHistoryURI(r.histURI);
-  }
-
-  @Override
-  protected Record transformRecord(Record record) throws NullCursorException {
-    return addVisitsToRecord(record);
-  }
-
-  @SuppressWarnings("unchecked")
-  private void addVisit(JSONArray visits, long date, long visitType) {
-    JSONObject visit = new JSONObject();
-    visit.put(KEY_DATE, date);               // Microseconds since epoch.
-    visit.put(KEY_TYPE, visitType);
-    visits.add(visit);
-  }
-
-  private void addVisit(JSONArray visits, long date) {
-    addVisit(visits, date, DEFAULT_VISIT_TYPE);
-  }
-
-  private MileageDataExtender getDataExtender() {
-    return ((MileageDataAccessor) dbHelper).getHistoryDataExtender();
-  }
-
-  private Record addVisitsToRecord(Record record) throws NullCursorException {
-    Logger.debug(LOG_TAG, "Adding visits for GUID " + record.guid);
-    HistoryRecord hist = (HistoryRecord) record;
-    JSONArray visitsArray = getDataExtender().visitsForGUID(hist.guid);
-    long missingRecords = hist.fennecVisitCount - visitsArray.size();
-
-    // Note that Fennec visit times are milliseconds, and we are working
-    // in microseconds. This is the point at which we translate.
-
-    // Add (missingRecords - 1) fake visits...
-    if (missingRecords > 0) {
-      long fakes = missingRecords - 1;
-      for (int j = 0; j < fakes; j++) {
-        // Set fake visit timestamp to be just previous to
-        // the real one we are about to add.
-        // TODO: make these equidistant?
-        long fakeDate = (hist.fennecDateVisited - (1 + j)) * 1000;
-        addVisit(visitsArray, fakeDate);
-      }
-
-      // ... and the 1 actual record we have.
-      // We still have to fake the visit type: Fennec doesn't track that.
-      addVisit(visitsArray, hist.fennecDateVisited * 1000);
-    }
-
-    hist.visits = visitsArray;
-    return hist;
+    return false;
   }
 
   @Override
@@ -157,7 +87,7 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
   }
 
   protected Object recordsBufferMonitor = new Object();
-  protected ArrayList<MileageRecord> recordsBuffer = new ArrayList<MileageRecord>();
+  protected ArrayList<EventRecord> recordsBuffer = new ArrayList<EventRecord>();
 
   /**
    * Queue record for insertion, possibly flushing the queue.
@@ -170,7 +100,7 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
    */
   @Override
   protected void insert(Record record) throws NoGuidForIdException, NullCursorException, ParentNotFoundException {
-    enqueueNewRecord((MileageRecord) prepareRecord(record));
+    enqueueNewRecord((EventRecord) prepareRecord(record));
   }
 
   /**
@@ -182,7 +112,7 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
    * @param record A <code>Record</code> with a GUID that is not present locally.
    * @throws NullCursorException
    */
-  protected void enqueueNewRecord(MileageRecord record) throws NullCursorException {
+  protected void enqueueNewRecord(EventRecord record) throws NullCursorException {
     synchronized (recordsBufferMonitor) {
       if (recordsBuffer.size() >= INSERT_RECORD_THRESHOLD) {
         flushNewRecords();
@@ -206,22 +136,22 @@ public class MileageRepositorySession extends AndroidBrowserRepositorySession {
       return;
     }
 
-    final ArrayList<MileageRecord> outgoing = recordsBuffer;
-    recordsBuffer = new ArrayList<MileageRecord>();
+    final ArrayList<EventRecord> outgoing = recordsBuffer;
+    recordsBuffer = new ArrayList<EventRecord>();
     Logger.debug(LOG_TAG, "Flushing " + outgoing.size() + " records to database.");
     // TODO: move bulkInsert to AndroidBrowserDataAccessor?
     int inserted = ((MileageDataAccessor) dbHelper).bulkInsert(outgoing);
     if (inserted != outgoing.size()) {
       // Something failed; most pessimistic action is to declare that all insertions failed.
       // TODO: perform the bulkInsert in a transaction and rollback unless all insertions succeed?
-      for (MileageRecord failed : outgoing) {
+      for (EventRecord failed : outgoing) {
         delegate.onRecordStoreFailed(new RuntimeException("Failed to insert history item with guid " + failed.guid + "."), failed.guid);
       }
       return;
     }
 
     // All good, everybody succeeded.
-    for (MileageRecord succeeded : outgoing) {
+    for (EventRecord succeeded : outgoing) {
       try {
         // Does not use androidID -- just GUID -> String map.
         updateBookkeeping(succeeded);
