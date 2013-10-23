@@ -118,7 +118,7 @@ public class MileageDataAccessor extends
    *          the number of records actually inserted.
    * @throws NullCursorException
    */
-  public int bulkInsert(ArrayList<MileageRecord> records) throws NullCursorException {
+  public int bulkInsert(ArrayList<EventRecord> records) throws NullCursorException {
     if (records.isEmpty()) {
       Logger.debug(LOG_TAG, "No records to insert, returning.");
     }

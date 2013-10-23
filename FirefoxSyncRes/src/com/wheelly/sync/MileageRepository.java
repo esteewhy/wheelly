@@ -4,19 +4,17 @@
 
 package com.wheelly.sync;
 
-import org.mozilla.gecko.sync.repositories.HistoryRepository;
-import org.mozilla.gecko.sync.repositories.android.AndroidBrowserHistoryRepositorySession;
 import org.mozilla.gecko.sync.repositories.android.AndroidBrowserRepository;
 import org.mozilla.gecko.sync.repositories.android.AndroidBrowserRepositoryDataAccessor;
 import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionCreationDelegate;
 
 import android.content.Context;
 
-public class MileageRepository extends AndroidBrowserRepository implements HistoryRepository {
+public class MileageRepository extends AndroidBrowserRepository {
 
   @Override
   protected void sessionCreator(RepositorySessionCreationDelegate delegate, Context context) {
-    delegate.onSessionCreated(new AndroidBrowserHistoryRepositorySession(MileageRepository.this, context));
+    delegate.onSessionCreated(new EventRepositorySession(MileageRepository.this, context));
   }
 
   @Override
