@@ -5,184 +5,162 @@
 package com.wheelly.sync;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import org.mozilla.gecko.background.common.log.Logger;
 import org.mozilla.gecko.sync.repositories.InactiveSessionException;
-import org.mozilla.gecko.sync.repositories.NoGuidForIdException;
-import org.mozilla.gecko.sync.repositories.NullCursorException;
-import org.mozilla.gecko.sync.repositories.ParentNotFoundException;
+import org.mozilla.gecko.sync.repositories.NoStoreDelegateException;
 import org.mozilla.gecko.sync.repositories.Repository;
-import org.mozilla.gecko.sync.repositories.android.AndroidBrowserRepositorySession;
-import org.mozilla.gecko.sync.repositories.android.RepoUtils;
-import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionFinishDelegate;
+import org.mozilla.gecko.sync.repositories.RepositorySession;
+import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionFetchRecordsDelegate;
+import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionGuidsSinceDelegate;
+import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionWipeDelegate;
 import org.mozilla.gecko.sync.repositories.domain.Record;
-
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
+import android.provider.BaseColumns;
 
-public class EventRepositorySession extends AndroidBrowserRepositorySession {
-  public static final String LOG_TAG = "EventRepoSess";
+public class EventRepositorySession extends RepositorySession {
+	
+	private final Context context;
+	
+	public EventRepositorySession(Repository repository, Context context) {
+		super(repository);
+		this.context = context;
+	}
+	
+	@Override
+	public void guidsSince(long timestamp,
+			RepositorySessionGuidsSinceDelegate delegate) {
+		ContentResolver cr = context.getContentResolver();
+		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
+				new String[] { "h.sync_etag" },
+				"h._created >= ?",
+				new String[] { Long.toString(timestamp) },
+				"odometer ASC, h._created ASC");
+		List<String> guids = new ArrayList<String>();
+		
+		if(c.moveToFirst()) {
+			do {
+				guids.add(c.getString(0));
+			} while(c.moveToNext());
+		}
+		
+		delegate.onGuidsSinceSucceeded(guids.toArray(new String[0]));
+	}
+	
+	public static final String IconColumnExpression =
+			"((r._id IS NOT NULL) * 4"
+			+ "	| (m1._id IS NOT NULL) * 2"
+			+ "	| (m2._id IS NOT NULL))";
+	
+	public static final String[] ListProjection = {
+		"h." + BaseColumns._ID + " " + BaseColumns._ID,
+		"h._created",
+		"h.odometer",
+		"h.fuel",
+		"l.name place",
+		"m2.mileage distance",
+		"m2.track_id track_id",
+		"ls.name destination",
+		"r.cost",
+		"r.amount",
+		"r.transaction_id",
+		IconColumnExpression + " icons",
+		"h.sync_id",
+		"h.sync_etag",
+		"h.sync_date",
+		"h.sync_state"
+	};
+	
+	@Override
+	public void fetchSince(long timestamp,
+			RepositorySessionFetchRecordsDelegate delegate) {
+		ContentResolver cr = context.getContentResolver();
+		final long end = now();
+		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
+				ListProjection,
+				"h._created >= ?",
+				new String[] { Long.toString(timestamp) },
+				"odometer ASC, h._created ASC");
+		
+		if(c.moveToFirst()) {
+			do {
+				
+				delegate.onFetchedRecord(recordFromCursor(c));
+			} while(c.moveToNext());
+		}
+		
+		delegate.onFetchCompleted(end);
+	}
+	
+	private static EventRecord recordFromCursor(Cursor c) {
+		EventRecord r = new EventRecord();
+		r.amount		= c.getFloat(c.getColumnIndex("amount"));
+		r.androidID		= c.getLong(c.getColumnIndex(BaseColumns._ID));
+		r.cost			= c.getFloat(c.getColumnIndex("cost"));
+		r.date			= c.getLong(c.getColumnIndex("_created"));
+		r.destination	= c.getString(c.getColumnIndex("destination"));
+		r.distance		= c.getFloat(c.getColumnIndex("distance"));
+		r.fuel			= c.getFloat(c.getColumnIndex("fuel"));
+		r.guid			= c.getString(c.getColumnIndex("sync_etag"));
+		r.lastModified	= c.getLong(c.getColumnIndex("sync_state"));;
+		r.location		= c.getString(c.getColumnIndex("place"));
+		r.map			= c.getString(c.getColumnIndex("track_id"));
+		r.odometer		= c.getLong(c.getColumnIndex("odometer"));
+		r.type			= c.getString(c.getColumnIndex("icons"));
+		return r;
+	}
+	
+	@Override
+	public void fetch(String[] guids,
+			RepositorySessionFetchRecordsDelegate delegate)
+			throws InactiveSessionException {
+		ContentResolver cr = context.getContentResolver();
+		final long end = now();
+		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
+				ListProjection,
+				"sync_etag IN (" + new String(new char[guids.length]).replace("\0", "?,").substring(0, -1) +  ")",
+				guids,
+				"odometer ASC, h._created ASC");
+		
+		if(c.moveToFirst()) {
+			do {
+				delegate.onFetchedRecord(recordFromCursor(c));
+			} while(c.moveToNext());
+		}
+		
+		delegate.onFetchCompleted(end);
+	}
 
-  public static final String KEY_DATE = "date";
-  public static final String KEY_TYPE = "type";
+	@Override
+	public void fetchAll(RepositorySessionFetchRecordsDelegate delegate) {
+		ContentResolver cr = context.getContentResolver();
+		final long end = now();
+		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
+				ListProjection,
+				null,
+				null,
+				"odometer ASC, h._created ASC");
+		
+		if(c.moveToFirst()) {
+			do {
+				delegate.onFetchedRecord(recordFromCursor(c));
+			} while(c.moveToNext());
+		}
+		
+		delegate.onFetchCompleted(end);
+	}
 
-  /**
-   * The number of records to queue for insertion before writing to databases.
-   */
-  public static int INSERT_RECORD_THRESHOLD = 50;
+	@Override
+	public void store(Record record) throws NoStoreDelegateException {
+		// TODO Auto-generated method stub
+		
+	}
 
-  public EventRepositorySession(Repository repository, Context context) {
-    super(repository);
-    dbHelper = new MileageDataAccessor(context);
-  }
-
-  @Override
-  protected Record retrieveDuringStore(Cursor cur) {
-    return RepoUtils.historyFromMirrorCursor(cur);
-  }
-
-  @Override
-  protected Record retrieveDuringFetch(Cursor cur) {
-    return RepoUtils.historyFromMirrorCursor(cur);
-  }
-
-  @Override
-  protected String buildRecordString(Record record) {
-    EventRecord hist = (EventRecord) record;
-    return hist.guid;
-  }
-
-  @Override
-  public boolean shouldIgnore(Record record) {
-    if (super.shouldIgnore(record)) {
-      return true;
-    }
-    if (!(record instanceof EventRecord)) {
-      return true;
-    }
-    return false;
-  }
-
-  @Override
-  protected Record prepareRecord(Record record) {
-    return record;
-  }
-
-  @Override
-  public void abort() {
-    if (dbHelper != null) {
-      ((MileageDataAccessor) dbHelper).closeExtender();
-      dbHelper = null;
-    }
-    super.abort();
-  }
-
-  @Override
-  public void finish(final RepositorySessionFinishDelegate delegate) throws InactiveSessionException {
-    if (dbHelper != null) {
-      ((MileageDataAccessor) dbHelper).closeExtender();
-      dbHelper = null;
-    }
-    super.finish(delegate);
-  }
-
-  protected Object recordsBufferMonitor = new Object();
-  protected ArrayList<EventRecord> recordsBuffer = new ArrayList<EventRecord>();
-
-  /**
-   * Queue record for insertion, possibly flushing the queue.
-   * <p>
-   * Must be called on <code>storeWorkQueue</code> thread! But this is only
-   * called from <code>store</code>, which is called on the queue thread.
-   *
-   * @param record
-   *          A <code>Record</code> with a GUID that is not present locally.
-   */
-  @Override
-  protected void insert(Record record) throws NoGuidForIdException, NullCursorException, ParentNotFoundException {
-    enqueueNewRecord((EventRecord) prepareRecord(record));
-  }
-
-  /**
-   * Batch incoming records until some reasonable threshold is hit or storeDone
-   * is received.
-   * <p>
-   * Must be called on <code>storeWorkQueue</code> thread!
-   *
-   * @param record A <code>Record</code> with a GUID that is not present locally.
-   * @throws NullCursorException
-   */
-  protected void enqueueNewRecord(EventRecord record) throws NullCursorException {
-    synchronized (recordsBufferMonitor) {
-      if (recordsBuffer.size() >= INSERT_RECORD_THRESHOLD) {
-        flushNewRecords();
-      }
-      Logger.debug(LOG_TAG, "Enqueuing new record with GUID " + record.guid);
-      recordsBuffer.add(record);
-    }
-  }
-
-  /**
-   * Flush queue of incoming records to database.
-   * <p>
-   * Must be called on <code>storeWorkQueue</code> thread!
-   * <p>
-   * Must be locked by recordsBufferMonitor!
-   * @throws NullCursorException
-   */
-  protected void flushNewRecords() throws NullCursorException {
-    if (recordsBuffer.size() < 1) {
-      Logger.debug(LOG_TAG, "No records to flush, returning.");
-      return;
-    }
-
-    final ArrayList<EventRecord> outgoing = recordsBuffer;
-    recordsBuffer = new ArrayList<EventRecord>();
-    Logger.debug(LOG_TAG, "Flushing " + outgoing.size() + " records to database.");
-    // TODO: move bulkInsert to AndroidBrowserDataAccessor?
-    int inserted = ((MileageDataAccessor) dbHelper).bulkInsert(outgoing);
-    if (inserted != outgoing.size()) {
-      // Something failed; most pessimistic action is to declare that all insertions failed.
-      // TODO: perform the bulkInsert in a transaction and rollback unless all insertions succeed?
-      for (EventRecord failed : outgoing) {
-        delegate.onRecordStoreFailed(new RuntimeException("Failed to insert history item with guid " + failed.guid + "."), failed.guid);
-      }
-      return;
-    }
-
-    // All good, everybody succeeded.
-    for (EventRecord succeeded : outgoing) {
-      try {
-        // Does not use androidID -- just GUID -> String map.
-        updateBookkeeping(succeeded);
-      } catch (NoGuidForIdException e) {
-        // Should not happen.
-        throw new NullCursorException(e);
-      } catch (ParentNotFoundException e) {
-        // Should not happen.
-        throw new NullCursorException(e);
-      } catch (NullCursorException e) {
-        throw e;
-      }
-      trackRecord(succeeded);
-      delegate.onRecordStoreSucceeded(succeeded.guid); // At this point, we are really inserted.
-    }
-  }
-
-  @Override
-  public void storeDone() {
-    storeWorkQueue.execute(new Runnable() {
-      @Override
-      public void run() {
-        synchronized (recordsBufferMonitor) {
-          try {
-            flushNewRecords();
-          } catch (Exception e) {
-            Logger.warn(LOG_TAG, "Error flushing records to database.", e);
-          }
-        }
-        storeDone(System.currentTimeMillis());
-      }
-    });
-  }
+	@Override
+	public void wipe(RepositorySessionWipeDelegate delegate) {
+		// TODO Auto-generated method stub
+	}
 }
