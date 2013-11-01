@@ -9,13 +9,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.mozilla.gecko.R;
+import org.mozilla.gecko.background.common.log.Logger;
 import org.mozilla.gecko.sync.CollectionKeys;
+import org.mozilla.gecko.sync.CredentialsSource;
 import org.mozilla.gecko.sync.CryptoRecord;
 import org.mozilla.gecko.sync.EngineSettings;
 import org.mozilla.gecko.sync.ExtendedJSONObject;
@@ -24,6 +29,9 @@ import org.mozilla.gecko.sync.HTTPFailureException;
 import org.mozilla.gecko.sync.InfoCollections;
 import org.mozilla.gecko.sync.JSONRecordFetcher;
 import org.mozilla.gecko.sync.MetaGlobal;
+import org.mozilla.gecko.sync.MetaGlobalException;
+import org.mozilla.gecko.sync.MetaGlobalMissingEnginesException;
+import org.mozilla.gecko.sync.MetaGlobalNotSetException;
 import org.mozilla.gecko.sync.NoCollectionKeysSetException;
 import org.mozilla.gecko.sync.NonObjectJSONException;
 import org.mozilla.gecko.sync.PersistedMetaGlobal;
@@ -38,6 +46,7 @@ import org.mozilla.gecko.sync.delegates.GlobalSessionCallback;
 import org.mozilla.gecko.sync.delegates.JSONRecordFetchDelegate;
 import org.mozilla.gecko.sync.delegates.KeyUploadDelegate;
 import org.mozilla.gecko.sync.delegates.MetaGlobalDelegate;
+import org.mozilla.gecko.sync.delegates.WipeServerDelegate;
 import org.mozilla.gecko.sync.middleware.Crypto5MiddlewareRepository;
 import org.mozilla.gecko.sync.net.BaseResource;
 import org.mozilla.gecko.sync.net.BaseResourceDelegate;
@@ -712,7 +721,7 @@ public class MainActivity extends Activity {
 			CollectionKeys keys = pck.keys();
 			if (keys != null) {
 				config.setCollectionKeys(keys);
-				sync();
+				serverSync();
 				return;
 			}
 		}
@@ -744,7 +753,7 @@ public class MainActivity extends Activity {
 						pck.persistKeys(keys);
 						pck.persistLastModified(responseTimestamp);
 						// session.advance();
-						sync();
+						serverSync();
 						return;
 					}
 
@@ -765,7 +774,7 @@ public class MainActivity extends Activity {
 					// move on.
 					config.setCollectionKeys(oldKeys);
 					pck.persistLastModified(response.normalizedWeaveTimestamp());
-					sync();
+					serverSync();
 				}
 
 				@Override
@@ -799,49 +808,258 @@ public class MainActivity extends Activity {
 			e1.printStackTrace();
 		}
 	}
+	
+	protected SynchronizerConfiguration getConfig() throws NonObjectJSONException, IOException, ParseException {
+		return new SynchronizerConfiguration(config.getBranch("events."));
+	}
+	
+	protected EngineSettings getEngineSettings() throws NonObjectJSONException, IOException, ParseException {
+		Integer version = 1;
+		
+		SynchronizerConfiguration config = this.getConfig();
+		if (config == null) {
+			return new EngineSettings(null, version.intValue());
+		}
+		return new EngineSettings(config.syncID, version.intValue());
+	}
+	
+	public boolean engineIsEnabled(String engineName,
+			EngineSettings engineSettings) throws MetaGlobalException {
+		if (this.config.metaGlobal == null) {
+			throw new MetaGlobalNotSetException();
+		}
 
-	void sync() {
+		// This should not occur.
+		if (this.config.enabledEngineNames == null) {
+			throw new MetaGlobalMissingEnginesException();
+		}
+
+		if (!(this.config.enabledEngineNames.contains(engineName))) {
+			return false;
+		}
+
+		// If we have a meta/global, check that it's safe for us to sync.
+		// (If we don't, we'll create one later, which is why we return `true` above.)
+		if (engineSettings != null) {
+			// Throws if there's a problem.
+			this.config.metaGlobal.verifyEngineSettings(engineName, engineSettings);
+		}
+
+		return true;
+	}
+	
+	protected void checkAndUpdateUserSelectedEngines(boolean enabledInMetaGlobal)
+			throws MetaGlobalException {
+		Map<String, Boolean> selectedEngines = config.userSelectedEngines;
+		String thisEngine = "events";
+		
+		if (selectedEngines != null && selectedEngines.containsKey(thisEngine)) {
+			boolean enabledInSelection = selectedEngines.get(thisEngine);
+			if (enabledInMetaGlobal != enabledInSelection) {
+				// Engine enable state has been changed by the user.
+				throw new MetaGlobalException.MetaGlobalEngineStateChangedException(enabledInSelection);
+			}
+		}
+	}
+	
+	private final String LOG_TAG = "Wheelly Logg";
+	
+	protected void resetLocalWithSyncID(String syncID) {
+	    // Clear both timestamps.
+	    SynchronizerConfiguration config;
+	    try {
+	      config = this.getConfig();
+	    } catch (Exception e) {
+	      Logger.warn(LOG_TAG, "Unable to reset " + this + ": fetching config failed.", e);
+	      return;
+	    }
+
+	    if (syncID != null) {
+	      config.syncID = syncID;
+	      Logger.info(LOG_TAG, "Setting syncID for " + this + " to '" + syncID + "'.");
+	    }
+	    config.localBundle.setTimestamp(0L);
+	    config.remoteBundle.setTimestamp(0L);
+	    config.persist(MainActivity.this.config.getBranch(bundlePrefix()));
+	    Logger.info(LOG_TAG, "Reset timestamps for " + this);
+	  }
+	
+	private String bundlePrefix() {
+		return "events.";
+	}
+	
+	protected void wipeServer(final WipeServerDelegate wipeDelegate) {
+		SyncStorageRequest request;
+		
+		try {
+			request = new SyncStorageRequest(config.collectionURI("events"));
+		} catch (URISyntaxException ex) {
+			wipeDelegate.onWipeFailed(ex);
+			return;
+		}
+		
+		request.delegate = new SyncStorageRequestDelegate() {
+			@Override
+			public String ifUnmodifiedSince() {
+				return null;
+			}
+
+			@Override
+			public void handleRequestSuccess(SyncStorageResponse response) {
+				BaseResource.consumeEntity(response);
+				resetLocalWithSyncID(null);
+				wipeDelegate.onWiped(response.normalizedWeaveTimestamp());
+			}
+
+			@Override
+			public void handleRequestFailure(SyncStorageResponse response) {
+				Logger.warn(LOG_TAG,
+						"Got request failure " + response.getStatusCode()
+								+ " in wipeServer.");
+				// Process HTTP failures here to pick up backoffs, etc.
+				// session.interpretHTTPFailure(response.httpResponse());
+				BaseResource.consumeEntity(response); // The exception thrown should not need the body of the response.
+				wipeDelegate.onWipeFailed(new HTTPFailureException(response));
+			}
+
+			@Override
+			public void handleRequestError(Exception ex) {
+				Logger.warn(LOG_TAG, "Got exception in wipeServer.", ex);
+				wipeDelegate.onWipeFailed(ex);
+			}
+
+			@Override
+			public String credentials() {
+				return config.credentials();
+			}
+		};
+		
+		request.delete();
+	}
+
+	Synchronizer getConfiguredSynchronizer()
+			throws NoCollectionKeysSetException, URISyntaxException,
+			NonObjectJSONException, IOException, ParseException {
 		KeyBundle collectionKey;
 		try {
 			collectionKey = config.getCollectionKeys().keyBundleForCollection("events");
 		} catch (NoCollectionKeysSetException e) {
-			return;
+			return null;
 		}
 		
 		Crypto5MiddlewareRepository cryptoRepo;
 		try {
-			cryptoRepo = new Crypto5MiddlewareRepository(new Server11Repository(config.getClusterURLString(),
-			        config.username,
-			        "events",
-			        config), collectionKey);
+			cryptoRepo = new Crypto5MiddlewareRepository(new Server11Repository(config.getClusterURLString(), config.username, "events", config), collectionKey);
 		} catch (URISyntaxException e) {
-			return;
+			return null;
 		}
 		cryptoRepo.recordFactory = new RecordFactory() {
-		    @Override
-		    public Record createRecord(Record record) {
-		        EventRecord r = new EventRecord();
-		        r.initFromEnvelope((CryptoRecord) record);
-		        return r;
-		    }
+			@Override
+			public Record createRecord(Record record) {
+				EventRecord r = new EventRecord();
+				r.initFromEnvelope((CryptoRecord) record);
+				return r;
+			}
 		};
 		
 		Repository remote = cryptoRepo;
-
 		Synchronizer synchronizer = new ServerLocalSynchronizer();
 		synchronizer.repositoryA = remote;
-		synchronizer.repositoryB = new EventRepository();;
+		synchronizer.repositoryB = new EventRepository();
+		return synchronizer;
+	}
+	public final Map<String, EngineSettings> enginesToUpdate = new HashMap<String, EngineSettings>();
+	public void recordForMetaGlobalUpdate(String engineName, EngineSettings engineSettings) {
+		enginesToUpdate.put(engineName, engineSettings);
+	}
+	
+	void serverSync() {
+		EngineSettings engineSettings = null;
 		try {
-			synchronizer.load(new SynchronizerConfiguration(config.getBranch("events.")));
-		} catch (NonObjectJSONException e) {
-			return;
-		} catch (IOException e) {
-			return;
-		} catch (ParseException e) {
+			engineSettings = getEngineSettings();
+		} catch (Exception e) { }
+		
+		try {
+			boolean enabledInMetaGlobal = engineIsEnabled("events", engineSettings);
+			checkAndUpdateUserSelectedEngines(enabledInMetaGlobal);
+			if(!enabledInMetaGlobal) {
+				return;
+			}
+		} catch (MetaGlobalException.MetaGlobalMalformedSyncIDException e) {
+			// Bad engine syncID. This should never happen. Wipe the server.
+			try {
+				Logger.info(LOG_TAG, "Wiping server because malformed engine sync ID was found in meta/global.");
+				wipeServer(new WipeServerDelegate() {
+					@Override
+					public void onWiped(long timestamp) {
+						uploadMetaGlobal();
+					}
+					
+					@Override
+					public void onWipeFailed(Exception e) {
+					}
+				});
+				Logger.info(LOG_TAG, "Wiped server after malformed engine sync ID found in meta/global.");
+			} catch (Exception ex) {
+			}
+		} catch (MetaGlobalException.MetaGlobalMalformedVersionException e) {
+			// Bad engine version. This should never happen. Wipe the server.
+			try {
+				Logger.info(LOG_TAG, "Wiping server because malformed engine version was found in meta/global.");
+				wipeServer(new WipeServerDelegate() {
+					@Override
+					public void onWiped(long timestamp) {
+						uploadMetaGlobal();
+					}
+				
+					@Override
+					public void onWipeFailed(Exception e) {
+					}
+				});
+				Logger.info(LOG_TAG, "Wiped server after malformed engine version found in meta/global.");
+			} catch (Exception ex) {
+			}
+		} catch (MetaGlobalException.MetaGlobalStaleClientSyncIDException e) {
+			// Our syncID is wrong. Reset client and take the server syncID.
+			Logger.warn(LOG_TAG, "Remote engine syncID different from local engine syncID:" +
+					" resetting local engine and assuming remote engine syncID.");
+			this.resetLocalWithSyncID(e.serverSyncID);
+		} catch (MetaGlobalException.MetaGlobalEngineStateChangedException e) {
+			// Add engine with new syncID to meta/global for upload.
+			String newSyncID = Utils.generateGuid();
+			recordForMetaGlobalUpdate("events", new EngineSettings(newSyncID, 1));
+			// Update SynchronizerConfiguration w/ new engine syncID.
+			this.resetLocalWithSyncID(newSyncID);
+			try {
+				// Engine sync status has changed. Wipe server.
+				Logger.warn(LOG_TAG, "Wiping server because engine sync state changed.");
+				wipeServer(new WipeServerDelegate() {
+					@Override
+					public void onWiped(long timestamp) {
+						uploadMetaGlobal();
+					}
+					
+					@Override
+					public void onWipeFailed(Exception e) {
+					}
+				});
+				Logger.warn(LOG_TAG, "Wiped server because engine sync state changed.");
+			} catch (Exception ex) {
+				//session.abort(ex, "Failed to wipe server after engine sync state changed");
+			}
+		} catch (MetaGlobalException e) {
 			return;
 		}
+		
+		Synchronizer synchronizer;
+		try {
+			synchronizer = getConfiguredSynchronizer();
+			synchronizer.load(getConfig());
+		} catch (Exception e) {
+			return;
+		}
+		
 		synchronizer.synchronize(this, new SynchronizerDelegate() {
-			
 			@Override
 			public void onSynchronized(Synchronizer synchronizer) {
 				SynchronizerConfiguration newConfig = synchronizer.save();
@@ -852,18 +1070,52 @@ public class MainActivity extends Activity {
 			    final SynchronizerSession synchronizerSession = synchronizer.getSynchronizerSession();
 			    int inboundCount = synchronizerSession.getInboundCount();
 			    int outboundCount = synchronizerSession.getOutboundCount();
+			    uploadMetaGlobal();
 			}
 			
 			@Override
 			public void onSynchronizeFailed(Synchronizer synchronizer,
 					Exception lastException, String reason) {
-				// TODO Auto-generated method stub
-				
+				uploadMetaGlobal();
 			}
 		});
 	}
 	
 	void uploadMetaGlobal() {
-		
+		if (!enginesToUpdate.isEmpty()) {
+			Logger.info(LOG_TAG, "Not uploading updated meta/global record since there are no engines requesting upload.");
+			ExtendedJSONObject engines = config.metaGlobal.getEngines();
+		    for (Entry<String, EngineSettings> pair : enginesToUpdate.entrySet()) {
+		      if (pair.getValue() == null) {
+		        engines.remove(pair.getKey());
+		      } else {
+		        engines.put(pair.getKey(), pair.getValue().toJSONObject());
+		      }
+		    }
+		    config.metaGlobal.upload(new MetaGlobalDelegate() {
+				
+				@Override
+				public void handleSuccess(MetaGlobal global, SyncStorageResponse response) {
+					Logger.info(LOG_TAG, "Successfully uploaded updated meta/global record.");
+					// Engine changes are stored as diffs, so update enabled engines in config to match uploaded meta/global.
+					config.enabledEngineNames = config.metaGlobal.getEnabledEngineNames();
+					// Clear userSelectedEngines because they are updated in config and meta/global.
+					config.userSelectedEngines = null;
+				}
+				
+				@Override
+				public void handleMissing(MetaGlobal global, SyncStorageResponse response) {
+				}
+				
+				@Override
+				public void handleFailure(SyncStorageResponse response) {
+				}
+				
+				@Override
+				public void handleError(Exception e) {
+				}
+			});
+		    enginesToUpdate.clear();
+		}
 	}
 }
