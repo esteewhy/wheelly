@@ -67,6 +67,8 @@ public class HeartbeatBroker {
 		long id;
 		ContentResolver cr = context.getContentResolver();
 		
+		values.put("modified", System.currentTimeMillis() / 1000L);
+		
 		if(values.containsKey(BaseColumns._ID)
 				&& (id = values.getAsLong(BaseColumns._ID)) > 0) {
 			cr.update(

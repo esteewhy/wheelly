@@ -42,6 +42,6 @@ public class EventSyncStage extends ServerSyncStage {
 
   @Override
   protected boolean isEnabled() throws MetaGlobalException {
-    return session != null && session.getContext() != null && super.isEnabled();
+    return session != null && session.getContext() != null;// && super.isEnabled();
   }
 }

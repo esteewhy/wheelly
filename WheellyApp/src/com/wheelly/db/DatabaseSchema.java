@@ -306,7 +306,8 @@ public final class DatabaseSchema {
 			+ "sync_id		TEXT,"
 			+ "sync_etag	TEXT,"
 			+ "sync_state	LONG NOT NULL DEFAULT 0,"
-			+ "sync_date	TIMESTAMP)";
+			+ "sync_date	TIMESTAMP,"
+			+ "modified		TIMESTAMP DEFAULT (strftime('%s', 'now')))";
 		
 		// reverse links detection
 		public static final String IconColumnExpression =
@@ -377,7 +378,8 @@ public final class DatabaseSchema {
 			"h.sync_id",
 			"h.sync_etag",
 			"h.sync_date",
-			"h.sync_state"
+			"h.sync_state",
+			"h.modified"
 		};
 		
 		public static final String Tables = "heartbeats h"
