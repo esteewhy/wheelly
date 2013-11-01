@@ -35,8 +35,8 @@ public class EventRepositorySession extends RepositorySession {
 			RepositorySessionGuidsSinceDelegate delegate) {
 		ContentResolver cr = context.getContentResolver();
 		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
-				new String[] { "h.sync_etag" },
-				"h._created >= ?",
+				new String[] { "h.sync_etag guid" },
+				"h.modified >= ?",
 				new String[] { Long.toString(timestamp) },
 				"odometer ASC, h._created ASC");
 		List<String> guids = new ArrayList<String>();
@@ -50,10 +50,11 @@ public class EventRepositorySession extends RepositorySession {
 		delegate.onGuidsSinceSucceeded(guids.toArray(new String[0]));
 	}
 	
-	public static final String IconColumnExpression =
-			"((r._id IS NOT NULL) * 4"
-			+ "	| (m1._id IS NOT NULL) * 2"
-			+ "	| (m2._id IS NOT NULL))";
+	public static final String TypeColumnExpression =
+			"CASE WHEN r._id IS NOT NULL THEN 'REFUEL'"
+			+ "	WHEN m1._id IS NOT NULL THEN 'START'"
+			+ "	WHEN m2._id IS NOT NULL THEN 'STOP'"
+			+ " END";
 	
 	public static final String[] ListProjection = {
 		"h." + BaseColumns._ID + " " + BaseColumns._ID,
@@ -67,11 +68,9 @@ public class EventRepositorySession extends RepositorySession {
 		"r.cost",
 		"r.amount",
 		"r.transaction_id",
-		IconColumnExpression + " icons",
-		"h.sync_id",
-		"h.sync_etag",
-		"h.sync_date",
-		"h.sync_state"
+		TypeColumnExpression + " type",
+		"h.sync_etag guid",
+		"h.modified"
 	};
 	
 	@Override
@@ -81,7 +80,7 @@ public class EventRepositorySession extends RepositorySession {
 		final long end = now();
 		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
 				ListProjection,
-				"h._created >= ?",
+				"h.modified >= ?",
 				new String[] { Long.toString(timestamp) },
 				"odometer ASC, h._created ASC");
 		
@@ -104,12 +103,12 @@ public class EventRepositorySession extends RepositorySession {
 		r.destination	= c.getString(c.getColumnIndex("destination"));
 		r.distance		= c.getFloat(c.getColumnIndex("distance"));
 		r.fuel			= c.getFloat(c.getColumnIndex("fuel"));
-		r.guid			= c.getString(c.getColumnIndex("sync_etag"));
-		r.lastModified	= c.getLong(c.getColumnIndex("sync_state"));;
+		r.guid			= c.getString(c.getColumnIndex("guid"));
+		r.lastModified  = c.getLong(c.getColumnIndex("modified"));
 		r.location		= c.getString(c.getColumnIndex("place"));
 		r.map			= c.getString(c.getColumnIndex("track_id"));
 		r.odometer		= c.getLong(c.getColumnIndex("odometer"));
-		r.type			= c.getString(c.getColumnIndex("icons"));
+		r.type			= c.getString(c.getColumnIndex("type"));
 		return r;
 	}
 	
@@ -121,7 +120,7 @@ public class EventRepositorySession extends RepositorySession {
 		final long end = now();
 		final Cursor c = cr.query(Uri.parse("content://com.wheelly/timeline"),
 				ListProjection,
-				"sync_etag IN (" + new String(new char[guids.length]).replace("\0", "?,").substring(0, -1) +  ")",
+				"guid IN (" + new String(new char[guids.length]).replace("\0", "?,").substring(0, -1) +  ")",
 				guids,
 				"odometer ASC, h._created ASC");
 		

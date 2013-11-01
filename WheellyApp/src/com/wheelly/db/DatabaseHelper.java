@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 10);
+		super(context, "wheelly.db", null, 11);
 		
 	}
 
@@ -69,6 +69,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		case 9:
 			db.execSQL(Mileages.PrevMileageView);
 			break;
+		case 10:
+			db.execSQL("ALTER TABLE heartbeats ADD COLUMN modified TIMESTAMP;");
+			db.execSQL("UPDATE heartbeats SET modified = strftime('%s', 'now');");
 		}
 	}
 }
