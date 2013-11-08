@@ -97,9 +97,38 @@ public class EventContentProvider extends ContentProvider {
 		throw new UnsupportedOperationException("Not supported by this provider");
 	}
 	
+	private static long getIdFromUriOrValues(Uri uri, ContentValues values) {
+		List<String> segments = uri.getPathSegments();
+		long id = 0;
+		if(segments.size() > 1) {
+			try {
+				id = Long.parseLong(segments.get(1));
+			} catch(NumberFormatException ex) {
+				id = 0;
+			}
+		}
+		
+		if(id <= 0) {
+			if(values.containsKey(BaseColumns._ID)) {
+				id = values.getAsLong(BaseColumns._ID);
+			} else {
+				throw new UnsupportedOperationException("Cannot detect record key for uri: " + uri);
+			}
+		}
+		return id;
+	}
+	
 	@Override
-	public int update(Uri uri, ContentValues contentvalues, String s, String[] as) {
-		throw new UnsupportedOperationException("Not supported by this provider");
+	public int update(Uri uri, ContentValues values, String selection,
+			String[] selectionArgs) {
+		long id = getIdFromUriOrValues(uri, values);
+		DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		final int count = db.update("heartbeats",
+				values,
+				BaseColumns._ID + " = ?",
+				new String[] { Long.toString(id) });
+		return count;
 	}
 	
 	private static final String IconColumnExpression =

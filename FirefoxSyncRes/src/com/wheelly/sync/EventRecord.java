@@ -32,11 +32,11 @@ public class EventRecord extends Record {
   public String type;
   public long date;
   public String location;
-  public float fuel;
-  public float distance;
+  public Number fuel;
+  public Number distance;
   public String destination;
-  public float amount;
-  public float cost;
+  public Number amount;
+  public Number cost;
   public String transaction;
   public String map;
   
@@ -84,11 +84,11 @@ public class EventRecord extends Record {
     this.type        = payload.getString("type");
     this.date        = payload.getTimestamp("date");
     this.location    = payload.getString("location");
-    this.fuel        = (Float) payload.get("fuel");
-    this.distance    = (Float) payload.get("distance");
+    this.fuel        = (Number) payload.get("fuel");
+    this.distance    = (Number) payload.get("distance");
     this.destination = payload.getString("destination");
-    this.amount      = (Float) payload.get("amount");
-    this.cost        = (Float) payload.get("cost");
+    this.amount      = (Number) payload.get("amount");
+    this.cost        = (Number) payload.get("cost");
     this.transaction = payload.getString("transaction");
     this.map         = payload.getString("map");
   }
