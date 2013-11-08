@@ -93,8 +93,7 @@ public class MainActivity extends Activity {
 					config = new SyncConfiguration("wheelly",
 							new PrefsSource() {
 								@Override
-								public SharedPreferences getPrefs(String name,
-										int mode) {
+								public SharedPreferences getPrefs(String name, int mode) {
 									return getSharedPreferences(name, mode);
 								}
 							});
@@ -105,7 +104,11 @@ public class MainActivity extends Activity {
 					config.clusterURL = config.serverURL;
 					config.syncKeyBundle = new KeyBundle(config.username, "aaaaa-bbbbb-ccccc-ddddd-ee");
 					config.stagesToSync = Arrays.asList(new String[] { "events" });
-
+					SyncConfiguration.storeSelectedEnginesToPrefs(config.getPrefs(), new HashMap<String, Boolean>() {
+						private static final long serialVersionUID = 1L;
+					{
+						put("events", true);
+					}});
 					ensureUser();
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
@@ -988,6 +991,7 @@ public class MainActivity extends Activity {
 		} catch (MetaGlobalException.MetaGlobalMalformedSyncIDException e) {
 			// Bad engine syncID. This should never happen. Wipe the server.
 			try {
+				recordForMetaGlobalUpdate("events", new EngineSettings(Utils.generateGuid(), 1));
 				Logger.info(LOG_TAG, "Wiping server because malformed engine sync ID was found in meta/global.");
 				wipeServer(new WipeServerDelegate() {
 					@Override
@@ -1005,6 +1009,7 @@ public class MainActivity extends Activity {
 		} catch (MetaGlobalException.MetaGlobalMalformedVersionException e) {
 			// Bad engine version. This should never happen. Wipe the server.
 			try {
+				recordForMetaGlobalUpdate("events", new EngineSettings(Utils.generateGuid(), 1));
 				Logger.info(LOG_TAG, "Wiping server because malformed engine version was found in meta/global.");
 				wipeServer(new WipeServerDelegate() {
 					@Override
@@ -1081,41 +1086,99 @@ public class MainActivity extends Activity {
 		});
 	}
 	
-	void uploadMetaGlobal() {
-		if (!enginesToUpdate.isEmpty()) {
+	public boolean hasUpdatedMetaGlobal() {
+		if (enginesToUpdate.isEmpty()) {
 			Logger.info(LOG_TAG, "Not uploading updated meta/global record since there are no engines requesting upload.");
-			ExtendedJSONObject engines = config.metaGlobal.getEngines();
-		    for (Entry<String, EngineSettings> pair : enginesToUpdate.entrySet()) {
-		      if (pair.getValue() == null) {
-		        engines.remove(pair.getKey());
-		      } else {
-		        engines.put(pair.getKey(), pair.getValue().toJSONObject());
-		      }
-		    }
-		    config.metaGlobal.upload(new MetaGlobalDelegate() {
-				
-				@Override
-				public void handleSuccess(MetaGlobal global, SyncStorageResponse response) {
-					Logger.info(LOG_TAG, "Successfully uploaded updated meta/global record.");
-					// Engine changes are stored as diffs, so update enabled engines in config to match uploaded meta/global.
-					config.enabledEngineNames = config.metaGlobal.getEnabledEngineNames();
-					// Clear userSelectedEngines because they are updated in config and meta/global.
-					config.userSelectedEngines = null;
-				}
-				
-				@Override
-				public void handleMissing(MetaGlobal global, SyncStorageResponse response) {
-				}
-				
-				@Override
-				public void handleFailure(SyncStorageResponse response) {
-				}
-				
-				@Override
-				public void handleError(Exception e) {
-				}
-			});
-		    enginesToUpdate.clear();
+			return false;
+		}
+
+		if (Logger.shouldLogVerbose(LOG_TAG)) {
+			Logger.trace(LOG_TAG, "Uploading updated meta/global record since there are engine changes to meta/global.");
+			Logger.trace(LOG_TAG, "Engines requesting update [" + Utils.toCommaSeparatedString(enginesToUpdate.keySet()) + "]");
+		}
+
+		return true;
+	}
+	
+	public void updateMetaGlobalInPlace() {
+		ExtendedJSONObject engines = config.metaGlobal.getEngines();
+		for (Entry<String, EngineSettings> pair : enginesToUpdate.entrySet()) {
+			if (pair.getValue() == null) {
+				engines.remove(pair.getKey());
+			} else {
+				engines.put(pair.getKey(), pair.getValue().toJSONObject());
+			}
+		}
+
+		enginesToUpdate.clear();
+	}
+	
+	public void uploadUpdatedMetaGlobal() {
+		updateMetaGlobalInPlace();
+
+		Logger.debug(LOG_TAG, "Uploading updated meta/global record.");
+		final Object monitor = new Object();
+
+		Runnable doUpload = new Runnable() {
+			@Override
+			public void run() {
+				config.metaGlobal.upload(new MetaGlobalDelegate() {
+					@Override
+					public void handleSuccess(MetaGlobal global, SyncStorageResponse response) {
+						Logger.info(LOG_TAG, "Successfully uploaded updated meta/global record.");
+						// Engine changes are stored as diffs, so update enabled engines in config to match uploaded meta/global.
+						config.enabledEngineNames = config.metaGlobal.getEnabledEngineNames();
+						// Clear userSelectedEngines because they are updated in config and meta/global.
+						config.userSelectedEngines = null;
+
+						synchronized (monitor) {
+							monitor.notify();
+						}
+					}
+
+					@Override
+					public void handleMissing(MetaGlobal global,
+							SyncStorageResponse response) {
+						Logger.warn(LOG_TAG, "Got 404 missing uploading updated meta/global record; shouldn't happen.  Ignoring.");
+						synchronized (monitor) {
+							monitor.notify();
+						}
+					}
+
+					@Override
+					public void handleFailure(SyncStorageResponse response) {
+						Logger.warn(LOG_TAG, "Failed to upload updated meta/global record; ignoring.");
+						synchronized (monitor) {
+							monitor.notify();
+						}
+					}
+
+					@Override
+					public void handleError(Exception e) {
+						Logger.warn(LOG_TAG, "Got exception trying to upload updated meta/global record; ignoring.", e);
+						synchronized (monitor) {
+							monitor.notify();
+						}
+					}
+				});
+			}
+		};
+
+		final Thread upload = new Thread(doUpload);
+		synchronized (monitor) {
+			try {
+				upload.start();
+				monitor.wait();
+				Logger.debug(LOG_TAG, "Uploaded updated meta/global record.");
+			} catch (InterruptedException e) {
+				Logger.error(LOG_TAG, "Uploading updated meta/global interrupted; continuing.");
+			}
+		}
+	}
+	
+	void uploadMetaGlobal() {
+		if (hasUpdatedMetaGlobal()) {
+			uploadUpdatedMetaGlobal();
 		}
 	}
 }
