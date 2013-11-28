@@ -17,8 +17,10 @@ package com.wheelly.service;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 
 import com.google.android.apps.mytracks.Constants;
@@ -26,8 +28,6 @@ import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
 import com.wheelly.activity.NoAccountsDialog;
 import com.wheelly.activity.SelectDialog;
-import com.wheelly.io.docs.SendSpreadsheetsAsyncTask;
-import com.wheelly.io.docs.SyncDocsAsyncTask;
 
 public class Synchronizer {
 	private final Context context;
@@ -38,8 +38,13 @@ public class Synchronizer {
 		this.fm = fm;
 	}
 	
-	private SendSpreadsheetsAsyncTask getTask(final long id, Account account) {
-		return new SendSpreadsheetsAsyncTask(context, id, account);
+	private void execute(final long id, Account account) {
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName("com.wheelly.sync.drive", "com.wheelly.sync.drive.SyncService"));
+		intent.putExtra("id", id);
+		intent.putExtra("accountName", account.name);
+		context.startService(intent);
+		//new SendSpreadsheetsAsyncTask(context, id, account.name).execute();
 	}
 	
 	public void execute(final long id) {
@@ -52,12 +57,12 @@ public class Synchronizer {
 		
 		if(1 == accounts.length) {
 			setPreferredAccountName(accounts[0].name);
-			getTask(id, accounts[0]).execute();
+			execute(id, accounts[0]);
 		} else {
 			final int selectedAccountIndex = getPreferredAccountIndex(accounts);
 			
 			if(selectedAccountIndex >= 0) {
-				getTask(id, accounts[selectedAccountIndex]).execute();
+				execute(id, accounts[selectedAccountIndex]);
 			} else {
 				new SelectDialog<Account>(accounts,
 						selectedAccountIndex,
@@ -71,7 +76,7 @@ public class Synchronizer {
 						@Override
 						public void onSelect(DialogInterface dialog, int which, Account account) {
 							setPreferredAccountName(account.name);
-							getTask(id, account).execute();
+							execute(id, account);
 						}
 					}).show(fm, "select");
 			}
@@ -93,8 +98,6 @@ public class Synchronizer {
 	}
 	
 	private void setPreferredAccountName(String name) {
-		PreferencesUtils.setString(context,
-			R.string.preferred_account_key,
-			name);
+		PreferencesUtils.setString(context, R.string.preferred_account_key, name);
 	}
 }

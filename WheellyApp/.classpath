@@ -10,13 +10,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="lib" path="/MyTracks/libs/guava-jdk5-13.0.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-api-services-drive-v2-rev30-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-oauth-client-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/gdata-spreadsheet-3.0.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-api-client-android-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-gson-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-http-client-android-1.12.0-beta.jar"/>
-	<classpathentry kind="lib" path="/MyTracks/libs/google-api-client-1.12.0-beta.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/wheelly-common"/>
+	<classpathentry kind="lib" path="/android-maps-extensions/libs/android-support-v4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
