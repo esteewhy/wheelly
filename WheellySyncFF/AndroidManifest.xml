@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.mozilla.gecko"
+    package="com.wheelly.sync"
     android:sharedUserId="org.mozilla.fennec.sharedID"
     android:versionCode="1"
     android:versionName="1.0" >
@@ -144,7 +144,7 @@
                 android:resource="@xml/sync_authenticator" />
         </service>
         <service
-            android:name="com.wheelly.sync.SyncService"
+            android:name="com.wheelly.sync.WheellySyncService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
