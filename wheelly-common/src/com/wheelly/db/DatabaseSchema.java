@@ -409,7 +409,9 @@ public final class DatabaseSchema {
 			+"		longitude double,"
 			+"		is_payee integer not null default 0,"
 			+"		resolved_address text,"
-			+"		color TEXT"
+			+"		color TEXT,"
+			+"		sync_etag TEXT,"
+			+"		modified TIMESTAMP DEFAULT (strftime('%s', 'now'))"
 			+"	)";
 		
 		public static final String Select =

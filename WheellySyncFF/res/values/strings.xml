@@ -2,13 +2,15 @@
 <!DOCTYPE resources [
 
 <!-- For standalone running. -->
-<!ENTITY brandShortName "Firefox">
+<!ENTITY brandShortName "Wheelly">
 
 <!-- Sync strings. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
+<!-- Don't localize these. They're here until they have
+     a better place to live. -->
 <!ENTITY syncBrand.fullName.label "Wheelly Sync">
 <!ENTITY syncBrand.shortName.label "Sync">
 
@@ -21,7 +23,7 @@
 <!-- J-PAKE Key Screen -->
 <!ENTITY sync.subtitle.connect.label 'To activate your new device, select “Set up &syncBrand.shortName.label;” on the device.'>
 <!ENTITY sync.subtitle.header2.label 'Enter this code on your other device'>
-<!ENTITY sync.subtitle.connectlocation2.label 'Select “&sync.title.pair.label;” in the &syncBrand.shortName.label; section of your other device\&apos;s Firefox options.'>
+<!ENTITY sync.subtitle.connectlocation2.label 'Select “&sync.title.pair.label;” in the &syncBrand.shortName.label; section of your other device\&apos;s Wheelly options.'>
 <!ENTITY sync.subtitle.pair.label 'To activate, select “Pair a device” on your other device.'>
 <!ENTITY sync.pin.default.label '...\n...\n...\n'>
 <!ENTITY sync.pin.oneline.label '...'>
@@ -47,7 +49,7 @@
 <!ENTITY sync.button.manual.label 'Manual Setup'>
 <!ENTITY sync.subtitle.nointernet.label 'No internet connection available.'>
 <!ENTITY sync.subtitle.failaccount.label 'Account creation on your device failed.'>
-<!ENTITY sync.subtitle.failmultiple.label 'Do you have more than one Firefox installed? Currently, &syncBrand.fullName.label; only supports one Firefox installation at a time. Please uninstall other instances to use &syncBrand.shortName.label;.'>
+<!ENTITY sync.subtitle.failmultiple.label 'Do you have more than one Wheelly installed? Currently, &syncBrand.fullName.label; only supports one Wheelly installation at a time. Please uninstall other instances to use &syncBrand.shortName.label;.'>
   
 <!-- Setup Success -->
 <!ENTITY sync.title.success.label 'Setup Complete'>
@@ -59,7 +61,7 @@
 <!ENTITY sync.pair.tryagain.label 'Please try again.'>
 <!ENTITY sync.pair.connectlocation.label 'To activate your new device, select “Set up &syncBrand.shortName.label;” on the device, and then select “I Have an Account.”'>
 
-<!-- Firefox SyncAdapter Settings Screen -->
+<!-- Wheelly SyncAdapter Settings Screen -->
 <!ENTITY sync.settings.options.label 'Options'>
 <!ENTITY sync.summary.pair.label 'Link another device to your &syncBrand.shortName.label; account'>
 
@@ -391,14 +393,14 @@ size. -->
      clicking this text in the promotions box will perform some action. Note
      that a non-breaking space (unicode= U+00A0) should be used between this
      character and the remainder of the string to prevent word wrap. -->
-<!ENTITY abouthome_about_sync3 "Set up Firefox Sync to access bookmarks, history and tabs from your other devices&#x00A0;»">
-<!ENTITY abouthome_about_apps3 "Get apps from the Firefox Marketplace and discover the best the Web has to offer&#x00A0;»">
+<!ENTITY abouthome_about_sync3 "Set up Wheelly Sync to access bookmarks, history and tabs from your other devices&#x00A0;»">
+<!ENTITY abouthome_about_apps3 "Get apps from the Wheelly Marketplace and discover the best the Web has to offer&#x00A0;»">
 <!-- Localization note (abouthome_sync_bold_name, abouthome_apps_bold_name):
      These strings are accentuated as bold text in the "abouthome_about_..."
      strings above. These strings should be a subset of the strings above and
      generally be the name of the product the string describes. -->
-<!ENTITY abouthome_sync_bold_name "Firefox Sync">
-<!ENTITY abouthome_apps_bold_name2 "Firefox Marketplace">
+<!ENTITY abouthome_sync_bold_name "Wheelly Sync">
+<!ENTITY abouthome_apps_bold_name2 "Wheelly Marketplace">
 
 <!ENTITY filepicker_title "Choose File">
 <!ENTITY filepicker_audio_title "Choose or record a sound">
@@ -462,116 +464,112 @@ just addresses the organization to follow, e.g. "This site is run by " -->
 <!ENTITY updater_apply_select2 "Touch to update">
 ]>
 <resources>
-
-    <!--
-   This Source Code Form is subject to the terms of the Mozilla Public
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/.
-    -->
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
+  <!-- Used for setup success. -->
+  <string name="brand_short_name">&brandShortName;</string>
 
-    <!-- Used for setup success. -->
-    <string name="brand_short_name"></string>
-    <string name="sync_app_name"></string>
-    <string name="sync_title_connect"></string>
-    <string name="sync_title_pair"></string>
+  <string name="sync_app_name">&sync.app.name.label;</string>
+  <string name="sync_title_connect">&sync.title.adddevice.label;</string>
+  <string name="sync_title_pair">&sync.title.pair.label;</string>
 
-    <!-- J-PAKE PIN Screen -->
-    <string name="sync_subtitle_header"></string>
-    <string name="sync_subtitle_connect"></string>
-    <string name="sync_subtitle_pair"></string>
-    <string name="sync_pin_default"></string>
-    <string name="sync_link_show"><u></u></string>
-    <string name="sync_link_advancedsetup"><u></u></string>
+  <!-- J-PAKE PIN Screen -->
+  <string name="sync_subtitle_header">&sync.subtitle.header2.label;</string>
+  <string name="sync_subtitle_connect">&sync.subtitle.connectlocation2.label;</string>
+  <string name="sync_subtitle_pair">&sync.pair.connectlocation.label;</string>
+  <string name="sync_pin_default">&sync.pin.oneline.label;</string>
+  <string name="sync_link_show"><u>&sync.link.show.label;</u></string>
+  <string name="sync_link_advancedsetup"><u>&sync.link.advancedsetup.label;</u></string>
 
-    <!-- J-PAKE Waiting Screen -->
+  <!-- J-PAKE Waiting Screen -->
+  
+  <string name="sync_jpake_subtitle_waiting">&sync.jpake.subtitle.waiting.label;</string>
 
-    <string name="sync_jpake_subtitle_waiting"></string>
+  <!-- Account Login Screen -->
+  <string name="sync_subtitle_account">&sync.subtitle.account.label;</string>
+  <string name="sync_input_username">&sync.input.username.label;</string>
+  <string name="sync_input_password">&sync.input.password.label;</string>
+  <string name="sync_input_key">&sync.input.key.label;</string>
+  <string name="sync_checkbox_server">&sync.checkbox.server.label;</string>
+  <string name="sync_input_server">&sync.input.server.label;</string>
+  
+  <!-- Setup Fail -->
+  <string name="sync_title_fail">&sync.title.fail.label;</string>
+  <string name="sync_subtitle_fail">&sync.subtitle.fail.label;</string>
+  <string name="sync_button_tryagain">&sync.button.tryagain.label;</string>
+  <string name="sync_button_manual">&sync.button.manual.label;</string>
+  <string name="sync_subtitle_nointernet">&sync.subtitle.nointernet.label;</string>
+  <string name="sync_subtitle_failaccount">&sync.subtitle.failaccount.label;</string>
+  <string name="sync_subtitle_failmultiple">&sync.subtitle.failmultiple.label;</string>
+  
+  <!-- Setup Success -->
+  <string name="sync_title_success">&sync.title.success.label;</string>
+  <string name="sync_subtitle_success">&sync.subtitle.success.label1;</string>
+  <string name="sync_settings">&sync.settings.label;</string>
+  <string name="sync_subtitle_manage">&sync.subtitle.manage.label1;</string>
+  
+  <!-- Pair Device -->
+  <string name="sync_pair_tryagain">&sync.pair.tryagain.label;</string>
 
-    <!-- Account Login Screen -->
-    <string name="sync_subtitle_account"></string>
-    <string name="sync_input_username"></string>
-    <string name="sync_input_password"></string>
-    <string name="sync_input_key"></string>
-    <string name="sync_checkbox_server"></string>
-    <string name="sync_input_server"></string>
+  <!-- Wheelly SyncAdapter Settings Screen -->
+  <string name="sync_settings_options">&sync.settings.options.label;</string>
+  <string name="sync_settings_summary_pair">&sync.summary.pair.label;</string>
 
-    <!-- Setup Fail -->
-    <string name="sync_title_fail"></string>
-    <string name="sync_subtitle_fail"></string>
-    <string name="sync_button_tryagain"></string>
-    <string name="sync_button_manual"></string>
-    <string name="sync_subtitle_nointernet"></string>
-    <string name="sync_subtitle_failaccount"></string>
-    <string name="sync_subtitle_failmultiple"></string>
+  <!-- Configure Engines -->
+  <string name="sync_configure_engines_title">&sync.configure.engines.title.label;</string>
+  <string name="sync_configure_engines_sync_my_title">&sync.configure.engines.sync.my.title.label;</string>
+  <string name="sync_configure_engines_title_bookmarks">&sync.configure.engines.title.bookmarks;</string>
+  <string name="sync_configure_engines_title_passwords">&sync.configure.engines.title.passwords;</string>
+  <string name="sync_configure_engines_title_history">&sync.configure.engines.title.history;</string>
+  <string name="sync_configure_engines_title_tabs">&sync.configure.engines.title.tabs;</string>
 
-    <!-- Setup Success -->
-    <string name="sync_title_success"></string>
-    <string name="sync_subtitle_success"></string>
-    <string name="sync_settings"></string>
-    <string name="sync_subtitle_manage"></string>
+  <!-- Common text -->
+  <string name="sync_button_cancel">&sync.button.cancel.label;</string>
+  <string name="sync_button_connect">&sync.button.connect.label;</string>
+  <string name="sync_button_ok">&sync.button.ok.label;</string>
+  
+  <!-- Account strings -->
+  <string name="sync_account_label">&sync.account.label.label;</string>
+  
+  <!-- Bookmark folder strings -->
+  <string name="bookmarks_folder_menu">&bookmarks.folder.menu.label;</string>
+  <string name="bookmarks_folder_places">&bookmarks.folder.places.label;</string>
+  <string name="bookmarks_folder_tags">&bookmarks.folder.tags.label;</string>
+  <string name="bookmarks_folder_toolbar">&bookmarks.folder.toolbar.label;</string>
+  <string name="bookmarks_folder_unfiled">&bookmarks.folder.unfiled.label;</string>
+  <string name="bookmarks_folder_desktop">&bookmarks.folder.desktop.label;</string>
+  <string name="bookmarks_folder_mobile">&bookmarks.folder.mobile.label;</string>
+  <string name="bookmarks_folder_reading_list">&bookmarks.folder.readinglist.label;</string>
+  <string name="bookmarks_folder_pinned">&bookmarks.folder.pinned.label;</string>
 
-    <!-- Pair Device -->
-    <string name="sync_pair_tryagain"></string>
+  <!-- Notification strings -->
+  <string name="sync_notification_oneaccount">&sync.notification.oneaccount.label;</string>
+  <string name="sync_notification_savedprefs">&sync.notification.configure.saved;</string>
 
-    <!-- Firefox SyncAdapter Settings Screen -->
-    <string name="sync_settings_options"></string>
-    <string name="sync_settings_summary_pair"></string>
+  <!-- Incorrect settings and changing credentials. -->
+  <string name="sync_invalidcreds_label">&sync.invalidcreds.label;</string>
+  <string name="sync_invalidserver_label">&sync.invalidserver.label;</string>
+  <string name="sync_verifying_label">&sync.verifying.label;</string>
+  <string name="sync_new_recoverykey_status_incorrect">&sync.new.recoverykey.status.incorrect;</string>
 
-    <!-- Configure Engines -->
-    <string name="sync_configure_engines_title"></string>
-    <string name="sync_configure_engines_sync_my_title"></string>
-    <string name="sync_configure_engines_title_bookmarks"></string>
-    <string name="sync_configure_engines_title_passwords"></string>
-    <string name="sync_configure_engines_title_history"></string>
-    <string name="sync_configure_engines_title_tabs"></string>
+  <!-- Send tab to device. -->
+  <string name="sync_new_tab">&new_tab;</string>
+  <string name="sync_title_send_tab">&sync.title.send.tab.label;</string>
+  <string name="sync_button_send">&sync.button.send.label;</string>
+  <string name="sync_button_set_up_sync">&sync.button.set.up.sync.label;</string>
+  <string name="sync_title_redirect_to_set_up_sync">&sync.title.redirect.to.set.up.sync.label;</string>
+  <string name="sync_text_redirect_to_set_up_sync">&sync.text.redirect.to.set.up.sync.label;</string>
+  <string name="sync_text_tab_sent">&sync.text.tab.sent.label;</string>
+  <string name="sync_text_tab_not_sent">&sync.text.tab.not.sent.label;</string>
 
-    <!-- Common text -->
-    <string name="sync_button_cancel"></string>
-    <string name="sync_button_connect"></string>
-    <string name="sync_button_ok"></string>
-
-    <!-- Account strings -->
-    <string name="sync_account_label"></string>
-
-    <!-- Bookmark folder strings -->
-    <string name="bookmarks_folder_menu"></string>
-    <string name="bookmarks_folder_places"></string>
-    <string name="bookmarks_folder_tags"></string>
-    <string name="bookmarks_folder_toolbar"></string>
-    <string name="bookmarks_folder_unfiled"></string>
-    <string name="bookmarks_folder_desktop"></string>
-    <string name="bookmarks_folder_mobile"></string>
-    <string name="bookmarks_folder_reading_list"></string>
-    <string name="bookmarks_folder_pinned"></string>
-
-    <!-- Notification strings -->
-    <string name="sync_notification_oneaccount"></string>
-    <string name="sync_notification_savedprefs"></string>
-
-    <!-- Incorrect settings and changing credentials. -->
-    <string name="sync_invalidcreds_label"></string>
-    <string name="sync_invalidserver_label"></string>
-    <string name="sync_verifying_label"></string>
-    <string name="sync_new_recoverykey_status_incorrect"></string>
-
-    <!-- Send tab to device. -->
-    <string name="sync_new_tab"></string>
-    <string name="sync_title_send_tab"></string>
-    <string name="sync_button_send"></string>
-    <string name="sync_button_set_up_sync"></string>
-    <string name="sync_title_redirect_to_set_up_sync"></string>
-    <string name="sync_text_redirect_to_set_up_sync"></string>
-    <string name="sync_text_tab_sent"></string>
-    <string name="sync_text_tab_not_sent"></string>
-
-    <!-- These strings are defined by Fennec and used in res/xml/*.xml. -->
-    <string name="moz_app_displayname">FxSync</string>
-    <string name="android_package_name">org.mozilla.fennec</string>
-    <string name="content_authority_db_browser">org.mozilla.fennec.db.browser</string>
-    <string name="moz_android_shared_account_type">org.mozilla.fennec_sync_test</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+  <!-- These strings are defined by Fennec and used in res/xml/*.xml. -->
+  <string name="moz_app_displayname">WheellySync</string>
+  <string name="android_package_name">org.mozilla.fennec</string>
+  <string name="content_authority_db_browser">com.wheelly</string>
+  <string name="moz_android_shared_account_type">com.wheelly.sync</string>
+  <string name="title_activity_main">MainActivity</string>
+  <string name="action_settings">Settings</string>
+  <string name="hello_world">Hello world!</string>
 </resources>

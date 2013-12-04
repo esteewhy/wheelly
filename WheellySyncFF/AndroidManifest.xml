@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wheelly.sync"
-    android:sharedUserId="org.mozilla.fennec.sharedID"
+    android:sharedUserId="com.wheelly.sharedID"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -34,11 +34,11 @@
         android:icon="@drawable/icon"
         android:label="@string/sync_app_name" >
         <activity
-            android:name="org.mozilla.gecko.sync.setup.activities.SetupSyncActivity"
+            android:name="com.wheelly.sync.setup.activities.WheellySetupSyncActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:icon="@drawable/icon"
             android:label="Wheelly Sync"
-            android:taskAffinity="org.mozilla.gecko.sync.setup"
+            android:taskAffinity="com.wheelly.sync.setup"
             android:theme="@style/SyncTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" >
 
@@ -61,7 +61,7 @@
             android:name="org.mozilla.gecko.sync.setup.activities.WebViewActivity"
             android:theme="@style/Gecko" />
         <activity
-            android:name="org.mozilla.gecko.sync.setup.activities.AccountActivity"
+            android:name="com.wheelly.sync.setup.activities.WheellyAccountActivity"
             android:clearTaskOnLaunch="true"
             android:theme="@style/SyncTheme"
             android:windowSoftInputMode="adjustResize|stateHidden" />
@@ -86,16 +86,6 @@
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@style/SyncTheme" />
-        <activity
-            android:name="org.mozilla.gecko.sync.config.activities.SelectEnginesActivity"
-            android:excludeFromRecents="true"
-            android:taskAffinity="org.mozilla.gecko.sync.setup"
-            android:theme="@style/SyncTheme" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
         <receiver android:name="org.mozilla.gecko.sync.receivers.UpgradeReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -113,25 +103,6 @@
                 <action android:name="org.mozilla.fennec_sync_test.accounts.SYNC_ACCOUNT_DELETED_ACTION" />
             </intent-filter>
         </receiver>
-
-        <activity
-            android:name="org.mozilla.gecko.sync.setup.activities.SendTabActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:excludeFromRecents="true"
-            android:icon="@drawable/icon"
-            android:label="Wheelly Sync"
-            android:taskAffinity="org.mozilla.gecko.sync.setup"
-            android:theme="@style/SyncTheme"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/*" />
-            </intent-filter>
-        </activity>
-
         <service
             android:name="com.wheelly.sync.SyncAuthenticatorService"
             android:exported="false" >
@@ -144,7 +115,7 @@
                 android:resource="@xml/sync_authenticator" />
         </service>
         <service
-            android:name="com.wheelly.sync.WheellySyncService"
+            android:name="com.wheelly.sync.syncadapter.WheellySyncService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -154,21 +125,10 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_syncadapter" />
         </service>
-
-        <activity
-            android:name="com.wheelly.sync.MainActivity"
-            android:label="@string/title_activity_main" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
         android:label="Sync tests"
         android:targetPackage="org.mozilla.gecko" />
-
 </manifest>

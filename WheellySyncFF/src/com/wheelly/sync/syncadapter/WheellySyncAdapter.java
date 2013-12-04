@@ -1,7 +1,8 @@
-package com.wheelly.sync;
+package com.wheelly.sync.syncadapter;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+
 import org.json.simple.parser.ParseException;
 import org.mozilla.gecko.sync.AlreadySyncingException;
 import org.mozilla.gecko.background.common.log.Logger;
@@ -16,6 +17,8 @@ import org.mozilla.gecko.sync.crypto.KeyBundle;
 import org.mozilla.gecko.sync.setup.Constants;
 import org.mozilla.gecko.sync.setup.SyncAccounts.SyncAccountParameters;
 import org.mozilla.gecko.sync.syncadapter.SyncAdapter;
+
+import com.wheelly.sync.WheellyGlobalSession;
 
 import android.accounts.Account;
 import android.content.ContentProviderClient;

@@ -2,7 +2,8 @@ package com.wheelly.sync;
 
 import org.mozilla.gecko.sync.setup.activities.AccountActivity;
 import org.mozilla.gecko.sync.setup.auth.AuthenticationResult;
-import org.mozilla.gecko.sync.setup.auth.BetterAccountAuthenticator;
+
+import com.wheelly.sync.setup.auth.BetterAccountAuthenticator;
 
 public class WheellyAccountAuthenticator extends BetterAccountAuthenticator {
 

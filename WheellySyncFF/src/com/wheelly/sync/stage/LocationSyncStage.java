@@ -1,21 +1,27 @@
-package com.wheelly.sync;
+package com.wheelly.sync.stage;
 
 import org.mozilla.gecko.sync.CryptoRecord;
 import org.mozilla.gecko.sync.MetaGlobalException;
 import org.mozilla.gecko.sync.repositories.RecordFactory;
 import org.mozilla.gecko.sync.repositories.Repository;
+import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionCreationDelegate;
 import org.mozilla.gecko.sync.repositories.domain.Record;
 import org.mozilla.gecko.sync.stage.ServerSyncStage;
 
-public class EventSyncStage extends ServerSyncStage {
+import android.content.Context;
+
+import com.wheelly.sync.repositories.LocationRepositorySession;
+import com.wheelly.sync.repositories.domain.LocationRecord;
+
+public class LocationSyncStage extends ServerSyncStage {
   @Override
   protected String getCollection() {
-    return "events";
+    return "locations";
   }
 
   @Override
   protected String getEngineName() {
-    return "events";
+    return "locations";
   }
 
   @Override
@@ -25,7 +31,16 @@ public class EventSyncStage extends ServerSyncStage {
 
   @Override
   protected Repository getLocalRepository() {
-    return new EventRepository();
+    return new Repository() {
+      @Override
+      public void createSession(RepositorySessionCreationDelegate delegate, Context context) {
+        try {
+          delegate.onSessionCreated(new LocationRepositorySession(this, context));
+        } catch(Exception ex) {
+          delegate.onSessionCreateFailed(ex);
+        }
+      }
+    };
   }
 
   @Override
@@ -33,7 +48,7 @@ public class EventSyncStage extends ServerSyncStage {
     return new RecordFactory() {
         @Override
         public Record createRecord(Record record) {
-            EventRecord r = new EventRecord();
+            Record r = new LocationRecord();
             r.initFromEnvelope((CryptoRecord) record);
             return r;
         }

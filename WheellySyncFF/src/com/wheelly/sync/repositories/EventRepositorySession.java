@@ -2,13 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package com.wheelly.sync;
+package com.wheelly.sync.repositories;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.mozilla.gecko.sync.Utils;
@@ -20,6 +16,9 @@ import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionFetchRecor
 import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionGuidsSinceDelegate;
 import org.mozilla.gecko.sync.repositories.delegates.RepositorySessionWipeDelegate;
 import org.mozilla.gecko.sync.repositories.domain.Record;
+
+import com.wheelly.sync.DateUtils;
+import com.wheelly.sync.repositories.domain.EventRecord;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -129,24 +128,13 @@ public class EventRepositorySession extends RepositorySession {
 		
 		delegate.onFetchCompleted(end);
 	}
-	
-	private static final DateFormat FORMAT_TIMESTAMP_ISO_8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	private static long parseDate(String date) {
-		try {
-			return FORMAT_TIMESTAMP_ISO_8601.parse(date).getTime() / 1000;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			return 0;
-		}
-	}
-	
+
 	private static EventRecord recordFromCursor(Cursor c) {
 		EventRecord r = new EventRecord();
 		r.amount		= c.getFloat(c.getColumnIndex("amount"));
 		r.androidID		= c.getLong(c.getColumnIndex(BaseColumns._ID));
 		r.cost			= c.getFloat(c.getColumnIndex("cost"));
-		r.date			= parseDate(c.getString(c.getColumnIndex("_created")));
+		r.date			= DateUtils.parseDate(c.getString(c.getColumnIndex("_created")));
 		r.destination	= c.getString(c.getColumnIndex("destination"));
 		r.distance		= c.getFloat(c.getColumnIndex("distance"));
 		r.fuel			= c.getFloat(c.getColumnIndex("fuel"));
@@ -242,7 +230,7 @@ public class EventRepositorySession extends RepositorySession {
 		Uri uri = Uri.parse("content://com.wheelly/heartbeats");
 		
 		ContentValues values = new ContentValues();
-		values.put("_created",	toDate(er.date));
+		values.put("_created",	DateUtils.toDate(er.date));
 		values.put("odometer",	er.odometer);
 		values.put("fuel",		er.fuel.floatValue());
 		values.put("sync_etag",	er.guid);
@@ -260,14 +248,10 @@ public class EventRepositorySession extends RepositorySession {
 		return er.androidID;
 	}
 	
-	private static String toDate(long date) {
-		return FORMAT_TIMESTAMP_ISO_8601.format(new Date(date));
-	}
-	
 	private long storeRefuel(EventRecord er) {
 		ContentValues values = new ContentValues();
 		values.put("heartbeat_id",	er.androidID);
-		values.put("_created",		toDate(er.date));
+		values.put("_created",		DateUtils.toDate(er.date));
 		values.put("_modified",		er.lastModified);
 		values.put("amount",		er.amount.floatValue());
 		values.put("cost",			er.cost.floatValue());
@@ -280,7 +264,7 @@ public class EventRepositorySession extends RepositorySession {
 		ContentValues values = new ContentValues();
 		values.put("start_heartbeat_id",	lastVacantHeartbeatId);
 		values.put("stop_heartbeat_id",		er.androidID);
-		values.put("_created",		toDate(er.date));
+		values.put("_created",		DateUtils.toDate(er.date));
 		values.put("_modified",		er.lastModified);
 		values.put("amount",		er.amount.floatValue());
 		values.put("mileage",		er.distance.floatValue());

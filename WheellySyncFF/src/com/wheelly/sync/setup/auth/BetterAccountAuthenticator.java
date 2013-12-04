@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-package org.mozilla.gecko.sync.setup.auth;
+package com.wheelly.sync.setup.auth;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -10,6 +10,12 @@ import java.util.Queue;
 import org.mozilla.gecko.background.common.log.Logger;
 import org.mozilla.gecko.sync.Utils;
 import org.mozilla.gecko.sync.setup.activities.AccountActivity;
+import org.mozilla.gecko.sync.setup.auth.AccountAuthenticator;
+import org.mozilla.gecko.sync.setup.auth.AuthenticateAccountStage;
+import org.mozilla.gecko.sync.setup.auth.AuthenticationResult;
+import org.mozilla.gecko.sync.setup.auth.AuthenticatorStage;
+import org.mozilla.gecko.sync.setup.auth.EnsureUserExistenceStage;
+import org.mozilla.gecko.sync.setup.auth.FetchUserNodeStage;
 
 public class BetterAccountAuthenticator extends AccountAuthenticator {
   private final String LOG_TAG = "BetterAccountAuthenticator";
