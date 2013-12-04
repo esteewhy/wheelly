@@ -12,7 +12,7 @@ import org.mozilla.gecko.sync.SyncConstants;
 import org.mozilla.gecko.sync.Utils;
 import org.mozilla.gecko.sync.setup.Constants;
 import org.mozilla.gecko.sync.setup.SyncAccounts;
-import org.mozilla.gecko.sync.setup.activities.SetupSyncActivity;
+import com.wheelly.sync.setup.activities.WheellySetupSyncActivity;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -146,7 +146,7 @@ public class SyncAuthenticatorService extends Service {
         String accountType, String authTokenType, String[] requiredFeatures,
         Bundle options) throws NetworkErrorException {
       Logger.debug(LOG_TAG, "addAccount()");
-      final Intent intent = new Intent(mContext, SetupSyncActivity.class);
+      final Intent intent = new Intent(mContext, WheellySetupSyncActivity.class);
       intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE,
                       response);
       intent.putExtra("accountType", SyncConstants.ACCOUNTTYPE_SYNC);

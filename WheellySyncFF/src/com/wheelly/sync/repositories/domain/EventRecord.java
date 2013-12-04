@@ -1,4 +1,4 @@
-package com.wheelly.sync;
+package com.wheelly.sync.repositories.domain;
 
 import org.mozilla.gecko.background.common.log.Logger;
 import org.mozilla.gecko.sync.ExtendedJSONObject;

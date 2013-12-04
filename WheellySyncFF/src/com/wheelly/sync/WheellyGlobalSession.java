@@ -34,6 +34,9 @@ import org.mozilla.gecko.sync.stage.SyncClientsEngineStage;
 import org.mozilla.gecko.sync.stage.UploadMetaGlobalStage;
 import org.mozilla.gecko.sync.stage.GlobalSyncStage.Stage;
 
+import com.wheelly.sync.stage.EventSyncStage;
+import com.wheelly.sync.stage.LocationSyncStage;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -54,7 +57,7 @@ public class WheellyGlobalSession extends GlobalSession {
 			IOException, ParseException, NonObjectJSONException {
 		super(userAPI, serverURL, username, password, prefsPath, syncKeyBundle,
 				callback, context, extras, clientsDelegate);
-		config.enabledEngineNames = new HashSet<String>(config.stagesToSync = Arrays.asList(new String[] { "events" }));
+		config.enabledEngineNames = new HashSet<String>(config.stagesToSync = Arrays.asList(new String[] { "locations", "events" }));
 	}
 	
 	@Override
@@ -67,9 +70,10 @@ public class WheellyGlobalSession extends GlobalSession {
 		stages.put(Stage.fetchMetaGlobal,		new FetchMetaGlobalStage());
 		stages.put(Stage.ensureKeysStage,		new EnsureCrypto5KeysStage());
 		stages.put(Stage.syncClientsEngine,		new SyncClientsEngineStage());
-
+		
+		stages.put(Stage.syncBookmarks,			new LocationSyncStage());
 		stages.put(Stage.syncHistory,			new EventSyncStage());
-
+		
 		stages.put(Stage.uploadMetaGlobal,		new UploadMetaGlobalStage());
 		stages.put(Stage.completed,				new CompletedStage());
 
@@ -149,7 +153,11 @@ public class WheellyGlobalSession extends GlobalSession {
 	}
 	@Override
 	public GlobalSyncStage getSyncStageByName(String name) throws NoSuchStageException {
-		return getSyncStageByName("events".equals(name) ? Stage.syncHistory : null);
+		return getSyncStageByName("events".equals(name)
+			? Stage.syncHistory
+			: "locations".equals(name)
+				? Stage.syncBookmarks
+				: null);
 	}
 	
 	@Override
@@ -159,6 +167,7 @@ public class WheellyGlobalSession extends GlobalSession {
 		}
 		
 		return new HashSet<String>() {{
+			add("locations");
 			add("events");
 		}};
 	}
