@@ -39,6 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class WheellySetupSyncActivity extends SetupSyncActivity {
+  public final String jpakeServer = "http://sync.wheelly.com:5000/";
+  
   private final static String LOG_TAG = "SetupSync";
 
   private boolean pairWithPin = false;
@@ -86,6 +88,7 @@ public class WheellySetupSyncActivity extends SetupSyncActivity {
         jClient.finished = true;
       }
       jClient = new JPakeClient(this);
+      jClient.jpakeServer = jpakeServer;
       jClient.receiveNoPin();
       return;
     }
@@ -161,6 +164,7 @@ public class WheellySetupSyncActivity extends SetupSyncActivity {
       jClient.finished = true;
     }
     jClient = new JPakeClient(this);
+    jClient.jpakeServer = jpakeServer;
     jClient.pairWithPin(pin);
   }
 
@@ -261,6 +265,7 @@ public class WheellySetupSyncActivity extends SetupSyncActivity {
     Logger.debug(LOG_TAG, "abort reason: " + error);
     if (!Constants.JPAKE_ERROR_USERABORT.equals(error)) {
       jClient = new JPakeClient(this);
+      jClient.jpakeServer = jpakeServer;
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
