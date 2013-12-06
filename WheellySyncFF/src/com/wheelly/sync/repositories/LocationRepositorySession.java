@@ -207,6 +207,7 @@ public class LocationRepositorySession extends RepositorySession {
 		if(er.androidID >= 0) {
 			cr.update(ContentUris.withAppendedId(uri, er.androidID), values, null, null);
 		} else {
+			values.put("datetime", System.currentTimeMillis());
 			return ContentUris.parseId(cr.insert(uri, values));
 		}
 		return er.androidID;
