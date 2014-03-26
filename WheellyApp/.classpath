@@ -11,6 +11,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="lib" path="/MyTracks/libs/guava-jdk5-13.0.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/wheelly-common"/>
-	<classpathentry kind="lib" path="/android-maps-extensions/libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/usr/src/android/acra/acra-4.5.0/build/acra-4.5.0.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/actionbarsherlock"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

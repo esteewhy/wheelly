@@ -1,21 +1,22 @@
 package com.wheelly.activity;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.wheelly.R;
 import com.wheelly.app.AndiCarImporter;
+import com.wheelly.fragments.EventListFragment;
 import com.wheelly.fragments.HeartbeatListFragment;
 import com.wheelly.fragments.MileageListFragment;
 import com.wheelly.fragments.RefuelListFragment;
 import com.wheelly.service.WorkflowNotifier;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
 @SuppressLint("NewApi")
-public class Main extends FragmentActivity {
+public class Main extends SherlockFragmentActivity {
 	private ViewPager mViewPager;
 	private TabsAdapter mTabsAdapter;
 	
@@ -27,7 +28,7 @@ public class Main extends FragmentActivity {
         mViewPager.setId(R.id.pager);
         setContentView(mViewPager);
 		
-		final ActionBar bar = getActionBar();
+		final ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
         
@@ -47,13 +48,19 @@ public class Main extends FragmentActivity {
 				.setIcon(R.drawable.ic_tab_cam),
 			HeartbeatListFragment.class, null);
 		
-		if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
-        } else {
-        	bar.setSelectedNavigationItem(
-        		getSharedPreferences("gui", Context.MODE_PRIVATE)
-        			.getInt("main_selected_tab", 0));
-        }
+		mTabsAdapter.addTab(bar.newTab()
+				.setText(R.string.time)
+				.setIcon(R.drawable.ic_tab_cam),
+			EventListFragment.class, null);
+		
+		bar.setSelectedNavigationItem( 
+			Math.min(
+				savedInstanceState != null
+					? savedInstanceState.getInt("tab", 0)
+					: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("main_selected_tab", 0),
+				bar.getTabCount() - 1
+			)
+		);
 		
 		new AndiCarImporter(this).attemptImporting();
 		new WorkflowNotifier(this).notifyAboutPendingMileages();
@@ -62,14 +69,14 @@ public class Main extends FragmentActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
+		outState.putInt("tab", getSupportActionBar().getSelectedNavigationIndex());
 	}
 	
 	@Override
 	protected void onDestroy() {
 		getSharedPreferences("gui", Context.MODE_PRIVATE)
 			.edit()
-			.putInt("main_selected_tab", getActionBar().getSelectedNavigationIndex())
+			.putInt("main_selected_tab", getSupportActionBar().getSelectedNavigationIndex())
 			.commit();
 		
 		super.onDestroy();

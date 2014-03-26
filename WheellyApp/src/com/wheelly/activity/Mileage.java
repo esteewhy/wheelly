@@ -1,12 +1,11 @@
 package com.wheelly.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.wheelly.R;
 import com.wheelly.fragments.MileageFragment;
 
-public class Mileage extends FragmentActivity {
+public class Mileage extends SherlockFragmentActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +22,7 @@ public class Mileage extends FragmentActivity {
 				.add(R.id.fragment_container, new MileageFragment())
 				.commit();
 			
-			ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
 }

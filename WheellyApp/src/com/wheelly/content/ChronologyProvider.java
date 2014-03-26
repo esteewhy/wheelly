@@ -39,14 +39,13 @@ public class ChronologyProvider extends ContentProvider {
 	private static final int HEARTBEATS_ID = 301;
 	private static final int HEARTBEATS_DEFAULTS = 302;
 	private static final int HEARTBEATS_REFERENCES = 303;
+	private static final int HEARTBEATS_RELATED = 304;
 	private static final int TIMELINE = 305;
 	private static final int TIMELINE_ID = 307;
 	private static final int LOCATIONS = 400;
 	private static final int LOCATIONS_ID = 401;
 	private static final int LOCATIONS_MILEAGES = 402;
 	private static final int LOCATIONS_REFUELS = 403;
-	private static final int LOCATIONS_HEARTBEATS = 404;
-	
 	private static final SparseArray<String[]> DataSchemaLookup = new SparseArray<String[]>();
 	private static final SparseArray<Uri> UriMap = new SparseArray<Uri>();
 	private static final UriMatcher uriMatcher;
@@ -71,6 +70,7 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "locations/#", LOCATIONS_ID);
 			
 			addURI(a, "heartbeats/references/#", HEARTBEATS_REFERENCES);
+			addURI(a, "heartbeats/related/#", HEARTBEATS_RELATED);
 			
 			addURI(a, "locations/mileages", LOCATIONS_MILEAGES);
 			addURI(a, "locations/refuels", LOCATIONS_REFUELS);
@@ -115,16 +115,7 @@ public class ChronologyProvider extends ContentProvider {
 				final int count = db.delete(tableName, selection, selectionArgs);
 				
 				if(count > 0) {
-					final ContentResolver cr = getContext().getContentResolver();
-					cr.notifyChange(uri, null);
-					
-					switch(uriCode) {
-					case MILEAGES:
-					case REFUELS:
-						cr.notifyChange(Heartbeats.CONTENT_URI, null);
-						cr.notifyChange(Timeline.CONTENT_URI, null);
-						break;
-					}
+					notify(uri, uriCode);
 				}
 				
 				return count;
@@ -194,6 +185,17 @@ public class ChronologyProvider extends ContentProvider {
 			return dbHelper.getReadableDatabase()
 				.rawQuery(DatabaseSchema.Heartbeats.ReferenceCount,
 					new String[] { Long.toString(ContentUris.parseId(uri)) });
+		case HEARTBEATS_RELATED:
+			return dbHelper.getReadableDatabase()
+				.query(
+					DatabaseSchema.Heartbeats.Tables,
+					DatabaseSchema.Heartbeats.RelatedItemProjection,
+					"h." + BaseColumns._ID + " = ?",
+					new String[] { Long.toString(ContentUris.parseId(uri)) },
+					null, null,
+					sortOrder,
+					"1"
+				);
 		case LOCATIONS_MILEAGES:
 			return dbHelper.getReadableDatabase()
 				.rawQuery(DatabaseSchema.Locations.SelectByMileages, null);

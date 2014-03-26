@@ -17,7 +17,7 @@ public final class DateUtils {
 	
 	final static Format todayFormat = new SimpleDateFormat("HH:mm");
 	final static Format yearFormat = new SimpleDateFormat("d MMM");
-	final static Format otherFormat = new SimpleDateFormat("yyyy-MM-dd");
+	final static Format otherFormat = new SimpleDateFormat(DateFormat);
 	
 	final static Calendar today = Calendar.getInstance();
 	

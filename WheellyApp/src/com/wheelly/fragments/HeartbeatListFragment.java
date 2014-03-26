@@ -8,12 +8,12 @@ import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem.OnMenuItemClickListener;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
@@ -133,7 +133,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		if(!super.onContextItemSelected(item)) {
 			switch(item.getItemId()) {
 			case R.id.ctx_menu_sync:
@@ -158,7 +158,6 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		//inflater.inflate(R.menu.heartbeats_menu, menu);
 		
 		menu.add(Menu.NONE, 5, Menu.NONE, "Sync")
 			.setIcon(android.R.drawable.ic_menu_upload)

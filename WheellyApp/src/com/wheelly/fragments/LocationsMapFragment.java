@@ -2,15 +2,11 @@ package com.wheelly.fragments;
 
 import java.util.List;
 
-import pl.mg6.android.maps.extensions.GoogleMap;
-import pl.mg6.android.maps.extensions.GoogleMap.OnCameraChangeListener;
-import pl.mg6.android.maps.extensions.GoogleMap.OnInfoWindowClickListener;
-import pl.mg6.android.maps.extensions.GoogleMap.OnMarkerClickListener;
-import pl.mg6.android.maps.extensions.ClusteringSettings;
-import pl.mg6.android.maps.extensions.Marker;
-import pl.mg6.android.maps.extensions.SupportMapFragment;
-import pl.mg6.android.maps.extensions.demo.DemoIconProvider;
+import pl.mg6.android.maps.extensions.demo.DemoClusterOptionsProvider;
 import ru.orangesoftware.financisto.activity.LocationActivity;
+
+import com.androidmapsextensions.*;
+import com.androidmapsextensions.GoogleMap.*;
 import com.google.android.apps.mytracks.MapContextActionCallback;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.gms.common.ConnectionResult;
@@ -21,15 +17,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.LatLngBounds.Builder;
 import com.google.common.base.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
-import com.wheelly.bus.LocationChoosenEvent;
-import com.wheelly.bus.LocationSelectedEvent;
-import com.wheelly.bus.LocationsLoadedEvent;
+import com.wheelly.bus.*;
 import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
 import com.wheelly.util.LocationUtils.AddressResolveCallback;
@@ -45,12 +38,7 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuCompat;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.EditText;
 
 public class LocationsMapFragment extends SupportMapFragment {
@@ -76,7 +64,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 		if (googleMap == null) {
 			googleMap = getExtendedMap();
 			googleMap.setClustering(new ClusteringSettings()
-				.iconDataProvider(new DemoIconProvider(getResources()))
+				.clusterOptionsProvider(new DemoClusterOptionsProvider(getResources()))
 				.addMarkersDynamically(true)
 			);
 			googleMap.setMyLocationEnabled(true);
@@ -178,13 +166,13 @@ public class LocationsMapFragment extends SupportMapFragment {
 			}
 			
 			@Override
-			public void onPrepare(Menu menu, Marker marker) {
+			public void onPrepare(com.actionbarsherlock.view.Menu menu, Marker marker) {
 				configureTitleWidget(marker);
 			}
 			
 			@SuppressLint("NewApi")
 			@Override
-			public void onCreate(Menu menu) {
+			public void onCreate(com.actionbarsherlock.view.Menu menu) {
 				editText = (EditText)
 					menu.add(0, 0, 0, "name")
 						.setIcon(android.R.drawable.ic_menu_edit)
@@ -216,7 +204,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 			}
 			
 			@Override
-			public boolean onClick(MenuItem item, Marker marker) {
+			public boolean onClick(com.actionbarsherlock.view.MenuItem item, Marker marker) {
 				if(null != marker && !marker.isCluster()) {
 					final ContentValues myLocation = new ContentValues();
 					

@@ -30,15 +30,8 @@ public class ApiAdapterFactory {
    * Gets the {@link ApiAdapter} for the current device.
    */
   public static ApiAdapter getApiAdapter() {
-    if (apiAdapter == null) {
-      if (Build.VERSION.SDK_INT >= 10) {
-        apiAdapter = new Api10Adapter();
-      } else if (Build.VERSION.SDK_INT >= 9) {
-        apiAdapter = new Api9Adapter();
-      } else {
-        apiAdapter = new Api8Adapter();
-      }
-    }
-    return apiAdapter;
+    return apiAdapter == null
+      ? apiAdapter = Build.VERSION.SDK_INT >= 11 ? new Api11Adapter() : new Api8Adapter()
+      : apiAdapter;
   }
 }
