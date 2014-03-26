@@ -112,7 +112,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1376314653059</id>
+			<id>1395750907698</id>
 			<name>MyTracks_src/com/google/android/apps/mytracks/util</name>
 			<type>5</type>
 			<matcher>
@@ -125,10 +125,6 @@
 					<matcher>
 						<id>org.eclipse.ui.ide.multiFilter</id>
 						<arguments>1.0-name-matches-false-false-UnitConversions.java</arguments>
-					</matcher>
-					<matcher>
-						<id>org.eclipse.ui.ide.multiFilter</id>
-						<arguments>1.0-name-matches-false-true-Api(9|10)Adapter\.java</arguments>
 					</matcher>
 				</arguments>
 			</matcher>

@@ -112,7 +112,7 @@ public class EventRepositorySession extends RepositorySession {
 					ListProjection,
 					"h.modified >= ?",
 					new String[] { Long.toString(timestamp) },
-					"odometer ASC, h._created ASC");
+					"h.odometer ASC, h._created ASC");
 			
 			if(c.moveToFirst()) {
 				do {

@@ -4,6 +4,7 @@ import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Refuels;
+import com.wheelly.db.DatabaseSchema.Timeline;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 12);
+		super(context, "wheelly.db", null, 18);
 	}
 
 	@Override
@@ -24,6 +25,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.execSQL(Mileages.NextMileageView);
 		db.execSQL(Mileages.PrevMileageView);
+		
+		db.execSQL(Timeline.PrevEventView);
+		db.execSQL(Timeline.NextEventView);
 	}
 
 	@Override
@@ -75,6 +79,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE locations ADD column modified TIMESTAMP;");
 			db.execSQL("UPDATE locations SET modified = strftime('%s', 'now');");
 			db.execSQL("ALTER TABLE locations ADD column sync_etag TEXT;");
+			break;
+		case 12:
+			db.execSQL(Timeline.PrevEventView);
+			db.execSQL(Timeline.NextEventView);
+			break;
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+			db.execSQL("DROP VIEW prev_event;");
+			db.execSQL("DROP VIEW next_event;");
+			db.execSQL(Timeline.PrevEventView);
+			db.execSQL(Timeline.NextEventView);
+			break;
 		}
 	}
 }

@@ -2,7 +2,7 @@ package com.wheelly.activity;
 
 import ru.orangesoftware.financisto.activity.LocationActivity;
 
-import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
@@ -14,22 +14,20 @@ import com.wheelly.fragments.LocationsListFragment;
 import com.wheelly.fragments.LocationsMapFragment;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.view.MenuItem;
 
 @SuppressLint("NewApi")
-public class LocationsList extends FragmentActivity {
+public class LocationsList extends SherlockFragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,10 +41,9 @@ public class LocationsList extends FragmentActivity {
 		
 		setContentView(mViewPager);
 		
-		final ActionBar bar = getActionBar();
+		final ActionBar bar = getSupportActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-		ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
 		
 		TabsAdapter mTabsAdapter = new TabsAdapter(this, mViewPager);
 		mTabsAdapter.addTab(bar.newTab().setText("List"),
@@ -82,31 +79,19 @@ public class LocationsList extends FragmentActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
+		outState.putInt("tab", getSupportActionBar().getSelectedNavigationIndex());
 	}
 	
 	@Override
 	protected void onDestroy() {
 		getSharedPreferences("gui", Context.MODE_PRIVATE)
 			.edit()
-			.putInt("locations_selected_tab", getActionBar().getSelectedNavigationIndex())
+			.putInt("locations_selected_tab", getSupportActionBar().getSelectedNavigationIndex())
 			.commit();
 		
 		BusProvider.getInstance().unregister(this);
 		
 		super.onDestroy();
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			// NavUtils.navigateUpFromSameTask(this);
-			onBackPressed();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
 	}
 	
 	@Override

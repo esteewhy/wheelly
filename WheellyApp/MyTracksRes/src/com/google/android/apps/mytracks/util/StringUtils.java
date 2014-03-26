@@ -23,12 +23,9 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**

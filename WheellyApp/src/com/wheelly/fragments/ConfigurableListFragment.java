@@ -1,17 +1,13 @@
 package com.wheelly.fragments;
 
-import java.io.File;
-
-import org.openintents.calendarpicker.contract.CalendarPickerConstants;
-
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.activity.Preferences;
 import com.wheelly.app.ListConfiguration;
-import com.wheelly.db.DatabaseHelper;
 import com.wheelly.fragments.FilterDialog.OnFilterChangedListener;
-import com.wheelly.util.BackupUtils;
+import com.wheelly.util.BackupHelper;
 import com.wheelly.util.FilterUtils;
 import com.wheelly.util.FilterUtils.F;
 import com.wheelly.util.FilterUtils.FilterResult;
@@ -20,30 +16,28 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.BaseColumns;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public abstract class ConfigurableListFragment extends ListFragment
+public abstract class ConfigurableListFragment extends SherlockListFragment
 	implements LoaderCallbacks<Cursor> {
 	
 	private ListConfiguration configuration;
@@ -58,7 +52,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	}
 	
 	private static final int LIST_LOADER = 0x01;
-	private static final int NEW_REQUEST = 1;
+	protected static final int NEW_REQUEST = 1;
 	protected static final int EDIT_REQUEST = 2;
 	private static final int DELETE_REQUEST = 3;
 	
@@ -151,9 +145,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		
-		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
-		menu.findItem(R.id.opt_menu_restore).setVisible(backupEnabled);
 		menu.findItem(R.id.opt_menu_locations).setIntent(new Intent(this.getActivity(), LocationsList.class));
 		menu.findItem(R.id.opt_menu_preferences).setIntent(new Intent(this.getActivity(), Preferences.class));
 	}
@@ -161,8 +152,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		final ListConfiguration cfg = getConfiguration();
-		
-		final String backupPath= Environment.getExternalStorageDirectory().getPath() + File.separator + "wheelly.db";
+		final Context ctx = ConfigurableListFragment.this.getActivity();
 		
 		switch (item.getItemId()) {
 			case R.id.opt_menu_add:
@@ -172,7 +162,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 			case R.id.opt_menu_filter:
 				filter.put(F.LOCATION_CONSTRAINT, locationConstraint);
 				final FilterDialog fd = new FilterDialog(new ContentValues(filter), new OnFilterChangedListener() {
-					
 					@Override
 					public void onFilterChanged(ContentValues value) {
 						if (null == value) {
@@ -192,41 +181,13 @@ public abstract class ConfigurableListFragment extends ListFragment
 				fd.show(getActivity().getSupportFragmentManager(), "filter");
 				return true;
 			case R.id.opt_menu_backup:
-				return BackupUtils.backupDatabase(
-					new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-						.getReadableDatabase()
-						.getPath(),
-					backupPath);
+				return new BackupHelper(ctx).backup();
 			case R.id.opt_menu_restore:
-				return BackupUtils.backupDatabase(
-						backupPath,
-					new DatabaseHelper(ConfigurableListFragment.this.getActivity())
-						.getReadableDatabase()
-						.getPath()
-					);
-			case R.id.opt_menu_calendar:
-				long calendar_id = 1;
-				Uri u = com.wheelly.content.EventContentProvider.constructUri(calendar_id);
-				Intent i = new Intent(Intent.ACTION_PICK, u);
-				downloadLaunchCheck(i, REQUEST_CODE_DATE_SELECTION);
+				new BackupHelper(ctx).restore();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
-	}
-	
-//	private static final int DIALOG_CALENDARPICKER_DOWNLOAD = 1;
-	private static final int REQUEST_CODE_DATE_SELECTION = 1;
-
-	// ========================================================================
-	void downloadLaunchCheck(Intent intent, int request_code) {
-		if (CalendarPickerConstants.DownloadInfo.isIntentAvailable(this.getActivity(), intent))
-			if (request_code >= 0)
-				startActivityForResult(intent, request_code);
-			else
-				startActivity(intent);
-//		else
-//			getActivity().showDialog(DIALOG_CALENDARPICKER_DOWNLOAD);
 	}
 	
 	@Override
@@ -236,7 +197,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		if(getUserVisibleHint()) {
 			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
 			

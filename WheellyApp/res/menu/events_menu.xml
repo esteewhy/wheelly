@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id		="@+id/opt_menu_mileage_start"
+		android:icon	="@drawable/hb_start"
+		android:title	="@string/start"
+		android:orderInCategory="-100"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_mileage_stop"
+		android:icon	="@drawable/hb_stop"
+		android:title	="@string/stop"
+		android:orderInCategory="-99"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_refuel"
+		android:icon	="@drawable/hb_refuel"
+		android:title	="@string/refuels"
+		android:orderInCategory="-98"
+		android:showAsAction="always" />
+	
+	<item
+		android:id		="@+id/opt_menu_backup"
+		android:icon	="@android:drawable/ic_menu_save"
+		android:title	="SD Backup" />
+	<item
+		android:id		="@+id/opt_menu_restore"
+		android:icon	="@drawable/ic_menu_archive"
+		android:title	="SD Restore" />
+</menu>

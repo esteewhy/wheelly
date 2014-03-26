@@ -32,6 +32,8 @@
 	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.wise" />
 	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.writely" />
 	<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+	
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 				<permission
         android:name="com.wheelly.permission.MAPS_RECEIVE"
         android:protectionLevel="signature"/>
@@ -43,9 +45,8 @@
 			android:icon="@drawable/icon"
 			android:label="@string/app_name"
 			android:theme="@style/ThemeSelector">
-		
 		<uses-library android:name="com.google.android.maps" android:required="false" />
-		
+		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
 		<activity
 				android:label="@string/app_name"
 				android:configChanges="orientation|keyboardHidden"
@@ -123,10 +124,6 @@
 			android:authorities="com.wheelly"
 			android:multiprocess="true"
 			android:name=".content.ChronologyProvider" />
-		
-		<provider android:label="Unified event stream"
-			android:name=".content.EventContentProvider"
-			android:authorities="com.wheelly.provider.events" />
 		
 		<receiver android:name=".activity.Widget"
 			 android:label="Wheelly Car Status" >

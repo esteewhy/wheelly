@@ -15,17 +15,15 @@ import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
-import com.google.android.apps.mytracks.ContextualActionModeCallback;
-import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.internal.view.menu.MenuWrapper;
 import com.google.android.gms.location.LocationListener;
 import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.app.ColorInput;
 import com.wheelly.app.ColorInput.OnSelectColorListener;
 import com.wheelly.app.LocationViewBinder;
-import com.wheelly.bus.LocationChoosenEvent;
-import com.wheelly.bus.LocationSelectedEvent;
-import com.wheelly.bus.LocationsLoadedEvent;
+import com.wheelly.bus.*;
 import com.wheelly.db.LocationBroker;
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.util.LocationUtils;
@@ -40,25 +38,21 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.ListFragment;
-import android.support.v4.view.MenuCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+
+import com.actionbarsherlock.view.*;
+
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.*;
 
 @SuppressLint({ "NewApi", "InlinedApi" })
-public class LocationsListFragment extends ListFragment {
+public class LocationsListFragment extends SherlockListFragment {
 	
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_EDIT = Menu.FIRST + 2;
@@ -68,33 +62,6 @@ public class LocationsListFragment extends ListFragment {
 	
 	static final int NEW_LOCATION_REQUEST = 1;
 	static final int EDIT_LOCATION_REQUEST = 2;
-	
-	private ContextualActionModeCallback contextualActionModeCallback = new ContextualActionModeCallback() {
-		@Override
-		public boolean onClick(int itemId, int position, long id) {
-			return handleContextItem(itemId, id);
-		}
-
-		@Override
-		public void onPrepare(Menu menu, int position, long id) {
-			BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsListFragment.this));
-		}
-
-		@Override
-		public void onCreate(Menu menu) {
-			menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
-			menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
-			menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete).setVisible(!inSelectMode);
-			menu.add(1, MENU_COLOR, 6, R.string.color).setIcon(android.R.drawable.ic_menu_slideshow);
-		}
-
-		@Override
-		public CharSequence getCaption(View view) {
-			TextView textView = (TextView) view.findViewById(android.R.id.text1);
-			return textView != null ? textView.getText() : null;
-		}
-	};
-	
 	boolean inSelectMode;
 	
 	@Override
@@ -104,7 +71,51 @@ public class LocationsListFragment extends ListFragment {
 		inSelectMode = intent.hasExtra(LocationActivity.LOCATION_ID_EXTRA);
 		getListView().setChoiceMode(inSelectMode ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		setListAdapter(buildAdapter());
-		ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, contextualActionModeCallback);
+		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+			ActionMode actionMode;
+			@Override
+			public boolean onItemLongClick(
+					AdapterView<?> parent, View view, final int position, final long id) {
+				if (actionMode != null) {
+					//  return false;
+				}
+				actionMode = getSherlockActivity().startActionMode(new ActionMode.Callback() {
+					@Override
+					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+						createContextMenu(menu);
+						return true;
+					}
+					
+					@Override
+					public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+						BusProvider.getInstance().post(new LocationSelectedEvent(id, LocationsListFragment.this));
+						// Return true to indicate change
+						return true;
+					}
+					
+					@Override
+					public void onDestroyActionMode(ActionMode mode) {
+						actionMode = null;
+					}
+					
+					@Override
+					public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+						mode.finish();
+						return handleContextItem(item.getItemId(), id);
+					}
+				});
+				
+				TextView textView = (TextView) view.findViewById(android.R.id.text1);
+				CharSequence text = textView != null ? textView.getText() : null;
+				
+				if (text != null) {
+					actionMode.setTitle(text);
+				}
+				view.setSelected(true);
+				return true;
+			}
+		});
+		
 		setHasOptionsMenu(true);
 		BusProvider.getInstance().register(this);
 	}
@@ -149,17 +160,24 @@ public class LocationsListFragment extends ListFragment {
 		return adapter;
 	}
 	
+	private void createContextMenu(Menu menu) {
+		menu.add(0, MENU_RESOLVE, 0, R.string.resolve_address).setIcon(android.R.drawable.ic_menu_mylocation);
+		menu.add(1, MENU_EDIT, 1, R.string.edit).setIcon(android.R.drawable.ic_menu_edit);
+		menu.add(1, MENU_DELETE, 2, R.string.delete).setIcon(android.R.drawable.ic_menu_delete).setVisible(!inSelectMode);
+		menu.add(1, MENU_COLOR, 6, R.string.color).setIcon(android.R.drawable.ic_menu_slideshow);
+	}
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle(R.string.locations);
-		contextualActionModeCallback.onCreate(menu);
+		createContextMenu(new MenuWrapper(menu));
 		AdapterContextMenuInfo mi = (AdapterContextMenuInfo)menuInfo;
-		contextualActionModeCallback.onPrepare(menu, mi.position, mi.id);
+		BusProvider.getInstance().post(new LocationSelectedEvent(mi.id, LocationsListFragment.this));
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		return
 			(handleContextItem(item.getItemId(), ((AdapterContextMenuInfo) item.getMenuInfo()).id))
 				? true
@@ -201,12 +219,12 @@ public class LocationsListFragment extends ListFragment {
 		return false;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		MenuCompat.setShowAsAction(menu.add(0, MENU_ADD, 0, R.string.item_add)
-			.setIcon(android.R.drawable.ic_menu_add), MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add(0, MENU_ADD, 0, R.string.item_add)
+			.setIcon(android.R.drawable.ic_menu_add)
+			.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 	
 	@Override

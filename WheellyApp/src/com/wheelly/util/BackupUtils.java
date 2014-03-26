@@ -1,6 +1,5 @@
 package com.wheelly.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,10 +8,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class BackupUtils {
-	public static boolean backupDatabase(String sourcePath, String destinationPath) {
+	public static boolean copyDatabase(String sourcePath, String destinationPath) {
+		boolean result = true;
+		InputStream input = null;
+		OutputStream output = null;
+		
 		try {
-			InputStream input = new FileInputStream(new File(sourcePath));
-			OutputStream output = new FileOutputStream(destinationPath);
+			input = new FileInputStream(sourcePath);
+			output = new FileOutputStream(destinationPath);
 			
 			byte[] buffer = new byte[1024];
 			int length;
@@ -21,8 +24,6 @@ public class BackupUtils {
 					output.write(buffer, 0, length);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				return false;
 			}
 
@@ -30,8 +31,23 @@ public class BackupUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
+		} finally {
+			if(null != output) {
+				try {
+					output.close();
+				} catch (IOException e) {
+					result = false;
+				}
+			}
+			
+			if(null != input) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					result = false;
+				}
+			}
 		}
-		
-		return true;
+		return result;
 	}
 }

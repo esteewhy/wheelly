@@ -3,13 +3,16 @@ package com.wheelly.activity;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 
 /**
@@ -40,10 +43,10 @@ public class TabsAdapter extends FragmentPagerAdapter implements
 		}
 	}
 
-	public TabsAdapter(FragmentActivity activity, ViewPager pager) {
+	public TabsAdapter(SherlockFragmentActivity activity, ViewPager pager) {
 		super(activity.getSupportFragmentManager());
 		mContext = activity;
-		mActionBar = activity.getActionBar();
+		mActionBar = activity.getSupportActionBar();
 		mViewPager = pager;
 		mViewPager.setAdapter(this);
 		mViewPager.setOnPageChangeListener(this);
@@ -84,7 +87,7 @@ public class TabsAdapter extends FragmentPagerAdapter implements
 	}
 
 	@Override
-	public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		Object tag = tab.getTag();
 		for (int i = 0; i < mTabs.size(); i++) {
 			if (mTabs.get(i) == tag) {
@@ -94,10 +97,10 @@ public class TabsAdapter extends FragmentPagerAdapter implements
 	}
 
 	@Override
-	public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
 
 	@Override
-	public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
 }

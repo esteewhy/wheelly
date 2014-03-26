@@ -18,8 +18,6 @@ package com.google.android.apps.mytracks.util;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.gms.location.DetectedActivity;
-import com.google.android.maps.mytracks.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
