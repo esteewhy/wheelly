@@ -85,7 +85,7 @@ public class Synchronizer {
 	
 	private int getPreferredAccountIndex(Account[] accounts) {
 		String preferredAccount = PreferencesUtils.getString(context,
-			R.string.preferred_account_key,
+			R.string.google_account_key,
 			PreferencesUtils.GOOGLE_ACCOUNT_DEFAULT);
 
 		for (int i = 0; i < accounts.length; i++) {
@@ -98,6 +98,6 @@ public class Synchronizer {
 	}
 	
 	private void setPreferredAccountName(String name) {
-		PreferencesUtils.setString(context, R.string.preferred_account_key, name);
+		PreferencesUtils.setString(context, R.string.google_account_key, name);
 	}
 }

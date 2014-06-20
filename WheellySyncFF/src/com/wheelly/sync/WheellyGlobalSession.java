@@ -17,10 +17,11 @@ import org.json.simple.parser.ParseException;
 import org.mozilla.gecko.background.common.log.Logger;
 import org.mozilla.gecko.sync.GlobalSession;
 import org.mozilla.gecko.sync.NonObjectJSONException;
+import org.mozilla.gecko.sync.SyncConfiguration;
 import org.mozilla.gecko.sync.SyncConfigurationException;
-import org.mozilla.gecko.sync.crypto.KeyBundle;
+import org.mozilla.gecko.sync.delegates.BaseGlobalSessionCallback;
 import org.mozilla.gecko.sync.delegates.ClientsDataDelegate;
-import org.mozilla.gecko.sync.delegates.GlobalSessionCallback;
+import org.mozilla.gecko.sync.delegates.NodeAssignmentCallback;
 import org.mozilla.gecko.sync.stage.CheckPreconditionsStage;
 import org.mozilla.gecko.sync.stage.CompletedStage;
 import org.mozilla.gecko.sync.stage.EnsureClusterURLStage;
@@ -38,25 +39,18 @@ import com.wheelly.sync.stage.EventSyncStage;
 import com.wheelly.sync.stage.LocationSyncStage;
 
 import android.content.Context;
-import android.os.Bundle;
 
 public class WheellyGlobalSession extends GlobalSession {
 
 	public WheellyGlobalSession(
-			String userAPI,
-			String serverURL,
-			String username,
-			String password,
-			String prefsPath,
-			KeyBundle syncKeyBundle,
-			GlobalSessionCallback callback,
+			SyncConfiguration config,
+			BaseGlobalSessionCallback callback,
 			Context context,
-			Bundle extras,
-			ClientsDataDelegate clientsDelegate)
+			ClientsDataDelegate clientsDelegate,
+			NodeAssignmentCallback nodeAssignmentCallback)
 			throws SyncConfigurationException, IllegalArgumentException,
 			IOException, ParseException, NonObjectJSONException {
-		super(userAPI, serverURL, username, password, prefsPath, syncKeyBundle,
-				callback, context, extras, clientsDelegate);
+		super(config, callback, context, clientsDelegate, nodeAssignmentCallback);
 		config.enabledEngineNames = new HashSet<String>(config.stagesToSync = Arrays.asList(new String[] { "locations", "events" }));
 	}
 	
@@ -65,7 +59,7 @@ public class WheellyGlobalSession extends GlobalSession {
 		HashMap<Stage, GlobalSyncStage> stages = new LinkedHashMap<Stage, GlobalSyncStage>();
 		
 		stages.put(Stage.checkPreconditions,	new CheckPreconditionsStage());
-		stages.put(Stage.ensureClusterURL,		new EnsureClusterURLStage());
+		stages.put(Stage.ensureClusterURL,		new EnsureClusterURLStage(nodeAssignmentCallback));
 		stages.put(Stage.fetchInfoCollections,	new FetchInfoCollectionsStage());
 		stages.put(Stage.fetchMetaGlobal,		new FetchMetaGlobalStage());
 		stages.put(Stage.ensureKeysStage,		new EnsureCrypto5KeysStage());

@@ -14,6 +14,7 @@ import java.security.GeneralSecurityException;
 
 import org.json.simple.JSONObject;
 import org.mozilla.gecko.background.common.log.Logger;
+import org.mozilla.gecko.sync.SyncConstants;
 import org.mozilla.gecko.sync.net.BaseResource;
 import org.mozilla.gecko.sync.net.BaseResourceDelegate;
 import org.mozilla.gecko.sync.setup.Constants;
@@ -53,9 +54,13 @@ public class CreateUserStage implements AuthenticatorStage {
 
     };
 
-    String userRequestUrl = aa.nodeServer + Constants.AUTH_NODE_PATHNAME + Constants.AUTH_NODE_VERSION + aa.username;
+    String userRequestUrl = aa.nodeServer + "user/1.0" + aa.username;
     final BaseResource httpResource = new BaseResource(userRequestUrl);
     httpResource.delegate = new BaseResourceDelegate(httpResource) {
+      @Override
+      public String getUserAgent() {
+        return SyncConstants.USER_AGENT;
+      }
 
       @Override
       public void handleHttpResponse(HttpResponse response) {

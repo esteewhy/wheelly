@@ -34,7 +34,7 @@
 		<link>
 			<name>res</name>
 			<type>2</type>
-			<location>D:/usr/src/android/android-sync/res</location>
+			<locationURI>PARENT-2-PROJECT_LOC/android-sync/res</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

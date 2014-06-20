@@ -17,7 +17,7 @@ public class SyncConstants {
                                                    GlobalConstants.MOZ_APP_VERSION + "." +
                                                    SYNC_MINOR_VERSION;
 
-  public static final String SYNC_USER_AGENT = "WheellySync " +
+  public static final String USER_AGENT = "WheellySync " +
                                                SYNC_VERSION_STRING + " (" +
                                                GlobalConstants.MOZ_APP_DISPLAYNAME + ")";
 
@@ -52,4 +52,10 @@ public class SyncConstants {
    * Account type.
    */
   public static final String PER_ACCOUNT_TYPE_PERMISSION = "com.wheelly.sync.permission.PER_ACCOUNT_TYPE";
+  
+  public static final String DEFAULT_AUTH_SERVER = "http://auth.wheelly.com/";
+  
+  // Used for BackoffHandler storage for Sync 1.1's SyncAdapter.
+  public static final String BACKOFF_PREF_SUFFIX_11 = "sync";
+
 }
