@@ -34,7 +34,7 @@
 		<link>
 			<name>Financisto_src</name>
 			<type>2</type>
-			<location>D:/usr/src/android/financisto/src</location>
+			<locationURI>PARENT-3-PROJECT_LOC/financisto/src</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
