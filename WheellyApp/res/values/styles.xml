@@ -93,4 +93,26 @@
 	
 	<style name="ThemeSelector" parent="android:Theme" />
 	<style name="Theme.Dialog" parent="android:Theme.Dialog" />
+	
+	<style name="AppBaseTheme" parent="@style/Widget.Sherlock.ActionBar">
+         
+    </style>
+     
+    <style name="textApearanceActionBar" parent="@style/TextAppearance.Sherlock.Widget.TextView.SpinnerItem">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+     
+     <style name="spinnerItemStyle" parent="@style/Widget.Sherlock.TextView.SpinnerItem">
+       <item name="android:textAppearance">@style/textApearanceActionBar</item>  
+       <item name="android:gravity">center_vertical</item>   
+    </style>
+ 
+   <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
+        <item name="android:spinnerDropDownItemStyle">@style/spinnerItemStyle</item>
+    </style>
+ 
+    <style name="ActionBarSpinnerStyle" parent="@style/Widget.Sherlock.Spinner.DropDown.ActionBar">
+        
+    </style>
 </resources>
