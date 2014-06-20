@@ -8,12 +8,28 @@ import com.wheelly.fragments.HeartbeatListFragment;
 import com.wheelly.fragments.MileageListFragment;
 import com.wheelly.fragments.RefuelListFragment;
 import com.wheelly.service.WorkflowNotifier;
+import com.wheelly.util.ViewGroupUtils;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+
 import com.actionbarsherlock.app.ActionBar;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 @SuppressLint("NewApi")
 public class Main extends SherlockFragmentActivity {
@@ -29,8 +45,11 @@ public class Main extends SherlockFragmentActivity {
         setContentView(mViewPager);
 		
 		final ActionBar bar = getSupportActionBar();
+		
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+        //bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+        
+        setupSpinner();
         
 		mTabsAdapter = new TabsAdapter(this, mViewPager);
 		mTabsAdapter.addTab(bar.newTab()
@@ -64,6 +83,19 @@ public class Main extends SherlockFragmentActivity {
 		
 		new AndiCarImporter(this).attemptImporting();
 		new WorkflowNotifier(this).notifyAboutPendingMileages();
+	}
+	
+	//http://www.hasnath.net/blog/actionbar-tab-spinnerlist-navigation-at-the-same-time
+	void setupSpinner() {
+		int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        
+        // If you're using sherlock, in older versions of android you are not supposed to get a reference to android.R.id.action_bar_title, So here's little hack for that.
+        if (titleId == 0) {
+            titleId = com.actionbarsherlock.R.id.abs__action_bar_title;
+        }
+         
+        View titleView = findViewById(titleId);
+        ViewGroupUtils.replaceView(titleView, getLayoutInflater().inflate(R.layout.spinner_layout, null));
 	}
 	
 	@Override

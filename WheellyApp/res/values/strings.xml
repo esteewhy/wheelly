@@ -102,4 +102,9 @@
     <string name="internalEmpty">0x00ff0001</string>
     
     <string name="new_location">New location</string>
+    
+    <string-array name="spinner_items">
+       <item>Dhaka</item>
+       <item>[Add vehicle]</item>
+	</string-array>
 </resources>
