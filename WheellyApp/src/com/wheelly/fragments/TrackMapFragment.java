@@ -147,7 +147,11 @@ public class TrackMapFragment extends SupportMapFragment {
 	
 	private void drawMap(TrackChangedEvent event) {
 		final MyTracksProviderUtils utils = MyTracksProviderUtils.Factory.get(getActivity()); 
-		Track track = utils.getTrack(event.id);
+		Track track = null;
+		
+		try {
+		utils.getTrack(event.id);
+		} catch(SecurityException e) {}
 		
 		if(null != track) {
 			getView().setVisibility(View.VISIBLE);

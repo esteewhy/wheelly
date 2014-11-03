@@ -23,11 +23,11 @@ import com.google.android.gms.maps.model.LatLng;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Vibrator;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.androidmapsextensions.GoogleMap;
 import com.androidmapsextensions.GoogleMap.OnMapLongClickListener;
 import com.androidmapsextensions.GoogleMap.OnMarkerDragListener;
@@ -83,7 +83,7 @@ public class Api11Adapter extends Api8Adapter {
 					}
 				}
 				
-				actionMode = ((SherlockFragmentActivity)fragment.getActivity()).startActionMode(new ActionMode.Callback() {
+				actionMode = ((ActionBarActivity)fragment.getActivity()).getSupportActionBar().startActionMode(new ActionMode.Callback() {
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 						callback.onCreate(menu);
@@ -119,7 +119,6 @@ public class Api11Adapter extends Api8Adapter {
 						return callback.onClick(item, marker);
 					}
 				});
-				
 			}
 			
 			@Override
@@ -141,7 +140,7 @@ public class Api11Adapter extends Api8Adapter {
 					.title("New location")
 					.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
 				
-				actionMode = ((SherlockFragmentActivity)fragment.getActivity()).startActionMode(new ActionMode.Callback() {
+				actionMode = ((ActionBarActivity)fragment.getActivity()).getSupportActionBar().startActionMode(new ActionMode.Callback() {
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 						callback.onCreate(menu);

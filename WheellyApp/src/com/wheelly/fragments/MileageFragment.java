@@ -46,7 +46,7 @@ public class MileageFragment extends Fragment {
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
 		final ContentValues values = new MileageBroker(getActivity()).loadOrCreate(id);
 		
-		final Controls c = new Controls(this);
+		final Controls c = new Controls();
 		
 		c.Mileage.setAmount(values.getAsLong("mileage"));
 		c.Destination.setValue(values.getAsLong("location_id"));
@@ -170,7 +170,7 @@ public class MileageFragment extends Fragment {
 	/**
 	 * Encapsulates UI objects.
 	 */
-	private static class Controls {
+	private class Controls {
 		final MileageInput Mileage;
 		final LocationInput Destination;
 		final TrackInput Track;
@@ -178,9 +178,9 @@ public class MileageFragment extends Fragment {
 		final View Save;
 		final View Cancel;
 		
-		public Controls(Fragment fragment) {
-			final FragmentManager fm = fragment.getFragmentManager();
-			final View view = fragment.getView();
+		public Controls() {
+			final FragmentManager fm = getChildFragmentManager();
+			final View view = getView();
 			
 			Mileage		= (MileageInput)view.findViewById(R.id.mileage);
 			Destination	= (LocationInput)fm.findFragmentById(R.id.place);
