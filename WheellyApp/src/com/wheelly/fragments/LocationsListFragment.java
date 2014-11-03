@@ -15,8 +15,6 @@ import ru.orangesoftware.financisto.utils.AddressGeocoder;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.internal.view.menu.MenuWrapper;
 import com.google.android.gms.location.LocationListener;
 import com.google.common.base.Strings;
 import com.wheelly.R;
@@ -38,21 +36,24 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.ListFragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-
-import com.actionbarsherlock.view.*;
-
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.*;
+import android.support.v7.app.ActionBarActivity;
 
 @SuppressLint({ "NewApi", "InlinedApi" })
-public class LocationsListFragment extends SherlockListFragment {
+public class LocationsListFragment extends ListFragment {
 	
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_EDIT = Menu.FIRST + 2;
@@ -79,7 +80,7 @@ public class LocationsListFragment extends SherlockListFragment {
 				if (actionMode != null) {
 					//  return false;
 				}
-				actionMode = getSherlockActivity().startActionMode(new ActionMode.Callback() {
+				actionMode = ((ActionBarActivity)getActivity()).getSupportActionBar().startActionMode(new ActionMode.Callback() {
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 						createContextMenu(menu);
@@ -171,7 +172,7 @@ public class LocationsListFragment extends SherlockListFragment {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle(R.string.locations);
-		createContextMenu(new MenuWrapper(menu));
+		createContextMenu(menu);
 		AdapterContextMenuInfo mi = (AdapterContextMenuInfo)menuInfo;
 		BusProvider.getInstance().post(new LocationSelectedEvent(mi.id, LocationsListFragment.this));
 	}

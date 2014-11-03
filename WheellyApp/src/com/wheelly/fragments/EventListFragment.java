@@ -11,9 +11,9 @@ import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.util.FloatMath;
 import android.util.Pair;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -190,6 +190,7 @@ public class EventListFragment extends ConfigurableListFragment {
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		menu.findItem(R.id.opt_menu_add).setVisible(false);
+		menu.findItem(R.id.opt_menu_filter).setVisible(false);
 		
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);

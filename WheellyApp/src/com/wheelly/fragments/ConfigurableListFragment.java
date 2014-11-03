@@ -1,6 +1,5 @@
 package com.wheelly.fragments;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.wheelly.IFilterHolder;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
@@ -23,21 +22,22 @@ import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public abstract class ConfigurableListFragment extends SherlockListFragment
+public abstract class ConfigurableListFragment extends ListFragment
 	implements LoaderCallbacks<Cursor> {
 	
 	private ListConfiguration configuration;

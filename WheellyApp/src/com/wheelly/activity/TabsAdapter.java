@@ -3,17 +3,15 @@ package com.wheelly.activity;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.ActionBarActivity;
 
 /**
  * This is a helper class that implements the management of tabs and all details
@@ -43,7 +41,7 @@ public class TabsAdapter extends FragmentPagerAdapter implements
 		}
 	}
 
-	public TabsAdapter(SherlockFragmentActivity activity, ViewPager pager) {
+	public TabsAdapter(ActionBarActivity activity, ViewPager pager) {
 		super(activity.getSupportFragmentManager());
 		mContext = activity;
 		mActionBar = activity.getSupportActionBar();

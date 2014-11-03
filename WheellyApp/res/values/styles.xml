@@ -91,18 +91,20 @@
 		<item name="android:drawablePadding">3dp</item>
 	</style>
 	
-	<style name="ThemeSelector" parent="android:Theme" />
+	<style name="ThemeSelector" parent="Theme.AppCompat" />
 	<style name="Theme.Dialog" parent="android:Theme.Dialog" />
-	
-	<style name="AppBaseTheme" parent="@style/Widget.Sherlock.ActionBar">
+	<style name="Widget.Styled.ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+	    
+	</style>
+	<style name="AppBaseTheme" parent="@style/Widget.Styled.ActionBar">
          
     </style>
      
-    <style name="textApearanceActionBar" parent="@style/TextAppearance.Sherlock.Widget.TextView.SpinnerItem">
+    <style name="textApearanceActionBar" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
         <item name="android:textColor">@android:color/white</item>
     </style>
      
-     <style name="spinnerItemStyle" parent="@style/Widget.Sherlock.TextView.SpinnerItem">
+     <style name="spinnerItemStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
        <item name="android:textAppearance">@style/textApearanceActionBar</item>  
        <item name="android:gravity">center_vertical</item>   
     </style>
@@ -112,7 +114,7 @@
         <item name="android:spinnerDropDownItemStyle">@style/spinnerItemStyle</item>
     </style>
  
-    <style name="ActionBarSpinnerStyle" parent="@style/Widget.Sherlock.Spinner.DropDown.ActionBar">
+    <style name="ActionBarSpinnerStyle" parent="@style/Widget.AppCompat.Spinner.DropDown.ActionBar">
         
     </style>
 </resources>

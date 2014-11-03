@@ -166,13 +166,13 @@ public class LocationsMapFragment extends SupportMapFragment {
 			}
 			
 			@Override
-			public void onPrepare(com.actionbarsherlock.view.Menu menu, Marker marker) {
+			public void onPrepare(Menu menu, Marker marker) {
 				configureTitleWidget(marker);
 			}
 			
 			@SuppressLint("NewApi")
 			@Override
-			public void onCreate(com.actionbarsherlock.view.Menu menu) {
+			public void onCreate(Menu menu) {
 				editText = (EditText)
 					menu.add(0, 0, 0, "name")
 						.setIcon(android.R.drawable.ic_menu_edit)
@@ -204,7 +204,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 			}
 			
 			@Override
-			public boolean onClick(com.actionbarsherlock.view.MenuItem item, Marker marker) {
+			public boolean onClick(MenuItem item, Marker marker) {
 				if(null != marker && !marker.isCluster()) {
 					final ContentValues myLocation = new ContentValues();
 					
