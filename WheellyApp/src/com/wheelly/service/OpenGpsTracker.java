@@ -1,12 +1,12 @@
 package com.wheelly.service;
 
 import nl.sogeti.android.gpstracker.logger.IGPSLoggerServiceRemote;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -31,10 +31,14 @@ public class OpenGpsTracker implements Tracker {
 	 * Checks if My Tracks service is available.
 	 */
 	public boolean checkAvailability() {
-		return context.getPackageManager()
-			.queryIntentServices(
-				this.serviceIntent,
-				PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
+		try {
+			context.getPackageManager()
+				.getPackageInfo("nl.sogeti.android.gpstracker", PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch(NameNotFoundException e) {
+			return false;
+		}
+			
 	}
 	
 	public boolean Start() {
