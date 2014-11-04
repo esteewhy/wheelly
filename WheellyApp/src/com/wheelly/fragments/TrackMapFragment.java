@@ -150,7 +150,7 @@ public class TrackMapFragment extends SupportMapFragment {
 		Track track = null;
 		
 		try {
-		utils.getTrack(event.id);
+			track = utils.getTrack(event.id);
 		} catch(SecurityException e) {}
 		
 		if(null != track) {

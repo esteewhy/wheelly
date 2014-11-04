@@ -5,11 +5,15 @@ import ru.orangesoftware.financisto.utils.Utils;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.common.base.Strings;
+import com.squareup.otto.Subscribe;
+import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
+import com.wheelly.bus.LocationChoosenEvent;
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,9 +54,8 @@ public final class LocationInput extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		BusProvider.getInstance().register(this);
 		final Activity ctx = getActivity();
-
-		
 		View v = inflater.inflate(R.layout.select_location, container, true);
 		
 		v.setOnLongClickListener(new OnLongClickListener() {
@@ -132,6 +135,11 @@ public final class LocationInput extends Fragment {
 		return adapter;
 	}
 	
+	@Subscribe public void onLocationChoosen(LocationChoosenEvent event) {
+		setValue(event.id);
+	}
+	
+	/// Stoped working after another support library update. Working around with Otto bus (above).
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
