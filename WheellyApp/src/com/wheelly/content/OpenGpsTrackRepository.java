@@ -7,7 +7,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.google.android.apps.mytracks.content.TracksColumns;
 import com.wheelly.db.LocationBroker;
 
 public class OpenGpsTrackRepository {
@@ -28,7 +27,7 @@ public class OpenGpsTrackRepository {
 	public float getDistance(long trackId) {
 		final Cursor cursor = context.getContentResolver()
 			.query(Uri.parse("content://nl.sogeti.android.gpstracker/tracks/" + trackId + "/waypoints"),
-				new String[] { "_id", "time", "longitude", "latitude", "altitude" },
+				new String[] { "waypoints._id", "time", "longitude", "latitude", "altitude" },
 				null,
 				null,
 				null);

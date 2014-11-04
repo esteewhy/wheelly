@@ -108,7 +108,7 @@ public class TripControlBar extends Fragment {
 			intent.putExtra("heartbeat", values);
 		}
 		
-		startActivityForResult(intent, requestId);
+		getParentFragment().startActivityForResult(intent, requestId);
 	}
 	
 	@Override
