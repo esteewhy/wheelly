@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class MileageFragment extends Fragment {
 				// @todo Compare to default
 				if(c.Mileage.getAmount() == 0) {
 					c.Mileage.setAmount(trackId > 0
-						? (long)FloatMath.ceil(new TrackRepository(getActivity()).getDistance(trackId))
+						? (long)Math.ceil(new TrackRepository(getActivity()).getDistance(trackId))
 						: 0);
 				}
 				

@@ -1,21 +1,25 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:compat="http://schemas.android.com/apk/res-auto">
 	<item
 		android:id		="@+id/opt_menu_mileage_start"
 		android:icon	="@drawable/hb_start"
 		android:title	="@string/start"
 		android:orderInCategory="-100"
+		compat:showAsAction="always"
 		android:showAsAction="always" />
 	<item
 		android:id		="@+id/opt_menu_mileage_stop"
 		android:icon	="@drawable/hb_stop"
 		android:title	="@string/stop"
 		android:orderInCategory="-99"
+		compat:showAsAction="always"
 		android:showAsAction="always" />
 	<item
 		android:id		="@+id/opt_menu_refuel"
 		android:icon	="@drawable/hb_refuel"
 		android:title	="@string/refuels"
 		android:orderInCategory="-98"
+		compat:showAsAction="always"
 		android:showAsAction="always" />
 	
 	<item

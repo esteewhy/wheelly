@@ -1,14 +1,17 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:compat="http://schemas.android.com/apk/res-auto">
 	<item
 		android:id		="@+id/opt_menu_add"
 		android:icon	="@android:drawable/ic_menu_add"
 		android:title	="@string/item_add"
+		compat:showAsAction="always"
 		android:showAsAction="always" />
 	<item
 		android:id		="@+id/opt_menu_filter"
 		android:icon	="@drawable/ic_menu_filter_off"
 		android:title	="@string/filter"
 		android:orderInCategory="-80"
+		compat:showAsAction="ifRoom"
 		android:showAsAction="ifRoom" />
 	
 	<item android:id	="@+id/opt_menu_locations"
