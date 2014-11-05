@@ -18,7 +18,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.LatLngBounds.Builder;
-import com.google.common.base.Strings;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
@@ -38,6 +37,8 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.view.*;
 import android.widget.EditText;
 
@@ -127,7 +128,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 		MenuCompat.setShowAsAction(
 			menu.add(Menu.NONE, 1, Menu.NONE, R.string.item_add)
 				.setIcon(android.R.drawable.ic_menu_add),
-			MenuItem.SHOW_AS_ACTION_IF_ROOM
+			MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
 		);
 	}
 	
@@ -313,7 +314,7 @@ public class LocationsMapFragment extends SupportMapFragment {
 				
 				final String argb = c.getString(colorIdx);
 				
-				if(!Strings.isNullOrEmpty(argb)) {
+				if(!TextUtils.isEmpty(argb)) {
 					float[] hsv = new float[3];
 					Color.colorToHSV(Color.parseColor(argb), hsv);
 					markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]));

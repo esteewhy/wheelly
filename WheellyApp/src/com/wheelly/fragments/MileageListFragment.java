@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.util.FloatMath;
@@ -16,24 +15,20 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Mileage;
 import com.wheelly.app.ListConfiguration;
 import com.wheelly.app.TripControlBar;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.fragments.InfoDialogFragment.Options;
-import com.wheelly.service.MyTracksTracker;
 import com.wheelly.service.WorkflowNotifier;
 
 public class MileageListFragment extends ConfigurableListFragment {
-	boolean suggestInstall;
-	
 	@Override
 	protected ListConfiguration configure() {
 		ListConfiguration cfg = new ListConfiguration();
@@ -92,12 +87,12 @@ public class MileageListFragment extends ConfigurableListFragment {
 					return true;
 				case R.id.start_place: {
 					final String argb = c.getString(c.getColumnIndex("start_color"));
-					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+					((TextView)v).setBackgroundColor(TextUtils.isEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
 					break;
 				}
 				case R.id.stop_place: {
 					final String argb = c.getString(c.getColumnIndex("stop_color"));
-					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+					((TextView)v).setBackgroundColor(TextUtils.isEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
 					break;
 				}
 				}
@@ -151,31 +146,9 @@ public class MileageListFragment extends ConfigurableListFragment {
 	}
 	
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		//Advise user installing MyTracks app.
-		suggestInstall =
-			null != savedInstanceState && savedInstanceState.containsKey("suggestInstall")
-				? savedInstanceState.getBoolean("suggestInstall")
-				: !new MyTracksTracker(getActivity()).checkAvailability();
-		
-		if(suggestInstall) {
-			Toast.makeText(getActivity(), R.string.advertise_mytracks, Toast.LENGTH_LONG).show();
-		}
-		
-		super.onActivityCreated(savedInstanceState);
-	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putBoolean("suggestInstall", suggestInstall);
-		super.onSaveInstanceState(outState);
-	}
-	
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.mileages_menu, menu);
-		menu.findItem(R.id.opt_menu_install_mytracks).setVisible(suggestInstall);
 	}
 	
 	@Override

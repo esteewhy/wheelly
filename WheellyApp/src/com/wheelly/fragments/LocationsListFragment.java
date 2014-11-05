@@ -16,7 +16,6 @@ import ru.orangesoftware.financisto.utils.AddressGeocoder;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.google.android.gms.location.LocationListener;
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.app.ColorInput;
 import com.wheelly.app.ColorInput.OnSelectColorListener;
@@ -51,6 +50,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.*;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 
 @SuppressLint({ "NewApi", "InlinedApi" })
 public class LocationsListFragment extends ListFragment {
@@ -133,7 +133,7 @@ public class LocationsListFragment extends ListFragment {
 						public boolean setViewValue(View view, Cursor cursor, int paramInt) {
 							if(android.R.id.text1 == view.getId()) {
 								final String argb = cursor.getString(cursor.getColumnIndex("color"));
-								if(!Strings.isNullOrEmpty(argb)) {
+								if(!TextUtils.isEmpty(argb)) {
 									view.setBackgroundColor(Color.parseColor(argb));
 								}
 							}

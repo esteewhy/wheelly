@@ -4,7 +4,6 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
 import com.google.android.gms.location.LocationListener;
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.db.DatabaseSchema.Locations;
@@ -27,6 +26,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -188,7 +188,7 @@ public final class LocationInput extends Fragment {
 				
 				final String argb = location.getAsString("color");
 				
-				if(!Strings.isNullOrEmpty(argb)) {
+				if(!TextUtils.isEmpty(argb)) {
 					c.labelView.setBackgroundColor(Color.parseColor(argb));
 				}
 				

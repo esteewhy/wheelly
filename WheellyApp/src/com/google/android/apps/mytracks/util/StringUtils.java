@@ -15,8 +15,6 @@
  */
 package com.google.android.apps.mytracks.util;
 
-import com.google.android.maps.mytracks.R;
-
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
@@ -26,7 +24,6 @@ import android.text.format.DateUtils;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
 /**
  * Various string manipulation methods.
@@ -40,8 +37,6 @@ public class StringUtils {
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
   private static final SimpleDateFormat ISO_8601_BASE = new SimpleDateFormat(
       "yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-  private static final Pattern ISO_8601_EXTRAS = Pattern.compile(
-      "^(\\.\\d+)?(?:Z|([+-])(\\d{2}):(\\d{2}))?$");
   static {
     ISO_8601_DATE_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     ISO_8601_BASE.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -115,35 +110,6 @@ public class StringUtils {
   public static String formatElapsedTimeWithHour(long time) {
     String value = formatElapsedTime(time);
     return TextUtils.split(value, ":").length == 2 ? "0:" + value : value;
-  }
-
-  /**
-   * Formats the distance.
-   * 
-   * @param context the context
-   * @param distance the distance in meters
-   * @param metricUnits true to use metric units. False to use imperial units
-   */
-  public static String formatDistance(Context context, double distance, boolean metricUnits) {
-    if (Double.isNaN(distance) || Double.isInfinite(distance)) {
-      return context.getString(R.string.value_unknown);
-    }
-    if (metricUnits) {
-      if (distance > 500.0) {
-        distance *= UnitConversions.M_TO_KM;
-        return context.getString(R.string.value_float_kilometer, distance);
-      } else {
-        return context.getString(R.string.value_float_meter, distance);
-      }
-    } else {
-      if (distance * UnitConversions.M_TO_MI > 0.5) {
-        distance *= UnitConversions.M_TO_MI;
-        return context.getString(R.string.value_float_mile, distance);
-      } else {
-        distance *= UnitConversions.M_TO_FT;
-        return context.getString(R.string.value_float_feet, distance);
-      }
-    }
   }
 
   /**

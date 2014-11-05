@@ -18,7 +18,6 @@ import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Refuel;
 import com.wheelly.app.ListConfiguration;
@@ -75,7 +74,7 @@ public class RefuelListFragment extends ConfigurableListFragment {
 			public boolean setViewValue(View v, Cursor c, int arg2) {
 				if(R.id.place == v.getId()) {
 					final String argb = c.getString(c.getColumnIndex("color"));
-					((TextView)v).setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+					((TextView)v).setBackgroundColor(TextUtils.isEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
 				}
 				return false;
 			}

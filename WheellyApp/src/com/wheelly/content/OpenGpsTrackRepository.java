@@ -5,11 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
-import android.provider.BaseColumns;
-
 import com.wheelly.db.LocationBroker;
 
 public class OpenGpsTrackRepository {
+	private final Uri BASE = Uri.parse("content://nl.sogeti.android.gpstracker/tracks");
 	private final Context context;
 	
 	public OpenGpsTrackRepository(Context context) {
@@ -17,30 +16,29 @@ public class OpenGpsTrackRepository {
 	}
 	
 	public Cursor list() {
-		return context.getContentResolver().query(
-			Uri.parse("content://nl.sogeti.android.gpstracker/tracks"), null, null, null, "creationtime DESC");
+		return context.getContentResolver().query(BASE, null, null, null, "creationtime DESC");
+	}
+	
+	public Cursor waypoints(long trackId) {
+		return context.getContentResolver()
+			.query(Uri.withAppendedPath(BASE, trackId + "/waypoints"),
+				new String[] { "waypoints._id", "time", "longitude", "latitude", "altitude" },
+				null,
+				null,
+				null);
 	}
 	
 	/*
 	 * Retrieves track distance in kilometers.
 	 */
 	public float getDistance(long trackId) {
-		final Cursor cursor = context.getContentResolver()
-			.query(Uri.parse("content://nl.sogeti.android.gpstracker/tracks/" + trackId + "/waypoints"),
-				new String[] { "waypoints._id", "time", "longitude", "latitude", "altitude" },
-				null,
-				null,
-				null);
+		final Cursor cursor = waypoints(trackId);
 		try {
 			if(cursor.moveToFirst()) {
 				Location lastLocation = null;
 				float mDistanceTraveled = 0;
 				do {
-                  final Location currentLocation = new Location( this.getClass().getName() );
-                  currentLocation.setTime(cursor.getLong(1));
-                  currentLocation.setLongitude(cursor.getDouble(2));
-                  currentLocation.setLatitude(cursor.getDouble(3));
-                  currentLocation.setAltitude(cursor.getDouble(4));
+                  final Location currentLocation = LOCATION(cursor);
                   
                   // Do no include obvious wrong 0.0 lat 0.0 long, skip to next value in while-loop
                   if(currentLocation.getLatitude() == 0.0d || currentLocation.getLongitude() == 0.0d) {
@@ -49,15 +47,16 @@ public class OpenGpsTrackRepository {
                   
                   if(lastLocation != null) {
                      float travelPart = lastLocation.distanceTo( currentLocation );
-                     long timePart = currentLocation.getTime() - lastLocation.getTime();
                      mDistanceTraveled += travelPart;
                   }
+                  lastLocation = currentLocation;
 				} while(cursor.moveToNext());
 				return mDistanceTraveled;
 			}
 		} finally {
 			cursor.close();
 		}
+		
 		return 0;
 	}
 	
@@ -73,10 +72,19 @@ public class OpenGpsTrackRepository {
 		ContentValues values = new ContentValues();
 		values.put("name", name);
 		context.getContentResolver().update(
-				Uri.parse("content://nl.sogeti.android.gpstracker/tracks"),
+				Uri.withAppendedPath(BASE, Long.toString(trackId)),
 			values,
-			BaseColumns._ID + " = ?",
-			new String[] { Long.toString(trackId) }
+			null,
+			null
 		);
+	}
+	
+	public static Location LOCATION(Cursor c) {
+		final Location l = new Location(OpenGpsTrackRepository.class.getName());
+        l.setTime(c.getLong(1));
+        l.setLongitude(c.getDouble(2));
+        l.setLatitude(c.getDouble(3));
+        l.setAltitude(c.getDouble(4));
+        return l;
 	}
 }
