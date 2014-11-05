@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
 
 /**
  * Utilities to access preferences stored in {@link SharedPreferences}.
@@ -46,18 +47,17 @@ public class PreferencesUtils {
 
   public static final String BLUETOOTH_SENSOR_DEFAULT = "";
   
-  public static final boolean CHART_BY_DISTANCE_DEFAULT = true;
   public static final boolean CHART_SHOW_CADENCE_DEFAULT = true;
   public static final boolean CHART_SHOW_ELEVATION_DEFAULT = true;
   public static final boolean CHART_SHOW_HEART_RATE_DEFAULT = true;
   public static final boolean CHART_SHOW_POWER_DEFAULT = true;
   public static final boolean CHART_SHOW_SPEED_DEFAULT = true;
-
-  public static final boolean CONFIRM_PLAY_EARTH_DEFAULT = true;
+  public static final String CHART_X_AXIS_DEFAULT = "DISTANCE";
 
   public static final String DEFAULT_ACTIVITY_DEFAULT = "";
   
   public static final String DRIVE_DELETED_LIST_DEFAULT = "";
+  public static final String DRIVE_EDITED_LIST_DEFAULT = "";
   public static final long DRIVE_LARGEST_CHANGE_ID_DEFAULT = -1L;
   public static final boolean DRIVE_SYNC_DEFAULT = false;
 
@@ -76,6 +76,7 @@ public class PreferencesUtils {
   public static final int MIN_RECORDING_INTERVAL_ADAPT_BATTERY_LIFE = -2;
   public static final int MIN_RECORDING_INTERVAL_DEFAULT = 0;
 
+  public static final int PHOTO_SIZE_DEFAULT = 1024; // 1024 kB
   public static final int RECORDING_DISTANCE_INTERVAL_DEFAULT = 10;
   
   // Values for recording_gps_accuracy
@@ -85,17 +86,18 @@ public class PreferencesUtils {
   
   public static final long RECORDING_TRACK_ID_DEFAULT = -1L;
   public static final boolean RECORDING_TRACK_PAUSED_DEFAULT = true;
-  public static final boolean REPORT_SPEED_DEFAULT = true;
   public static final long SELECTED_TRACK_ID_DEFAULT = -1L;
   public static final String SENSOR_TYPE_DEFAULT = "NONE";
 
   // Share track
+  public static final String SHARE_TRACK_ACCOUNT_DEFAULT = "";
   public static final boolean SHARE_TRACK_INVITE_DEFAULT = false;
   public static final boolean SHARE_TRACK_PUBLIC_DEFAULT = false;
 
   public static final int SPLIT_FREQUENCY_DEFAULT = 0;
   
   // Stats
+  public static final String STATS_RATE_DEFAULT = "SPEED";
   public static final boolean STATS_SHOW_COORDINATE_DEFAULT = false;
   public static final boolean STATS_SHOW_GRADE_ELEVATION_DEFAULT = false;
   public static final String STATS_UNITS_DEFAULT = "METRIC";
@@ -114,7 +116,7 @@ public class PreferencesUtils {
   public static final int TRACK_WIDGET_ITEM3_DEFAULT = 1; // total time
   public static final int TRACK_WIDGET_ITEM4_DEFAULT = 2; // average speed
   public static final int VOICE_FREQUENCY_DEFAULT = 0;
-
+  
   private PreferencesUtils() {}
 
   /**
@@ -186,6 +188,35 @@ public class PreferencesUtils {
   }
 
   /**
+   * Gets a float preference value.
+   * 
+   * @param context the context
+   * @param keyId the key id
+   * @param defaultValue the default value
+   */
+  public static float getFloat(Context context, int keyId, float defaultValue) {
+    SharedPreferences sharedPreferences = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+    return sharedPreferences.getFloat(getKey(context, keyId), defaultValue);
+  }
+
+  /**
+   * Sets a float preference value.
+   * 
+   * @param context the context
+   * @param keyId the key id
+   * @param value the value
+   */
+  @SuppressLint("CommitPrefEdits")
+  public static void setFloat(Context context, int keyId, float value) {
+    SharedPreferences sharedPreferences = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+    Editor editor = sharedPreferences.edit();
+    editor.putFloat(getKey(context, keyId), value);
+    ApiAdapterFactory.getApiAdapter().applyPreferenceChanges(editor);
+  }
+
+  /**
    * Gets a long preference value.
    * 
    * @param context the context
@@ -242,4 +273,26 @@ public class PreferencesUtils {
     ApiAdapterFactory.getApiAdapter().applyPreferenceChanges(editor);
   }
   
+  /**
+   * Adds a value to a list.
+   * 
+   * @param context the context
+   * @param keyId the key id
+   * @param defaultValue the default value
+   * @param value the value
+   */
+  public static void addToList(Context context, int keyId, String defaultValue, String value) {
+    String list = getString(context, keyId, defaultValue);
+    if (defaultValue.equals(list)) {
+      setString(context, keyId, value);
+      return;
+    }
+    String[] items = TextUtils.split(list, ";");
+    for (String item : items) {
+      if (value.equals(item)) {
+        return;
+      }
+    }
+    setString(context, keyId, list + ";" + value);
+  }
 }

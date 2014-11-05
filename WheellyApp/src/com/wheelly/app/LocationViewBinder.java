@@ -4,9 +4,10 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
-import com.google.common.base.Strings;
+
 import com.wheelly.R;
 import com.wheelly.util.LocationUtils;
 
@@ -22,7 +23,7 @@ public class LocationViewBinder implements ViewBinder {
 		switch(view.getId()) {
 		case android.R.id.text1:
 			final String argb = cursor.getString(cursor.getColumnIndex("color"));
-			((TextView)view).setBackgroundColor(!Strings.isNullOrEmpty(argb) ? Color.parseColor(argb) : Color.TRANSPARENT);
+			((TextView)view).setBackgroundColor(!TextUtils.isEmpty(argb) ? Color.parseColor(argb) : Color.TRANSPARENT);
 			return false;
 		case android.R.id.text2:
 			((TextView)view).setText(LocationUtils.locationToText(cursor));
