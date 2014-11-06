@@ -110,6 +110,7 @@ public class TrackMapFragment extends SupportMapFragment {
 		@Override
 		protected void onPostExecute(PolylineOptions result) {
 			super.onPostExecute(result);
+			waypoints.close();
 			googleMap.addPolyline(result);
 		}
 	}
@@ -117,25 +118,19 @@ public class TrackMapFragment extends SupportMapFragment {
 	private PathTask pt;
 	
 	private void drawMap(TrackChangedEvent event) {
-		Cursor waypoints = null;
-		try {
-			waypoints = new OpenGpsTrackRepository(getActivity()).waypoints(event.id);
+		Cursor waypoints = new OpenGpsTrackRepository(getActivity()).waypoints(event.id);
+		
+		
+		if(waypoints.moveToFirst()) {
+			getView().setVisibility(View.VISIBLE);
+			if(pt != null && !pt.isCancelled()) {
+				pt.cancel(true);
+			}
 			
-			if(waypoints.moveToFirst()) {
-				getView().setVisibility(View.VISIBLE);
-				if(pt != null && !pt.isCancelled()) {
-					pt.cancel(true);
-				}
-				
-				pt = new PathTask(waypoints);
-				pt.execute();
-			} else {
-				getView().setVisibility(View.GONE);
-			}
-		} finally {
-			if(null != waypoints) {
-				waypoints.close();
-			}
+			pt = new PathTask(waypoints);
+			pt.execute();
+		} else {
+			getView().setVisibility(View.GONE);
 		}
 	}
 }
