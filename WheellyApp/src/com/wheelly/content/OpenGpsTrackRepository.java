@@ -51,7 +51,7 @@ public class OpenGpsTrackRepository {
                   }
                   lastLocation = currentLocation;
 				} while(cursor.moveToNext());
-				return mDistanceTraveled;
+				return mDistanceTraveled / 1000;
 			}
 		} finally {
 			cursor.close();
