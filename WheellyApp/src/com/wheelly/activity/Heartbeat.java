@@ -60,13 +60,13 @@ public class Heartbeat extends FragmentActivity {
 	/**
 	 * Holds UI controls references.
 	 */
-	private static class Controls {
+	private class Controls {
 		final HeartbeatInput Heartbeat;
 		final View SaveButton;
 		final View CancelButton;
 		
 		public Controls(FragmentActivity view) {
-			Heartbeat		= (HeartbeatInput)view.getSupportFragmentManager().findFragmentById(R.id.heartbeat);
+			Heartbeat		= (HeartbeatInput)getSupportFragmentManager().findFragmentById(R.id.heartbeat);
 			SaveButton		= (View)view.findViewById(R.id.bSave);
 			CancelButton	= (View)view.findViewById(R.id.bSaveAndNew);
 		}

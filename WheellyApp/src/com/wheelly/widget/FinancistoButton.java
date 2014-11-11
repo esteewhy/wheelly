@@ -4,6 +4,7 @@ import com.wheelly.R;
 import com.wheelly.content.TransactionRepository;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 public final class FinancistoButton extends Fragment {
-	
-	public static final String TRAN_ID_EXTRA = "tranId";
 	private static final int NEW_TRANSACTION_REQUEST = 1;
 
 	private Button SyncButton;
@@ -34,13 +33,26 @@ public final class FinancistoButton extends Fragment {
 				
 				Intent intent = new Intent(TransactionRepository.FINANCISTO_ACTION);
 				if(id > 0) {
-					intent.putExtra(TRAN_ID_EXTRA, id);
+					intent.putExtra("tranId", id);
 				}
+				prepopulate(intent);
 				startActivityForResult(intent, NEW_TRANSACTION_REQUEST);
 			}
 		});
 		
 		return v;
+	}
+	
+	private void prepopulate(Intent intent) {
+		final ContentValues values = getValues();
+		
+		if(null == values) {
+			return;
+		}
+		
+		if(values.containsKey("cost")) {
+			intent.putExtra("accountAmount", (long)(values.getAsFloat("cost") * 100));
+		}
 	}
 	
 	@Override
@@ -65,5 +77,13 @@ public final class FinancistoButton extends Fragment {
 					transactionId))
 		);
 		SyncButton.setTag(R.id.tag_transaction_id, transactionId);
+	}
+	
+	public ContentValues getValues() {
+		return (ContentValues)SyncButton.getTag(R.id.tag_transaction_values);
+	}
+	
+	public void setValues(ContentValues values) {
+		SyncButton.setTag(R.id.tag_transaction_values, values);
 	}
 }

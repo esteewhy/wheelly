@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-
 public class UnderlinedTextView extends TextView{
 	private Paint paint = new Paint();
 	

@@ -2,7 +2,6 @@ package com.wheelly.activity;
 
 import ru.orangesoftware.financisto.activity.LocationActivity;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
@@ -14,7 +13,6 @@ import com.wheelly.fragments.LocationsListFragment;
 import com.wheelly.fragments.LocationsMapFragment;
 
 import android.annotation.SuppressLint;
-import com.actionbarsherlock.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
@@ -25,9 +23,11 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 
 @SuppressLint("NewApi")
-public class LocationsList extends SherlockFragmentActivity {
+public class LocationsList extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

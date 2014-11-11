@@ -105,38 +105,41 @@ public class OdometerSpinner extends View
 		mDigitPaint.setColor(Color.WHITE);
 		mDigitPaint.setTextAlign(Align.CENTER);
 		
-		setCurrentDigit(rnd.nextInt(9));
+		setValue(rnd.nextInt(9));
 		
 		setLongClickable(true);
 		setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View paramView) {
-				setCurrentDigit((mCurrentDigit + 1) % 10);
+				setValueAndNotify((mCurrentDigit + 1) % 10);
 				return true;
 			}
 		});
 	}
 	static final Random rnd = new Random();
 	
-	public int getCurrentDigit()
+	public int getValue()
 	{
 		return mCurrentDigit;
 	}
 	
-	public void setCurrentDigit(int digit)
+	private void setValueAndNotify(int digit)
 	{
+		int old = getValue();
+		setValue(digit);
+		
+		if(getValue() != old && mDigitChangeListener != null) {
+			mDigitChangeListener.onDigitChange(this, getValue());
+		}
+	}
+	
+	public void setValue(int value) {
 		/*
 		 *  Basic range limiting - in a production widget,
 		 *  you might want to throw an exception if the number passed
 		 *  if less than 0 or greater than 9
 		 */
-		int newVal = Math.max(Math.min(digit, 9), 0);
-		
-		int old = mCurrentDigit;
-		mCurrentDigit = newVal;
-		
-		if(mCurrentDigit != old && mDigitChangeListener != null)
-			mDigitChangeListener.onDigitChange(this, mCurrentDigit);
+		mCurrentDigit = Math.max(Math.min(value, 9), 0);
 		
 		mDigitAbove = (mCurrentDigit + 1) % 10;
 		mDigitBelow = (mCurrentDigit + 9) % 10;
@@ -279,7 +282,7 @@ public class OdometerSpinner extends View
 				final boolean up = totalDelta > 0;
 				postDelta = up ? -postDelta : postDelta;
 				
-				setCurrentDigit(up ? mDigitBelow : mDigitAbove);
+				setValueAndNotify(up ? mDigitBelow : mDigitAbove);
 				mTouchStartY += up ? -mHeight : mHeight;
 				
 				mDigitY += postDelta;
@@ -310,7 +313,7 @@ public class OdometerSpinner extends View
 				newValue = deltaY < 0 ? mDigitAbove : mDigitBelow;
 			}
 			
-			setCurrentDigit(newValue);
+			setValueAndNotify(newValue);
 			getParent().requestDisallowInterceptTouchEvent(false);
 			return true;
 		}

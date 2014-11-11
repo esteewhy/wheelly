@@ -13,8 +13,6 @@ package com.wheelly.fragments;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.app.LocationViewBinder;
 import com.wheelly.db.LocationBroker;
@@ -46,6 +44,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -112,7 +111,7 @@ public class FilterDialog extends DialogFragment {
 						final String entityType = filter.getAsString(F.LOCATION_CONSTRAINT);
 						
 						getActivity().getSupportLoaderManager().initLoader(
-							Strings.isNullOrEmpty(entityType) ? 0 : entityType.hashCode(), null,
+							TextUtils.isEmpty(entityType) ? 0 : entityType.hashCode(), null,
 							new LoaderCallbacks<Cursor>() {
 								@Override
 								public Loader<Cursor> onCreateLoader(int arg0,

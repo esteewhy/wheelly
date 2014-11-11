@@ -36,6 +36,7 @@ public final class DatabaseSchema {
 			
 			+ "mileage		NUMERIC,"
 			+ "amount		NUMERIC,"
+			+ "vehicle_id	LONG,"
 			//TODO Calculated fields.
 			+ "calc_cost	NUMERIC,"
 			+ "calc_amount	NUMERIC"
@@ -215,8 +216,8 @@ public final class DatabaseSchema {
 			+ "is_full		INTEGER NOT NULL DEFAULT 1,"
 			+ "heartbeat_id	LONG,"
 			
-			+ "calc_mileage	NUMERIC"
-			
+			+ "calc_mileage	NUMERIC,"
+			+ "vehicle_id	LONG"
 			//+ ",FOREIGN KEY(heartbeat_id) REFERENCES heartbeats(_id)"
 			+ ")";
 		
@@ -307,7 +308,8 @@ public final class DatabaseSchema {
 			+ "sync_etag	TEXT,"
 			+ "sync_state	LONG NOT NULL DEFAULT 0,"
 			+ "sync_date	TIMESTAMP,"
-			+ "modified		TIMESTAMP DEFAULT (strftime('%s', 'now')))";
+			+ "modified		TIMESTAMP DEFAULT (strftime('%s', 'now')),"
+			+ "vehicle_id	LONG)";
 		
 		// reverse links detection
 		public static final String IconColumnExpression =

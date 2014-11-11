@@ -6,10 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
-import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtils.LocationIterator;
-import com.google.android.apps.mytracks.content.Track;
-import com.google.android.apps.mytracks.util.LocationUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -24,7 +20,11 @@ import com.squareup.otto.Subscribe;
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
 import com.wheelly.bus.TrackChangedEvent;
+import com.wheelly.content.OpenGpsTrackRepository;
 
+/**
+ * Renders rough map from Open GPS Tracker waypoints cursor
+ */
 public class TrackMapFragment extends SupportMapFragment {
 	private GoogleMap googleMap;
 	
@@ -56,60 +56,31 @@ public class TrackMapFragment extends SupportMapFragment {
 		return new LatLng(location.getLatitude(), location.getLongitude());
 	}
 	
-	private static PolylineOptions PATH1(MyTracksProviderUtils utils, long id) {
-		LocationIterator locations = utils.getTrackPointLocationIterator(id, -1, false, MyTracksProviderUtils.DEFAULT_LOCATION_FACTORY);
-		Track t = new Track();
-		
-		while(locations.hasNext()) {
-			t.addLocation(locations.next());
-		}
-		
-		LocationUtils.decimate(t, 500);
+	private static PolylineOptions PATH3(Cursor waypoints) {
 		final PolylineOptions path = new PolylineOptions();
-		
-		for(Location l : t.getLocations()) {
-			if(LocationUtils.isValidLocation(l)) {
-				path.add(POINT(l));
-			}
+		if(waypoints.moveToFirst()) {
+			do {
+				final Location l = OpenGpsTrackRepository.LOCATION(waypoints);
+				LatLng ll = new LatLng(l.getLatitude(), l.getLongitude());
+				if(ll.latitude != 0 || ll.longitude != 0) {
+					path.add(ll);
+				}
+			} while(waypoints.moveToNext());
 		}
-		
-		return path;
-	}
-	
-	@SuppressWarnings("unused")
-	private static PolylineOptions PATH2(MyTracksProviderUtils utils, long id) {
-		final Cursor locations = utils.getTrackPointCursor(id, -1, -1, false);
-		final PolylineOptions path = new PolylineOptions();
-		try {
-			if(locations.moveToFirst()) {
-				final int latIdx = locations.getColumnIndex("latitude");
-				final int lonIdx = locations.getColumnIndex("longitude");
-				
-				do {
-					LatLng l = new LatLng(locations.getDouble(latIdx) / 1e6, locations.getDouble(lonIdx) / 1e6);
-					if(l.latitude != 0 || l.longitude != 0) {
-						path.add(l);
-					}
-				} while(locations.moveToNext());
-			}
-		} finally {
-			locations.close();
-		}
-		
 		return path;
 	}
 	
 	private class PathTask extends AsyncTask<Void, Void, PolylineOptions> {
-		private final MyTracksProviderUtils utils;
-		private final long id;
+		private final Cursor waypoints;
 		
-		public PathTask(MyTracksProviderUtils utils, long id) {
-			this.utils = utils;
-			this.id = id;
+		public PathTask(Cursor waypoints) {
+			this.waypoints = waypoints;
 			googleMap.clear();
 			
-			final Location first = utils.getFirstValidTrackPoint(id);
-			final Location last = utils.getLastValidTrackPoint(id);
+			if(!waypoints.moveToFirst()) return;
+			final Location first = OpenGpsTrackRepository.LOCATION(waypoints);
+			if(!waypoints.moveToLast()) return;
+			final Location last = OpenGpsTrackRepository.LOCATION(waypoints);
 			
 			if(first != null && last != null) {
 				final LatLng start = POINT(first);
@@ -133,12 +104,13 @@ public class TrackMapFragment extends SupportMapFragment {
 		
 		@Override
 		protected PolylineOptions doInBackground(Void... paramArrayOfParams) {
-			return PATH1(utils, id);
+			return PATH3(waypoints);
 		}
 		
 		@Override
 		protected void onPostExecute(PolylineOptions result) {
 			super.onPostExecute(result);
+			waypoints.close();
 			googleMap.addPolyline(result);
 		}
 	}
@@ -146,16 +118,16 @@ public class TrackMapFragment extends SupportMapFragment {
 	private PathTask pt;
 	
 	private void drawMap(TrackChangedEvent event) {
-		final MyTracksProviderUtils utils = MyTracksProviderUtils.Factory.get(getActivity()); 
-		Track track = utils.getTrack(event.id);
+		Cursor waypoints = new OpenGpsTrackRepository(getActivity()).waypoints(event.id);
 		
-		if(null != track) {
+		
+		if(waypoints.moveToFirst()) {
 			getView().setVisibility(View.VISIBLE);
 			if(pt != null && !pt.isCancelled()) {
 				pt.cancel(true);
 			}
 			
-			pt = new PathTask(utils, event.id);
+			pt = new PathTask(waypoints);
 			pt.execute();
 		} else {
 			getView().setVisibility(View.GONE);

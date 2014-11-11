@@ -1,11 +1,12 @@
 package com.wheelly.activity;
 
 import android.os.Bundle;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+
 import com.wheelly.R;
 import com.wheelly.fragments.MileageFragment;
 
-public class Mileage extends SherlockFragmentActivity {
+public class Mileage extends ActionBarActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

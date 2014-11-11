@@ -11,18 +11,18 @@ import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.util.FloatMath;
 import android.util.Pair;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.activity.Mileage;
@@ -87,7 +87,7 @@ public class EventListFragment extends ConfigurableListFragment {
 						case R.id.place: {
 							final String argb = cursor.getString(cursor.getColumnIndex("color"));
 							final TextView tv = (TextView)view; 
-							tv.setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+							tv.setBackgroundColor(TextUtils.isEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
 							
 							final int[] icons = new int[] { R.drawable.hb_stop, R.drawable.hb_start, R.drawable.hb_refuel, };
 							final int iconIndex = new StringBuilder(Integer.toString(cursor.getInt(cursor.getColumnIndex("icons")), 2)).reverse().indexOf("1");
@@ -190,6 +190,7 @@ public class EventListFragment extends ConfigurableListFragment {
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		menu.findItem(R.id.opt_menu_add).setVisible(false);
+		menu.findItem(R.id.opt_menu_filter).setVisible(false);
 		
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
