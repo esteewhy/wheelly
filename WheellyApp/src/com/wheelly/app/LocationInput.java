@@ -4,12 +4,12 @@ import ru.orangesoftware.financisto.activity.LocationActivity;
 import ru.orangesoftware.financisto.utils.Utils;
 
 import com.google.android.gms.location.LocationListener;
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.LocationBroker;
 import com.wheelly.util.LocationUtils;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,11 +21,12 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.issue40537.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,9 +51,8 @@ public final class LocationInput extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		final Activity ctx = getActivity();
-
 		
+		final Activity ctx = getActivity();
 		View v = inflater.inflate(R.layout.select_location, container, true);
 		
 		v.setOnLongClickListener(new OnLongClickListener() {
@@ -188,7 +188,7 @@ public final class LocationInput extends Fragment {
 				
 				final String argb = location.getAsString("color");
 				
-				if(!Strings.isNullOrEmpty(argb)) {
+				if(!TextUtils.isEmpty(argb)) {
 					c.labelView.setBackgroundColor(Color.parseColor(argb));
 				}
 				

@@ -4,12 +4,15 @@ import ru.orangesoftware.financisto.utils.Utils;
 
 import com.wheelly.R;
 import com.wheelly.content.TrackRepository;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
@@ -68,10 +71,26 @@ public final class TrackInput extends Fragment {
 				LayoutParams.WRAP_CONTENT));
 		
 		
-		tracksCursor = new TrackRepository(ctx).list();
+		try {
+			tracksCursor = new TrackRepository(ctx).list();
+		}
+		catch(SecurityException e) {
+		}
 		
 		//@todo implement notification about disabled sharing in MyTracks
 		if(null != tracksCursor) {
+			populateTracks(ctx, v, tracksCursor);
+		}
+		
+		c = new Controls(v);
+		c.labelView.setText(R.string.track);
+		c.locationAdd.setVisibility(View.GONE);
+		setValue(0);//force default label
+		return v;
+	}
+
+	private void populateTracks(final Activity ctx, final View v, final Cursor tracksCursor) {
+
 			ctx.startManagingCursor(tracksCursor);
 			@SuppressWarnings("deprecation")
 			final ListAdapter adapter =
@@ -102,13 +121,7 @@ public final class TrackInput extends Fragment {
 						.show();
 				}
 			});
-		}
 		
-		c = new Controls(v);
-		c.labelView.setText(R.string.track);
-		c.locationAdd.setVisibility(View.GONE);
-		setValue(0);//force default label
-		return v;
 	}
 	
 	public long getValue() {
@@ -116,15 +129,23 @@ public final class TrackInput extends Fragment {
 	}
 	
 	public void setValue(final long trackId) {
-		if(selectedTrackId != trackId) {
+		if(selectedTrackId != trackId && null != tracksCursor) {
 			if(trackId != 0 && Utils.moveCursor(tracksCursor, "_id", trackId) != -1) {
 				c.locationText.setText(tracksCursor.getString(tracksCursor.getColumnIndexOrThrow("name")));
 				((View)c.labelView.getParent()).setOnLongClickListener(new OnLongClickListener() {
 					@Override
 					public boolean onLongClick(View v) {
-						Intent intent = new Intent(TrackRepository.MYTRACKS_ACTION);
-						intent.putExtra("track_id", trackId);
-						startActivity(intent);
+						Intent intent = new Intent();
+						intent.setData(
+							Uri.withAppendedPath(Uri.parse("content://nl.sogeti.android.gpstracker/tracks/"), Long.toString(trackId))
+						);
+						intent.setClassName("nl.sogeti.android.gpstracker", "nl.sogeti.android.gpstracker.viewer.LoggerMap");
+						try {
+							startActivity(intent);
+						} catch(ActivityNotFoundException e) {
+							
+						}
+						
 						return false;
 					}
 				});

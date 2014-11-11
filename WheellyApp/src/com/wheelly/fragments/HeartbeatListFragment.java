@@ -1,26 +1,22 @@
 package com.wheelly.fragments;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.view.ContextMenu;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 
-import com.google.common.base.Strings;
 import com.wheelly.R;
 import com.wheelly.activity.Heartbeat;
 import com.wheelly.app.ListConfiguration;
@@ -28,7 +24,6 @@ import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.fragments.InfoDialogFragment.Options;
-import com.wheelly.service.Synchronizer;
 
 public class HeartbeatListFragment extends ConfigurableListFragment {
 	
@@ -67,7 +62,7 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 						case R.id.place: {
 							final String argb = cursor.getString(cursor.getColumnIndex("color"));
 							final TextView tv = (TextView)view; 
-							tv.setBackgroundColor(Strings.isNullOrEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
+							tv.setBackgroundColor(TextUtils.isEmpty(argb) ? Color.TRANSPARENT : Color.parseColor(argb));
 							
 							final int[] icons = new int[] { R.drawable.hb_stop, R.drawable.hb_start, R.drawable.hb_refuel, };
 							final int iconIndex = new StringBuilder(Integer.toString(cursor.getInt(cursor.getColumnIndex("icons")), 2)).reverse().indexOf("1");
@@ -136,10 +131,6 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		if(!super.onContextItemSelected(item)) {
 			switch(item.getItemId()) {
-			case R.id.ctx_menu_sync:
-				final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
-				new Synchronizer(getActivity(), getFragmentManager()).execute(mi.id);
-				return true;
 			case R.id.ctx_menu_sync_pull:
 			case R.id.ctx_menu_sync_push: {
 				final ContentValues values = new ContentValues();
@@ -153,28 +144,6 @@ public class HeartbeatListFragment extends ConfigurableListFragment {
 			return false;
 		}
 		return true;
-	}
-	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		
-		menu.add(Menu.NONE, 5, Menu.NONE, "Sync")
-			.setIcon(android.R.drawable.ic_menu_upload)
-			.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					//new WheellyProviderUtils(getActivity()).resetSync(-1);
-					new Synchronizer(getActivity(), getFragmentManager()).execute(-1);
-					return true;
-				}
-			});
-	}
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 	@Override

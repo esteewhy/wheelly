@@ -48,15 +48,16 @@ public class Odometer extends TableLayout
 		mDigitSpinners[4] = (OdometerSpinner) findViewById(R.id.widget_odometer_spinner_10k);
 		mDigitSpinners[5] = (OdometerSpinner) findViewById(R.id.widget_odometer_spinner_100k);
 		
+		final OdometerSpinner.OnDigitChangeListener listener = new OdometerSpinner.OnDigitChangeListener() {
+			public void onDigitChange(OdometerSpinner s, int newDigit)
+			{
+				updateValue();
+			}
+		};
+		
 		for(OdometerSpinner s : mDigitSpinners)
 		{
-			s.setOnDigitChangeListener(new OdometerSpinner.OnDigitChangeListener()
-			{
-				public void onDigitChange(OdometerSpinner s, int newDigit)
-				{
-					updateValue();
-				}
-			});
+			s.setOnDigitChangeListener(listener);
 		}
 	}
 	
@@ -67,7 +68,7 @@ public class Odometer extends TableLayout
 		
 		for(OdometerSpinner s : mDigitSpinners)
 		{
-			tempValue += (s.getCurrentDigit() * factor);
+			tempValue += (s.getValue() * factor);
 			factor *= 10;
 		}
 		
@@ -90,9 +91,9 @@ public class Odometer extends TableLayout
 			
 			int digitVal = (int) Math.floor(tempValue / factor);
 			tempValue -= (digitVal * factor);
-			mDigitSpinners[i].setCurrentDigit(digitVal);
+			mDigitSpinners[i].setValue(digitVal);
 		}
-		mDigitSpinners[0].setCurrentDigit(tempValue);
+		mDigitSpinners[0].setValue(tempValue);
 		
 		if(old != mCurrentValue && mValueChangeListener != null)
 			mValueChangeListener.onValueChange(this, mCurrentValue);

@@ -41,6 +41,7 @@ public class Refuel extends FragmentActivity {
 		c.Price.setAmount((long)Math.round(refuel.getAsFloat("unit_price") * 100));
 		c.Cost.setAmount((long)Math.round(refuel.getAsFloat("cost") * 100));
 		c.Financisto.setValue((long)refuel.getAsLong("transaction_id"));
+		c.Financisto.setValues(refuel);
 		
 		c.Save.setOnClickListener(
 			new OnClickListener() {

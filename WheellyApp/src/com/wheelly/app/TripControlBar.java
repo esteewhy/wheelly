@@ -7,7 +7,7 @@ import com.wheelly.activity.HeartbeatDialog;
 import com.wheelly.content.TrackRepository;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.HeartbeatBroker;
-import com.wheelly.service.MyTracksTracker;
+import com.wheelly.service.OpenGpsTracker;
 import com.wheelly.service.Tracker.TrackListener;
 import com.wheelly.util.DateUtils;
 
@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -107,7 +108,7 @@ public class TripControlBar extends Fragment {
 			intent.putExtra("heartbeat", values);
 		}
 		
-		startActivityForResult(intent, requestId);
+		getParentFragment().startActivityForResult(intent, requestId);
 	}
 	
 	@Override
@@ -189,7 +190,7 @@ public class TripControlBar extends Fragment {
 		
 		if(val.TrackId < 0) {
 			val.TrackId = val.TrackId * -1;
-			new MyTracksTracker(getActivity())
+			new OpenGpsTracker(getActivity())
 				.setStartTrackListener(new TrackListener() {
 					@Override
 					public void onTrackStopped() {
@@ -231,7 +232,7 @@ public class TripControlBar extends Fragment {
 	private void start(final View v) {
 		final Value val = getValue();
 		
-		if(new MyTracksTracker(getActivity())
+		if(new OpenGpsTracker(getActivity())
 			.setStartTrackListener(new TrackListener() {
 				@Override
 				public void onStartTrack(long trackId) {
@@ -353,7 +354,7 @@ public class TripControlBar extends Fragment {
 		this.canStartTracking = startId > 0
 			&& value.TrackId == 0
 			&& stopId <= 0
-			&& new MyTracksTracker(getActivity()).checkAvailability();
+			&& new OpenGpsTracker(getActivity()).checkAvailability();
 		
 		// Store temp values into controls.
 		initButton(c.StartButton, startId,  value.StartHeartbeat,
@@ -389,12 +390,12 @@ public class TripControlBar extends Fragment {
 		MenuCompat.setShowAsAction(menu
 				.add(0, R.id.bStart, 1, R.string.start)
 				.setIcon(R.drawable.btn_start),
-			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT); 
+			MenuItemCompat.SHOW_AS_ACTION_ALWAYS | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT); 
 		MenuCompat.setShowAsAction(menu
 				.add(0, R.id.bStop, 2, R.string.stop)
 				.setIcon(R.drawable.btn_stop)
 				.setEnabled(false),
-			MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItemCompat.SHOW_AS_ACTION_ALWAYS | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 	}
 	
 	@Override

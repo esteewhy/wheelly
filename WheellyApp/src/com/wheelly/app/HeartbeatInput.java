@@ -65,7 +65,7 @@ public final class HeartbeatInput extends Fragment {
 	/**
 	 * Holds control references.
 	 */
-	private static class Controls {
+	private class Controls {
 		final MileageInput OdometerEditText;
 		final FuelInput FuelAmountEditor;
 		final DateTimeBar CreatedDateTimeBar;
@@ -75,7 +75,7 @@ public final class HeartbeatInput extends Fragment {
 			OdometerEditText	= (MileageInput)view.findViewById(R.id.odometer);
 			FuelAmountEditor	= (FuelInput)view.findViewById(R.id.fuel);
 			CreatedDateTimeBar	= (DateTimeBar)view.findViewById(R.id.datetimebar);
-			Place				= (LocationInput)((FragmentActivity)view.getContext()).getSupportFragmentManager().findFragmentById(R.id.place);
+			Place				= (LocationInput)getChildFragmentManager().findFragmentById(R.id.place);
 		}
 	}
 }
