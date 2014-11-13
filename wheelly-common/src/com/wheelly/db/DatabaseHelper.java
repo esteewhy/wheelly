@@ -1,26 +1,39 @@
 package com.wheelly.db;
 
-import com.wheelly.db.DatabaseSchema.Heartbeats;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
+
 import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Refuels;
 import com.wheelly.db.DatabaseSchema.Timeline;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
+	private final AssetManager assetManager;
+	
 	public DatabaseHelper(Context context) {
-		super(context, "wheelly.db", null, 18);
+		super(context, "wheelly.db", null, 19);
+		this.assetManager = context.getAssets();
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(Mileages.Create);
 		db.execSQL(Refuels.Create);
-		db.execSQL(Heartbeats.Create);
+		try {
+			runScript(db, readFile("db/create/heartbeats.sql"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		db.execSQL(Locations.Create);
 		
 		db.execSQL(Mileages.NextMileageView);
@@ -94,6 +107,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			db.execSQL(Timeline.PrevEventView);
 			db.execSQL(Timeline.NextEventView);
 			break;
+		case 18:
+			try {
+				runScript(db, readFile("db/create/heartbeats.sql").replace("heartbeats", "heartbeats_t"));
+				runScript(db, readFile("db/alter/20141112-upgrade_heartbeats.sql"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private String readFile(String scriptFile) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		InputStream is = assetManager.open(scriptFile);
+		Scanner scanner = new Scanner(is);
+		try {
+			while (scanner.hasNextLine()) {
+				sb.append(scanner.nextLine().trim()).append(" ");
+			}
+		} finally {
+			scanner.close();
+			is.close();
+		}
+		return sb.toString().trim();
+	}
+	
+	private static void runScript(SQLiteDatabase db, String script) throws IOException {
+		String[] content = script.split(";");
+		for (String s : content) {
+			String sql = s.trim();
+			if (sql.length() > 1) {
+				try {
+					db.execSQL(sql);
+				} catch (SQLiteException ex) {
+					Log.e("DatabaseSchema", "Unable to run sql: "+sql, ex);
+					throw ex;
+				}
+			}
 		}
 	}
 }

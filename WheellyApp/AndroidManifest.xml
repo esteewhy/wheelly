@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.wheelly"
 		android:versionCode="8"
-		android:versionName="20131204">
+		android:versionName="20141112">
 	<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="7"/>
 	<supports-screens 
 		android:smallScreens="true"
