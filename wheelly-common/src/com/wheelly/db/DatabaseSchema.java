@@ -297,20 +297,6 @@ public final class DatabaseSchema {
 	}
 	
 	public static final class Heartbeats {
-		public static final String Create =
-			"CREATE TABLE heartbeats ("
-			+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-			+ "_created		TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-			+ "odometer		NUMERIC NOT NULL,"
-			+ "fuel			NUMERIC NOT NULL,"
-			+ "place_id		LONG,"
-			+ "sync_id		TEXT,"
-			+ "sync_etag	TEXT,"
-			+ "sync_state	LONG NOT NULL DEFAULT 0,"
-			+ "sync_date	TIMESTAMP,"
-			+ "modified		TIMESTAMP DEFAULT (strftime('%s', 'now')),"
-			+ "vehicle_id	LONG)";
-		
 		// reverse links detection
 		public static final String IconColumnExpression =
 				"((r._id IS NOT NULL) * 4"
