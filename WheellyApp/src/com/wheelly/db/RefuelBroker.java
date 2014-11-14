@@ -30,9 +30,9 @@ public class RefuelBroker {
 				? cr.query(
 					ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
 					Refuels.SingleProjection,
-					null, null, null)
+					"type = 4", null, null)
 				: cr.query(Refuels.CONTENT_URI, Refuels.DefaultProjection,
-					null,
+					"type = 4",
 					// pass parameter to some projection fields
 					new String[] {
 						Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60))
@@ -48,8 +48,7 @@ public class RefuelBroker {
 				r.put("name",			"First refuel!");
 				//r.put("_created",		"");
 				r.put("transaction_id",	0);
-				r.put("heartbeat_id",	-1);
-				r.put("calc_mileage",	0);
+				r.put("type",			4);
 				r.put("amount",			0);
 				r.put("cost",			0);
 				r.put("unit_price",		0);
@@ -62,9 +61,13 @@ public class RefuelBroker {
 	
 	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
 		long id = refuel.getAsLong(BaseColumns._ID);
-		refuel.put("heartbeat_id", new HeartbeatBroker(context).updateOrInsert(heartbeat));
 		ContentResolver cr = context.getContentResolver();
-			
+		
+		final int type = refuel.getAsInteger("type");
+		if(!refuel.containsKey("type")|| type != 4) {
+			refuel.put("type", 4);
+		}
+		
 		if(id > 0) {
 			cr.update(
 				ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
@@ -82,8 +85,6 @@ public class RefuelBroker {
 		values.put("name",			cursor.getString(cursor.getColumnIndexOrThrow("name")));
 		values.put("_created",		cursor.getString(cursor.getColumnIndexOrThrow("_created")));
 		values.put("transaction_id",cursor.getLong(cursor.getColumnIndexOrThrow("transaction_id")));
-		values.put("heartbeat_id",	cursor.getLong(cursor.getColumnIndexOrThrow("heartbeat_id")));
-		values.put("calc_mileage",	cursor.getFloat(cursor.getColumnIndexOrThrow("calc_mileage")));
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
 		values.put("cost",			cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
 		values.put("unit_price",	cursor.getFloat(cursor.getColumnIndexOrThrow("unit_price")));

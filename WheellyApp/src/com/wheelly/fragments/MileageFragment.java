@@ -33,7 +33,7 @@ public class MileageFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.mileage_edit, null);
+		return inflater.inflate(R.layout.mileage_edit, container);
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class MileageFragment extends Fragment {
 		
 		final Controls c = new Controls();
 		
-		c.Mileage.setAmount(values.getAsLong("mileage"));
+		c.Mileage.setAmount(values.getAsLong("distance"));
 		c.Destination.setValue(values.getAsLong("location_id"));
 		c.Track.setOnTrackChangedListener(new OnTrackChangedListener() {
 			@Override

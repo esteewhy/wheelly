@@ -114,32 +114,6 @@ public final class DatabaseSchema {
 			+ " LEFT OUTER JOIN prev_mileages p"
 			+ "		ON p.mileage_id = m." + _ID;
 		
-		public static final String PrevMileageView =
-				"CREATE VIEW prev_mileages AS"
-				+ " SELECT m." + _ID + " mileage_id, prev.*"
-				+ " FROM mileages m"
-				+ " INNER JOIN heartbeats start"
-				+ " 	ON m.start_heartbeat_id = start." + _ID
-				+ " INNER JOIN heartbeats prev_stop"
-				+ " 	ON start.odometer = prev_stop.odometer"
-				+ "			AND start.place_id = prev_stop.place_id"
-				+ " 		AND start." + _ID + " != prev_stop." + _ID
-				+ " INNER JOIN mileages prev"
-				+ " 	ON prev.stop_heartbeat_id = prev_stop." + _ID;
-		
-		public static final String NextMileageView =
-			"CREATE VIEW next_mileages AS"
-			+ " SELECT m." + _ID + " mileage_id, next.*"
-			+ " FROM mileages m"
-			+ " INNER JOIN heartbeats stop"
-			+ " 	ON m.stop_heartbeat_id = stop." + _ID
-			+ " INNER JOIN heartbeats next_start"
-			+ " 	ON stop.odometer = next_start.odometer"
-			+ "			AND stop.place_id = next_start.place_id"
-			+ " 		AND stop." + _ID + " != next_start." + _ID
-			+ " INNER JOIN mileages next"
-			+ " 	ON next.start_heartbeat_id = next_start." + _ID;
-		
 		public static final String[] SINGLE_VIEW_PROJECTION = {
 			"m." + _ID,
 			"COALESCE(stop._created, start._created, m._created) _created",
@@ -159,13 +133,12 @@ public final class DatabaseSchema {
 			"_created",
 			"name",
 			"track_id",
-			"start_heartbeat_id",
-			"stop_heartbeat_id",
-			"mileage",
+			"_id start_heartbeat_id",
+			"(SELECT start._id FROM start_events start WHERE start.heartbeat_id = m._id) stop_heartbeat_id",
+			"m._id as stop_heartbeat_id",
+			"distance",
 			"amount",
 			"location_id",
-			"calc_cost",
-			"calc_amount"
 		};
 		
 		public static final String[] DefaultProjection = {
@@ -175,10 +148,6 @@ public final class DatabaseSchema {
 			"MAX(m.amount) amount",
 			"0 location_id",
 			"NULL track_id",
-			"NULL start_heartbeat_id",
-			"NULL stop_heartbeat_id",
-			"0 calc_cost",
-			"0 calc_amount",
 			"CURRENT_TIMESTAMP	name"
 		};
 		
@@ -297,12 +266,6 @@ public final class DatabaseSchema {
 	}
 	
 	public static final class Heartbeats {
-		// reverse links detection
-		public static final String IconColumnExpression =
-				"((r._id IS NOT NULL) * 4"
-				+ "	| (m1._id IS NOT NULL) * 2"
-				+ "	| (m2._id IS NOT NULL))";
-		
 		public static final String[] ListProjection = {
 			"h." + _ID,
 			"h._created",
@@ -310,7 +273,7 @@ public final class DatabaseSchema {
 			"h.fuel",
 			"l.name place",
 			"h.sync_state",
-			IconColumnExpression + " icons",
+			"h.type icons",
 			"l.color color",
 		};
 		
@@ -319,20 +282,6 @@ public final class DatabaseSchema {
 			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + _ID
 			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + _ID
 			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + _ID;
-		
-		public static final String ReferenceCount =
-			"SELECT SUM(cnt) FROM ("
-			+ "SELECT COUNT(1) cnt FROM mileages WHERE start_heartbeat_id = ?1"
-			+ " UNION "
-			+ "SELECT COUNT(1) cnt FROM mileages WHERE stop_heartbeat_id = ?1"
-			+ " UNION "
-			+ "SELECT COUNT(1) cnt FROM refuels WHERE heartbeat_id = ?1"
-			+ ")";
-		
-		public static final String[] RelatedItemProjection = {
-			Heartbeats.IconColumnExpression + " icons",
-			"COALESCE(r." + _ID + " , m1." + _ID + ", m2." + _ID + ", h." + _ID + ") edit_id"
-		};
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
 		static {
@@ -358,22 +307,20 @@ public final class DatabaseSchema {
 		
 		private static final String EnRouteRefuelAmount =
 				"SELECT Sum(r.amount)"
-				+ " FROM refuels r"
-				+ " INNER JOIN heartbeats rh"
-				+ "  ON r.heartbeat_id = rh." + _ID
-				+ " WHERE rh._created BETWEEN start._created AND h._created";
+				+ " FROM heartbeats r"
+				+ " WHERE r.type = 4 AND r._created BETWEEN start._created AND h._created";
 		
 		private static final String FuelField =
-				"COALESCE(r.amount, h.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m2.calc_amount, h.fuel)";
+				"COALESCE(h.amount, h.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), h.fuel)";
 		
 		private static final String LegTypeField =
-				"(CASE WHEN r." + _ID + " IS NULL THEN"
-				+ "	CASE WHEN m1." + _ID + " IS NOT NULL THEN"
-				+ "			CASE WHEN p." + _ID + " IS NOT NULL THEN 5"//RESTART
-				+ "			WHEN m1.stop_heartbeat_id > 0 THEN 1"//START
+				"(CASE WHEN type != 4 THEN"
+				+ "	CASE WHEN type = 1 THEN"
+				+ "			CASE WHEN p._id IS NOT NULL THEN 5"//RESTART
+				+ "			WHEN stop._id IS NOT NULL 0 THEN 1"//START
 				+ "			ELSE 6 END"//RUNNING
-				+ "		WHEN m2." + _ID + " IS NOT NULL THEN"
-				+ "			CASE WHEN n." + _ID + " IS NOT NULL THEN 3"//PAUSE
+				+ "		WHEN type = 2 THEN"
+				+ "			CASE WHEN n._id IS NOT NULL THEN 3"//PAUSE
 				+ "			ELSE 2 END END"//STOP
 				+ "	ELSE 4 END)";//REFUEL
 		
@@ -384,12 +331,11 @@ public final class DatabaseSchema {
 			"h.fuel",
 			"l.name place",
 			"l.color",
-			"m2.mileage distance",
-			"ls.name destination",
-			"r.cost",
+			"h.distance",
+			"h.cost",
 			FuelField + " amount",
-			"r.transaction_id",
-			Heartbeats.IconColumnExpression + " icons",
+			"h.transaction_id",
+			"h.type icons",
 			"h.sync_id",
 			"h.sync_etag",
 			"h.sync_date",
@@ -399,36 +345,13 @@ public final class DatabaseSchema {
 		};
 		
 		public static final String Tables = "heartbeats h"
-			+ " LEFT JOIN locations l	ON h.place_id = l." + _ID
-			+ " LEFT JOIN mileages m1	ON m1.start_heartbeat_id = h." + _ID
-			+ " LEFT JOIN mileages m2	ON m2.stop_heartbeat_id = h." + _ID
-			+ " LEFT JOIN locations ls	ON m2.location_id = ls." + _ID
-			+ " LEFT JOIN refuels r		ON r.heartbeat_id = h." + _ID
-			+ " LEFT JOIN prev_event p	ON p.heartbeat_id = h." + _ID
-			+ " LEFT JOIN next_event n	ON n.heartbeat_id = h." + _ID
-			+ " LEFT JOIN heartbeats start ON start." + _ID + " = m2.start_heartbeat_id";
-		
-		public static final String PrevEventView =
-			"CREATE VIEW prev_event AS"
-			+ " SELECT h." + _ID + " heartbeat_id, prev.*"
-			+ " FROM heartbeats h"
-			+ " INNER JOIN heartbeats prev"
-			+ " 	ON h.odometer = prev.odometer"
-			+ "			AND h.place_id = prev.place_id"
-			+ "			AND h._created > prev._created"
-			+ "			AND SUBSTR(h._created, 1, 10) = SUBSTR(prev._created, 1, 10)"
-			+ "			AND h." + _ID + " != prev." + _ID;
-		
-		public static final String NextEventView =
-			"CREATE VIEW next_event AS"
-			+ " SELECT h." + _ID + " heartbeat_id, next.*"
-			+ " FROM heartbeats h"
-			+ " INNER JOIN heartbeats next"
-			+ " 	ON h.odometer = next.odometer"
-			+ "			AND h.place_id = next.place_id"
-			+ "			AND h._created < next._created"
-			+ "			AND SUBSTR(h._created, 1, 10) = SUBSTR(next._created, 1, 10)"
-			+ " 		AND h." + _ID + " != next." + _ID;
+			+ " LEFT JOIN locations l			ON h.place_id = l._id"
+			+ " LEFT JOIN stop_eventss stop		ON stop.heartbeat_id = h._id"
+			+ " LEFT JOIN start_events start	ON start.heartbeat_id = h._id"
+			+ " LEFT JOIN locations ls			ON start.location_id = ls._id"
+			+ " LEFT JOIN refuels r				ON r.heartbeat_id = h._id"
+			+ " LEFT JOIN prev_event p			ON p.heartbeat_id = h._id"
+			+ " LEFT JOIN next_event n			ON n.heartbeat_id = h._id";
 		
 		public static final Map<String, String> FilterExpr = new HashMap<String, String>();
 		static {
@@ -446,50 +369,11 @@ public final class DatabaseSchema {
 	}
 	
 	public static final class Locations {
-		public static String Create =
-			"create table if not exists locations ("
-			+"		_id integer primary key autoincrement," 
-			+"		name text not null,	"
-			+"		datetime long not null,"
-			+"		provider text,"
-			+"		accuracy float,"
-			+"		latitude double,"
-			+"		longitude double,"
-			+"		is_payee integer not null default 0,"
-			+"		resolved_address text,"
-			+"		color TEXT,"
-			+"		sync_etag TEXT,"
-			+"		modified TIMESTAMP DEFAULT (strftime('%s', 'now'))"
-			+"	)";
-		
 		public static final String Select =
 			"SELECT * FROM locations";
 		
 		public static final String Single =
 			"SELECT * FROM locations WHERE _id = ? LIMIT 1";
-		
-		public static final String SelectByMileages =
-			"SELECT l.* FROM locations l"
-			+ " INNER JOIN ("
-			+ "  SELECT location_id, COUNT(" + _ID + ") cnt FROM ("
-			+ "   SELECT " + _ID + ", location_id FROM mileages"
-			+ "   UNION"
-			+ "   SELECT m." + _ID + ", h.place_id FROM mileages m INNER JOIN heartbeats h ON m.start_heartbeat_id = h." + _ID
-			+ "   UNION"
-			+ "   SELECT m." + _ID + ", h.place_id FROM mileages m INNER JOIN heartbeats h ON m.stop_heartbeat_id = h." + _ID
-			+ "  ) GROUP BY location_id"
-			+ " ) ml ON ml.location_id = l." + _ID
-			+ " ORDER BY ml.cnt DESC";
-		
-		public static final String SelectByRefuels =
-			"SELECT l.* FROM locations l"
-			+ " INNER JOIN ("
-			+ "  SELECT COUNT(1) cnt, h.place_id place_id"
-			+ "  FROM refuels r"
-			+ "  INNER JOIN heartbeats h ON r.heartbeat_id = h." + _ID
-			+ "  GROUP BY h.place_id"
-			+ " ) rl ON rl.place_id = l." + _ID
-			+ " ORDER BY rl.cnt DESC";
 		
 		public static final Uri CONTENT_URI =
 				BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATIONS).build();

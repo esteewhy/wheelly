@@ -13,7 +13,6 @@ import com.wheelly.util.FilterUtils.FilterResult;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,7 +44,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 	protected abstract ListConfiguration configure();
 	public abstract SimpleCursorAdapter createListAdapter();
 	public abstract CursorLoader createViewItemCursorLoader(long id);
-	public abstract InfoDialogFragment.Options configureViewItemDialog();
 
 	private ListConfiguration getConfiguration() {
 		return null == configuration ? (configuration = configure()) : configuration;
@@ -98,23 +96,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 		super.onResume();
 	}
 	
-	protected void viewItem(final long id) {
-		final InfoDialogFragment.Options dialogCfg = configureViewItemDialog();
-		
-		dialogCfg.onClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(which == Dialog.BUTTON_POSITIVE) {
-					editItem(id);
-				}
-			};
-		};
-		
-		dialogCfg.loader = createViewItemCursorLoader(id);
-		
-		new InfoDialogFragment(dialogCfg).show(getFragmentManager(), "dialog");
-	}
-	
 	protected void editItem(final long id) {
 		Intent intent = new Intent(getActivity(), getConfiguration().ItemActivityClass);
 		intent.putExtra(BaseColumns._ID, id);
@@ -131,7 +112,7 @@ public abstract class ConfigurableListFragment extends ListFragment
 	
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, final long id) {
-		viewItem(id);
+		editItem(id);
 	}
 	
 	@Override
@@ -202,10 +183,6 @@ public abstract class ConfigurableListFragment extends ListFragment
 			final AdapterContextMenuInfo mi = (AdapterContextMenuInfo)item.getMenuInfo();
 			
 			switch (item.getItemId()) {
-				case R.id.ctx_menu_view: {
-					viewItem(mi.id);
-					return true;
-				}
 				case R.id.ctx_menu_edit:
 					editItem(mi.id);
 					return true;
