@@ -90,14 +90,6 @@ public class HeartbeatBroker {
 		return cursor.moveToFirst() ? cursor.getInt(0) : 0;
 	}
 	
-	public Pair<Integer, Long> related(final long id) {
-		final ContentResolver cr = context.getContentResolver();
-		final Cursor cursor = cr.query(
-			ContentUris.withAppendedId(Uri.withAppendedPath(Heartbeats.CONTENT_URI, "related"), id),
-				null, null, null, null);
-		return cursor.moveToFirst() ? new Pair<Integer, Long>(cursor.getInt(0), cursor.getLong(1)) : null;
-	}
-	
 	public static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		

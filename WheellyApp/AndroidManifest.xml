@@ -124,6 +124,10 @@
 			android:authorities="com.wheelly"
 			android:multiprocess="true"
 			android:name=".content.ChronologyProvider" />
+		<provider
+			android:authorities="com.wheelly"
+			android:multiprocess="true"
+			android:name=".content.LocationProvider" />
 		
 		<receiver android:name=".activity.Widget"
 			 android:label="Wheelly Car Status" >

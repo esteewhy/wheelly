@@ -1,6 +1,7 @@
 package com.wheelly.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -10,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.v4.content.CursorLoader;
 import android.util.FloatMath;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,7 +32,6 @@ import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.db.DatabaseSchema.Mileages;
 import com.wheelly.db.DatabaseSchema.Timeline;
-import com.wheelly.fragments.InfoDialogFragment.Options;
 
 public class EventListFragment extends ConfigurableListFragment {
 	boolean suggestInstall;
@@ -150,24 +149,6 @@ public class EventListFragment extends ConfigurableListFragment {
 	}
 	
 	@Override
-	public Options configureViewItemDialog() {
-		return
-			new InfoDialogFragment.Options() {{
-				
-				fields.put(R.string.mileage_input_label, "mileage");
-				fields.put(R.string.fuel_burnt, "fuel");
-				fields.put(R.string.departure, "start_time");
-				fields.put(R.string.origin, "start_place");
-				fields.put(R.string.finish, "stop_place");
-				fields.put(R.string.fuel_consumption, "consumption");
-				
-				titleField = "destination";
-				dataField = "_created";
-				iconResId = R.drawable.ic_tab_jet_selected;
-			}};
-	}
-	
-	@Override
 	public CursorLoader createViewItemCursorLoader(long id) {
 		return
 			new CursorLoader(
@@ -236,12 +217,12 @@ public class EventListFragment extends ConfigurableListFragment {
 	
 	@Override
 	protected void editItem(long id) {
-		final Pair<Integer, Long> relatedItem = new HeartbeatBroker(getActivity()).related(id);
+		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(id);
 		
-		if(null != relatedItem && relatedItem.second >= 0) {
+		if(values.getAsLong("_id") == id) {
 			Class<?> activityClass = Heartbeat.class;
 			
-			switch(relatedItem.first) {
+			switch(values.getAsInteger("type")) {
 			case 4:
 				activityClass = Refuel.class;
 				break;
@@ -251,11 +232,10 @@ public class EventListFragment extends ConfigurableListFragment {
 				break;
 			}
 			Intent intent = new Intent(getActivity(), activityClass);
-			intent.putExtra(BaseColumns._ID, relatedItem.second);
+			intent.putExtra(BaseColumns._ID, id);
 			startActivityForResult(intent, EDIT_REQUEST);
 			return;
 		}
-		
 		super.editItem(id);
 	}
 }
