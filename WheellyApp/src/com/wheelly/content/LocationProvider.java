@@ -1,10 +1,11 @@
 package com.wheelly.content;
 
 import java.util.List;
+
 import com.wheelly.db.DatabaseHelper;
-import com.wheelly.db.DatabaseSchema;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
-import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationsSchema;
+
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -26,16 +27,16 @@ public class LocationProvider extends ContentProvider {
 	private static final UriMatcher uriMatcher;
 	
 	static {
-		final String a = DatabaseSchema.CONTENT_AUTHORITY;
+		final String a = LocationsSchema.CONTENT_AUTHORITY;
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH) {{
 			addURI(a, "locations", LOCATIONS);
 			addURI(a, "locations/#", LOCATIONS_ID);
 		}};
 		
-		DataSchemaLookup.put(LOCATIONS, Locations.CONTENT_TYPE);
-		DataSchemaLookup.put(LOCATIONS_ID, Locations.CONTENT_ITEM_TYPE);
+		DataSchemaLookup.put(LOCATIONS, LocationsSchema.CONTENT_TYPE);
+		DataSchemaLookup.put(LOCATIONS_ID, LocationsSchema.CONTENT_ITEM_TYPE);
 		
-		UriMap.put(LOCATIONS, Locations.CONTENT_URI);
+		UriMap.put(LOCATIONS, LocationsSchema.CONTENT_URI);
 	}
 	
 	private SQLiteOpenHelper dbHelper;

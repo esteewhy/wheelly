@@ -1,0 +1,74 @@
+<LinearLayout
+	xmlns:android	="http://schemas.android.com/apk/res/android"
+	xmlns:wheelly	="http://schemas.android.com/apk/res/com.wheelly"
+	android:layout_width	="fill_parent"
+	android:layout_height	="fill_parent"
+	android:orientation		="vertical">
+	
+	<ScrollView
+		android:layout_width	="fill_parent"
+		android:layout_height	="0dp"
+		android:layout_weight	="1">
+		
+		<LinearLayout
+			android:layout_width	="fill_parent"
+			android:layout_height	="wrap_content"
+			android:orientation		="vertical"
+			android:id				="@+id/list">
+			
+			<fragment
+				class		="com.wheelly.app.HeartbeatInput"
+				android:id	="@+id/heartbeat"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" /> 
+			
+			<include
+				layout="@layout/edit_divider" />
+			
+			<Button
+				android:layout_height	="wrap_content"
+				android:layout_weight	="1"
+				android:id				="@+id/bStop"
+				android:text			="@string/stop"
+				android:drawableLeft	="@drawable/btn_stop"
+				android:layout_width	="match_parent"/>
+			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<com.wheelly.widget.LabeledLayout
+				android:layout_width	="fill_parent"
+				android:layout_height	="wrap_content"
+				wheelly:label			="@string/mileage_input_label">
+				
+				<com.wheelly.widget.MileageInput
+					android:id				="@+id/mileage"
+					android:layout_height	="wrap_content"
+					android:layout_width	="fill_parent" />
+				
+			</com.wheelly.widget.LabeledLayout>
+			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<fragment
+				class					="com.wheelly.app.TrackInput"
+				android:id				="@+id/track"
+				android:layout_height	="wrap_content"
+				android:layout_width	="fill_parent" />
+			
+			<include
+				layout	="@layout/edit_divider" />
+			
+			<fragment
+				android:layout_width="fill_parent"
+				android:layout_height="175dp"
+				class="com.wheelly.fragments.TrackMapFragment"
+				android:tag="map" />
+			
+		</LinearLayout>
+	</ScrollView>
+	
+	<include layout="@layout/save_and_new_buttons" />
+	
+</LinearLayout>	

@@ -15,7 +15,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.issue40537.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -90,7 +90,6 @@ public final class TrackInput extends Fragment {
 	}
 
 	private void populateTracks(final Activity ctx, final View v, final Cursor tracksCursor) {
-
 			ctx.startManagingCursor(tracksCursor);
 			@SuppressWarnings("deprecation")
 			final ListAdapter adapter =
