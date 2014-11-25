@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
 import com.wheelly.db.HeartbeatBroker;
@@ -30,13 +31,9 @@ public class Refuel extends FragmentActivity {
 		final Intent intent = this.getIntent();
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
 		final ContentValues refuel = new RefuelBroker(this).loadOrCreate(id);
-		final ContentValues heartbeat = new HeartbeatBroker(this).loadOrCreate(
-			refuel.getAsLong("heartbeat_id")
-		);
+		final Controls c = new Controls();
 		
-		final Controls c = new Controls(this);
-		
-		c.Heartbeat.setValues(heartbeat);
+		c.Heartbeat.setValues(refuel);
 		c.Amount.setAmount((long)Math.round(refuel.getAsFloat("amount") * 100));
 		c.Price.setAmount((long)Math.round(refuel.getAsFloat("unit_price") * 100));
 		c.Cost.setAmount((long)Math.round(refuel.getAsFloat("cost") * 100));
@@ -49,7 +46,6 @@ public class Refuel extends FragmentActivity {
 				public void onClick(View v) {
 					
 					final ContentValues heartbeat = c.Heartbeat.getValues();
-					refuel.put("heartbeat_id", heartbeat.getAsLong(BaseColumns._ID));
 					refuel.put("amount", (float)c.Amount.getAmount() / 100);
 					refuel.put("unit_price", (float)c.Price.getAmount() / 100);
 					refuel.put("cost", (float)c.Cost.getAmount() / 100);
@@ -85,7 +81,7 @@ public class Refuel extends FragmentActivity {
 	/**
 	 * Encapsulates UI objects.
 	 */
-	private static class Controls {
+	private class Controls {
 		final HeartbeatInput Heartbeat;
 		final AmountInput Amount;
 		final AmountInput Price;
@@ -94,15 +90,15 @@ public class Refuel extends FragmentActivity {
 		final View Cancel;
 		final FinancistoButton Financisto;
 		
-		public Controls(FragmentActivity view) {
-			final FragmentManager fm = view.getSupportFragmentManager();
+		public Controls() {
+			final FragmentManager fm = getSupportFragmentManager();
 			
 			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
 			Amount		= (AmountInput)fm.findFragmentById(R.id.amount);
 			Price		= (AmountInput)fm.findFragmentById(R.id.price);
 			Cost		= (AmountInput)fm.findFragmentById(R.id.cost);
-			Save		= (View)view.findViewById(R.id.bSave);
-			Cancel		= (View)view.findViewById(R.id.bSaveAndNew);
+			Save		= (View)findViewById(R.id.bSave);
+			Cancel		= (View)findViewById(R.id.bSaveAndNew);
 			Financisto	= (FinancistoButton)fm.findFragmentById(R.id.financisto);
 		}
 	}

@@ -10,9 +10,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Pair;
 
 /**
  * Higher level abstraction over heartbeat persistence that accommodates
@@ -82,14 +80,6 @@ public class HeartbeatBroker {
 		}
 	}
 	
-	public int referenceCount(final long id) {
-		final ContentResolver cr = context.getContentResolver();
-		final Cursor cursor = cr.query(
-			ContentUris.withAppendedId(Uri.withAppendedPath(Heartbeats.CONTENT_URI, "references"), id),
-				null, null, null, null);
-		return cursor.moveToFirst() ? cursor.getInt(0) : 0;
-	}
-	
 	public static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
 		
@@ -98,6 +88,15 @@ public class HeartbeatBroker {
 		values.put("odometer", cursor.getLong(cursor.getColumnIndexOrThrow("odometer")));
 		values.put("fuel", cursor.getLong(cursor.getColumnIndexOrThrow("fuel")));
 		values.put("place_id", cursor.getLong(cursor.getColumnIndexOrThrow("place_id")));
+		values.put("type", cursor.getLong(cursor.getColumnIndexOrThrow("type")));
+		//stop hearbeat
+		//values.put("distance", cursor.getFloat(cursor.getColumnIndexOrThrow("distance")));
+		//values.put("track_id", cursor.getLong(cursor.getColumnIndexOrThrow("track_id")));
+		//refuel
+		//values.put("amount", cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
+		//values.put("unit_price", cursor.getFloat(cursor.getColumnIndexOrThrow("unit_price")));
+		//values.put("cost", cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
+		//values.put("transaction_id", cursor.getLong(cursor.getColumnIndexOrThrow("transaction_id")));
 		
 		return values;
 	}

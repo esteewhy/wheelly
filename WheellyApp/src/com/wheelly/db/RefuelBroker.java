@@ -1,5 +1,6 @@
 package com.wheelly.db;
 
+import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Refuels;
 
 import android.content.ContentResolver;
@@ -28,7 +29,7 @@ public class RefuelBroker {
 		final Cursor cursor =
 			id > 0
 				? cr.query(
-					ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
+					ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
 					Refuels.SingleProjection,
 					"type = 4", null, null)
 				: cr.query(Refuels.CONTENT_URI, Refuels.DefaultProjection,
@@ -60,6 +61,7 @@ public class RefuelBroker {
 	}
 	
 	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
+		refuel.putAll(heartbeat);
 		long id = refuel.getAsLong(BaseColumns._ID);
 		ContentResolver cr = context.getContentResolver();
 		
@@ -70,12 +72,12 @@ public class RefuelBroker {
 		
 		if(id > 0) {
 			cr.update(
-				ContentUris.withAppendedId(Refuels.CONTENT_URI, id),
+				ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
 				refuel, null, null);
 			return id;
 		} else {
 			refuel.remove(BaseColumns._ID);
-			return ContentUris.parseId(cr.insert(Refuels.CONTENT_URI, refuel));
+			return ContentUris.parseId(cr.insert(Heartbeats.CONTENT_URI, refuel));
 		}
 	}
 	
@@ -88,6 +90,8 @@ public class RefuelBroker {
 		values.put("amount",		cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
 		values.put("cost",			cursor.getFloat(cursor.getColumnIndexOrThrow("cost")));
 		values.put("unit_price",	cursor.getFloat(cursor.getColumnIndexOrThrow("unit_price")));
+		
+		values.putAll(HeartbeatBroker.deserialize(cursor));
 		return values;
 	}
 }

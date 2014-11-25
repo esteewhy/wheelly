@@ -1,6 +1,4 @@
 package com.wheelly.db;
-
-import com.wheelly.db.DatabaseSchema.Locations;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -27,7 +25,7 @@ public class LocationBroker {
 		
 		final Cursor cursor =
 				cr.query(
-					ContentUris.withAppendedId(Locations.CONTENT_URI, id),
+					ContentUris.withAppendedId(LocationsSchema.CONTENT_URI, id),
 					null, null, null, null);
 		
 		try {
@@ -41,7 +39,7 @@ public class LocationBroker {
 	}
 	
 	public long getNearest(Location location, float minDistance) {
-		final Cursor locationCursor = context.getContentResolver().query(Locations.CONTENT_URI, null, null, null, null);
+		final Cursor locationCursor = context.getContentResolver().query(LocationsSchema.CONTENT_URI, null, null, null, null);
 		long locationId = -1;
 		
 		try {
@@ -72,11 +70,11 @@ public class LocationBroker {
 		final ContentResolver cr = context.getContentResolver();
 		
 		if(id > 0) {
-			cr.update(ContentUris.withAppendedId(Locations.CONTENT_URI, id), values, null, null);
+			cr.update(ContentUris.withAppendedId(LocationsSchema.CONTENT_URI, id), values, null, null);
 			return id;
 		} else {
 			values.remove(BaseColumns._ID);
-			return ContentUris.parseId(cr.insert(Locations.CONTENT_URI, values));
+			return ContentUris.parseId(cr.insert(LocationsSchema.CONTENT_URI, values));
 		}
 	}
 	

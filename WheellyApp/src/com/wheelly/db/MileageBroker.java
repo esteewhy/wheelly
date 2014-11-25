@@ -32,10 +32,9 @@ public class MileageBroker {
 			id > 0
 				? cr.query(
 					ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
-					Mileages.SingleEditProjection,
-					"type = 2", null, null)
+					null, null, null, null)
 				: cr.query(Mileages.CONTENT_URI, Mileages.DefaultProjection,
-					"type = 2", null, "_created DESC LIMIT 1");
+					null, null, "_created DESC LIMIT 1");
 		
 		try {
 			if(cursor.moveToFirst()) {
@@ -43,9 +42,9 @@ public class MileageBroker {
 			} else {
 				final ContentValues m = new ContentValues();
 				m.put(BaseColumns._ID, 0);
-				m.put("type", 2);
+				m.put("type", 1);
 				m.put("name", "First mileage!");
-				m.put("location_id", -1);
+				m.put("place_id", -1);
 				return m;
 			}
 		} finally {
@@ -57,8 +56,7 @@ public class MileageBroker {
 		long id;
 		ContentResolver cr = context.getContentResolver();
 		
-		final int type = values.getAsInteger("type");
-		if(!values.containsKey("type")|| type != 2) {
+		if(!values.containsKey("type")) {
 			values.put("type", 2);
 		}
 		
@@ -90,20 +88,10 @@ public class MileageBroker {
 	
 	public static ContentValues deserialize(Cursor cursor) {
 		ContentValues values = new ContentValues();
-		values.put(BaseColumns._ID,
-				cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
-		values.put("type", cursor.getInt(cursor.getColumnIndexOrThrow("type")));
-		values.put("name",
-				cursor.getString(cursor.getColumnIndexOrThrow("name")));
-		values.put("_created",
-				cursor.getString(cursor.getColumnIndexOrThrow("_created")));
-		values.put("track_id", cursor.getInt(cursor.getColumnIndex("track_id")));
-		values.put("distance",
-				cursor.getFloat(cursor.getColumnIndexOrThrow("distance")));
-		values.put("amount",
-				cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
-		values.put("location_id",
-				cursor.getLong(cursor.getColumnIndexOrThrow("location_id")));
+		values.put("distance", cursor.getFloat(cursor.getColumnIndexOrThrow("distance")));
+		values.put("track_id", cursor.getLong(cursor.getColumnIndexOrThrow("track_id")));
+		values.put("amount", cursor.getFloat(cursor.getColumnIndexOrThrow("amount")));
+		values.putAll(HeartbeatBroker.deserialize(cursor));
 		return values;
 	}
 }

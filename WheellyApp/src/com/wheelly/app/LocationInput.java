@@ -6,8 +6,8 @@ import ru.orangesoftware.financisto.utils.Utils;
 import com.google.android.gms.location.LocationListener;
 import com.wheelly.R;
 import com.wheelly.activity.LocationsList;
-import com.wheelly.db.DatabaseSchema.Locations;
 import com.wheelly.db.LocationBroker;
+import com.wheelly.db.LocationsSchema;
 import com.wheelly.util.LocationUtils;
 
 import android.annotation.SuppressLint;
@@ -71,7 +71,7 @@ public final class LocationInput extends Fragment {
 				getLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
 					@Override
 					public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-						return new CursorLoader(getActivity(), Locations.CONTENT_URI, null, null, null, null);
+						return new CursorLoader(getActivity(), LocationsSchema.CONTENT_URI, null, null, null, null);
 					}
 					
 					@Override

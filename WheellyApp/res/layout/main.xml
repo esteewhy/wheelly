@@ -4,5 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-
+	<fragment
+			class		="com.wheelly.fragments.EventListFragment"
+			android:id	="@+id/events"
+			android:layout_height	="wrap_content"
+			android:layout_width	="fill_parent" />
 </LinearLayout>

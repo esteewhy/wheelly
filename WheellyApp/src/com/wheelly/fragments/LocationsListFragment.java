@@ -22,7 +22,7 @@ import com.wheelly.app.ColorInput.OnSelectColorListener;
 import com.wheelly.app.LocationViewBinder;
 import com.wheelly.bus.*;
 import com.wheelly.db.LocationBroker;
-import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationsSchema;
 import com.wheelly.util.LocationUtils;
 
 import android.annotation.SuppressLint;
@@ -196,7 +196,7 @@ public class LocationsListFragment extends ListFragment {
 			return true;
 		case MENU_DELETE:
 			getActivity().getContentResolver().delete(
-				Locations.CONTENT_URI,
+				LocationsSchema.CONTENT_URI,
 				BaseColumns._ID + " = ?",
 				new String[] { Long.toString(id) }
 			);

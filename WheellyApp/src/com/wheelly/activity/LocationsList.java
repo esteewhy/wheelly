@@ -8,7 +8,7 @@ import com.wheelly.R;
 import com.wheelly.bus.LocationChoosenEvent;
 import com.wheelly.bus.LocationSelectedEvent;
 import com.wheelly.bus.LocationsLoadedEvent;
-import com.wheelly.db.DatabaseSchema.Locations;
+import com.wheelly.db.LocationsSchema;
 import com.wheelly.fragments.LocationsListFragment;
 import com.wheelly.fragments.LocationsMapFragment;
 
@@ -100,7 +100,7 @@ public class LocationsList extends ActionBarActivity {
 			getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
 				@Override
 				public Loader<Cursor> onCreateLoader(int paramInt, Bundle paramBundle) {
-					return new CursorLoader(LocationsList.this, Locations.CONTENT_URI, null, null, null, null);
+					return new CursorLoader(LocationsList.this, LocationsSchema.CONTENT_URI, null, null, null, null);
 				}
 				
 				@Override
@@ -110,7 +110,7 @@ public class LocationsList extends ActionBarActivity {
 					if(getIntent().hasExtra(LocationActivity.LOCATION_ID_EXTRA)) {
 						final long id = getIntent().getLongExtra(LocationActivity.LOCATION_ID_EXTRA, -1);
 						
-						if(id >= 0 && getContentResolver().query(ContentUris.withAppendedId(Locations.CONTENT_URI, id), null, null, null, null).moveToFirst()) {
+						if(id >= 0 && getContentResolver().query(ContentUris.withAppendedId(LocationsSchema.CONTENT_URI, id), null, null, null, null).moveToFirst()) {
 							BusProvider.getInstance().post(new LocationSelectedEvent(id, this));
 						} else {
 							getIntent().putExtra(LocationActivity.LOCATION_ID_EXTRA, -1);

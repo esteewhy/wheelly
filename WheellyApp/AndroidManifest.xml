@@ -80,6 +80,18 @@
 			android:taskAffinity=".activity.Refuel"
 			android:launchMode="singleTop" />
 		
+		<activity android:name=".activity.Start"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Start"
+			android:launchMode="singleTop" />
+			
+		<activity android:name=".activity.Stop"
+			android:configChanges="orientation|keyboardHidden" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+			android:taskAffinity=".activity.Stop"
+			android:launchMode="singleTop" />
+		
 		<activity
 			android:name	="ru.orangesoftware.financisto.activity.DateFilterActivity"
 			android:label	="@string/filter"
@@ -125,7 +137,7 @@
 			android:multiprocess="true"
 			android:name=".content.ChronologyProvider" />
 		<provider
-			android:authorities="com.wheelly"
+			android:authorities="com.wheelly.locations"
 			android:multiprocess="true"
 			android:name=".content.LocationProvider" />
 		
