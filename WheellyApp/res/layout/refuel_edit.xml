@@ -92,7 +92,4 @@
 			</com.wheelly.widget.LabeledLayout>
 		</LinearLayout>
 	</ScrollView>
-	
-	<include layout="@layout/save_and_new_buttons" />
-	
 </LinearLayout>	

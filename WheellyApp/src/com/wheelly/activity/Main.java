@@ -1,7 +1,6 @@
 package com.wheelly.activity;
 
 import com.wheelly.R;
-import com.wheelly.app.AndiCarImporter;
 import com.wheelly.service.WorkflowNotifier;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ public class Main extends ActionBarActivity {
 		
 		setContentView(R.layout.main);
 		
-		new AndiCarImporter(this).attemptImporting();
 		new WorkflowNotifier(this).notifyAboutPendingMileages();
 	}
 }

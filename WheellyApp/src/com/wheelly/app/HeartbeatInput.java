@@ -17,7 +17,7 @@ import com.wheelly.widget.MileageInput;
  */
 public final class HeartbeatInput extends Fragment {
 	
-	private Controls c;
+	public Controls c;
 	private ContentValues values;
 	
 	/**
@@ -64,11 +64,11 @@ public final class HeartbeatInput extends Fragment {
 	/**
 	 * Holds control references.
 	 */
-	private class Controls {
-		final MileageInput OdometerEditText;
-		final FuelInput FuelAmountEditor;
-		final DateTimeBar CreatedDateTimeBar;
-		final LocationInput Place;
+	public class Controls {
+		public final MileageInput OdometerEditText;
+		public final FuelInput FuelAmountEditor;
+		public final DateTimeBar CreatedDateTimeBar;
+		public final LocationInput Place;
 		
 		public Controls(View view) {
 			OdometerEditText	= (MileageInput)view.findViewById(R.id.odometer);

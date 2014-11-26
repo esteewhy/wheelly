@@ -31,17 +31,18 @@ public class LocationsList extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.location_list);
 		initUIAsViewPager(savedInstanceState);
 		BusProvider.getInstance().register(this);
 	}
 	
 	private void initUIAsViewPager(Bundle savedInstanceState) {
-		ViewPager mViewPager = new ViewPager(this);
-		mViewPager.setId(R.id.pager);
+		ViewPager mViewPager = (ViewPager)findViewById(R.id.pager);
 		
-		setContentView(mViewPager);
+		if(null == mViewPager) return;
 		
 		final ActionBar bar = getSupportActionBar();
+		
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
 		
@@ -51,30 +52,17 @@ public class LocationsList extends ActionBarActivity {
 		mTabsAdapter.addTab(bar.newTab().setText("Map"),
 			LocationsMapFragment.class, null);
 		
-		bar.setSelectedNavigationItem(
-			savedInstanceState != null
-				? savedInstanceState.getInt("tab", 0)
-				: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
-		);
-	}
-	/*
-	private void initUIAsTabHost(Bundle savedInstanceState) {
-		TabHost tabHost = new TabHost(this);
-		tabHost.setId(android.R.id.tabhost);
-		tabHost.setup();
-		
-		TabManager tabManager = new TabManager(this, tabHost, android.R.id.tabcontent);
-		tabManager.addTab(tabHost.newTabSpec("List").setIndicator("List"), LocationsListFragment.class, null);
-		tabManager.addTab(tabHost.newTabSpec("Map").setIndicator("Map"), LocationsMapFragment.class, null);
-		
-		if (savedInstanceState != null) {
-			tabHost.setCurrentTab(
-				savedInstanceState != null
-					? savedInstanceState.getInt("tab", 0)
-					: getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0)
-			);
+		int index = -1;
+		if(savedInstanceState != null) {
+			index = savedInstanceState.getInt("tab", 0);
 		}
-	}*/
+		if(index < 0) {
+			index = getSharedPreferences("gui", Context.MODE_PRIVATE).getInt("locations_selected_tab", 0);
+		}
+		if(index >= 0) {
+			bar.setSelectedNavigationItem(index);
+		}
+	}
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -84,10 +72,13 @@ public class LocationsList extends ActionBarActivity {
 	
 	@Override
 	protected void onDestroy() {
-		getSharedPreferences("gui", Context.MODE_PRIVATE)
-			.edit()
-			.putInt("locations_selected_tab", getSupportActionBar().getSelectedNavigationIndex())
-			.commit();
+		final int index = getSupportActionBar().getSelectedNavigationIndex();
+		if(index > 0) {
+			getSharedPreferences("gui", Context.MODE_PRIVATE)
+				.edit()
+				.putInt("locations_selected_tab", index)
+				.commit();
+		}
 		
 		BusProvider.getInstance().unregister(this);
 		

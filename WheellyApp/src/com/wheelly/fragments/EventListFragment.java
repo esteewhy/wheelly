@@ -226,8 +226,7 @@ public class EventListFragment extends ListFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.common_menu, menu);
-		inflater.inflate(R.menu.events_menu, menu);
+		inflater.inflate(R.menu.list_menu, menu);
 	}
 	
 	@Override
@@ -236,8 +235,6 @@ public class EventListFragment extends ListFragment {
 		
 		menu.findItem(R.id.opt_menu_locations).setIntent(new Intent(this.getActivity(), LocationsList.class));
 		menu.findItem(R.id.opt_menu_preferences).setIntent(new Intent(this.getActivity(), Preferences.class));
-		menu.findItem(R.id.opt_menu_add).setVisible(false);
-		menu.findItem(R.id.opt_menu_filter).setVisible(false);
 		
 		final boolean backupEnabled = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 		menu.findItem(R.id.opt_menu_backup).setVisible(backupEnabled);
@@ -253,11 +250,6 @@ public class EventListFragment extends ListFragment {
 		final Context ctx = getActivity();
 		
 		switch (item.getItemId()) {
-			case R.id.opt_menu_add: {
-				Intent intent = new Intent(getActivity(), Heartbeat.class);
-				startActivityForResult(intent, NEW_REQUEST);
-				break;
-			}
 			case R.id.opt_menu_backup:
 				return new BackupHelper(ctx).backup();
 			case R.id.opt_menu_restore:
