@@ -103,6 +103,9 @@ public final class DatabaseSchema {
 			"CURRENT_TIMESTAMP _created",
 			"NULL transaction_id",
 			"(" + EstimateCost +") cost",
+			"odometer",
+			"fuel",
+			"0 place_id",
 			"4 type"
 		};
 		
@@ -151,7 +154,7 @@ public final class DatabaseSchema {
 				+ " WHERE r.type = 4 AND r._created BETWEEN start._created AND h._created";
 		
 		private static final String FuelField =
-				"COALESCE(h.amount, h.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), h.fuel)";
+				"COALESCE(NULLIF(h.amount, 0), h.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), h.fuel)";
 		
 		private static final String LegTypeField =
 				"(CASE WHEN h.type != 4 THEN"

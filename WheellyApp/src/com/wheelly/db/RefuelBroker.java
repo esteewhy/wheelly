@@ -32,13 +32,13 @@ public class RefuelBroker {
 					ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
 					Refuels.SingleProjection,
 					"type = 4", null, null)
-				: cr.query(Refuels.CONTENT_URI, Refuels.DefaultProjection,
-					"type = 4",
+				: cr.query(Heartbeats.CONTENT_URI, Refuels.DefaultProjection,
+					null,
 					// pass parameter to some projection fields
 					new String[] {
 						Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("fuel_capacity", 60))
 					},
-					"_created DESC LIMIT 1");
+					"odometer DESC, _created DESC LIMIT 1");
 		
 		try {
 			if(cursor.moveToFirst()) {

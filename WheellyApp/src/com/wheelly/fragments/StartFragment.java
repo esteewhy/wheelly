@@ -5,9 +5,10 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.issue40537.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -20,7 +21,7 @@ import com.wheelly.service.OpenGpsTracker;
 import com.wheelly.service.WorkflowNotifier;
 import com.wheelly.service.Tracker.TrackListener;
 
-public class StartFragment extends Fragment {
+public class StartFragment extends ItemFragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,15 +33,13 @@ public class StartFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		//components
 		final Intent intent = getActivity().getIntent();
-		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(id);
+		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(intent.getLongExtra(BaseColumns._ID, 0));
 		
 		final Controls c = new Controls();
 		
 		c.Heartbeat.setValues(values);
-		c.Save.setOnClickListener(
+		onSave =
 			new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -62,16 +61,7 @@ public class StartFragment extends Fragment {
 					getActivity().setResult(Activity.RESULT_OK, intent);
 					getActivity().finish();
 				}
-			});
-		
-		c.Cancel.setOnClickListener(
-				new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						getActivity().setResult(Activity.RESULT_CANCELED);
-						getActivity().finish();
-					}
-				});
+			};
 		
 		c.StartButton.setOnClickListener(
 				new OnClickListener() {
@@ -108,8 +98,6 @@ public class StartFragment extends Fragment {
 	 */
 	private class Controls {
 		final HeartbeatInput Heartbeat;
-		final View Save;
-		final View Cancel;
 		final Button StartButton;
 		
 		public Controls() {
@@ -117,8 +105,6 @@ public class StartFragment extends Fragment {
 			final View view = getView();
 			
 			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
-			Save		= (View)view.findViewById(R.id.bSave);
-			Cancel		= (View)view.findViewById(R.id.bSaveAndNew);
 			StartButton	= (Button)view.findViewById(R.id.bStart);		
 		}
 	}

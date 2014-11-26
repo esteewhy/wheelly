@@ -51,27 +51,7 @@ public class MileageBroker {
 			cursor.close();
 		}
 	}
-	
-	public long updateOrInsert(ContentValues values) {
-		long id;
-		ContentResolver cr = context.getContentResolver();
-		
-		if(!values.containsKey("type")) {
-			values.put("type", 2);
-		}
-		
-		if(values.containsKey(BaseColumns._ID)
-				&& (id = values.getAsLong(BaseColumns._ID)) > 0) {
-			cr.update(
-				ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
-				values, null, null);
-			return id;
-		} else {
-			values.remove(BaseColumns._ID);
-			return ContentUris.parseId(cr.insert(Heartbeats.CONTENT_URI, values));
-		}
-	}
-	
+
 	public long getLastPendingId() {
 		SQLiteDatabase db = null;
 		try {

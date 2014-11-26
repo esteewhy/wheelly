@@ -22,6 +22,12 @@
 		compat:showAsAction="always"
 		android:showAsAction="always" />
 	
+	<item android:id	="@+id/opt_menu_locations"
+		android:title	="@string/locations"
+		android:icon	="@android:drawable/ic_menu_myplaces" />
+	<item android:id	="@+id/opt_menu_preferences"
+		android:title	="@string/preferences"
+		android:icon	="@android:drawable/ic_menu_preferences" />
 	<item
 		android:id		="@+id/opt_menu_backup"
 		android:icon	="@android:drawable/ic_menu_save"

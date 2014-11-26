@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.issue40537.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +27,10 @@ import com.wheelly.service.WorkflowNotifier;
 import com.wheelly.service.Tracker.TrackListener;
 import com.wheelly.util.DateUtils;
 import com.wheelly.widget.MileageInput;
+import com.wheelly.widget.MileageInput.OnAmountChangedListener;
 import com.wheelly.content.TrackRepository;
 
-public class StopFragment extends Fragment {
+public class StopFragment extends ItemFragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,13 +42,21 @@ public class StopFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		//components
 		final Intent intent = getActivity().getIntent();
 		final long id = intent.getLongExtra(BaseColumns._ID, 0);
 		final ContentValues values = new MileageBroker(getActivity()).loadOrCreate(id);
+		final long start = values.getAsLong("odometer");
 		
 		final Controls c = new Controls();
 		c.bind(values);
+		c.Heartbeat.c.OdometerEditText.setOnAmountChangedListener(new OnAmountChangedListener() {
+			@Override
+			public void onAmountChanged(long oldAmount, long newAmount) {
+				if(oldAmount != newAmount) {
+					c.Distance.setAmount(newAmount - start);
+				}
+			}
+		});
 		c.Track.setOnTrackChangedListener(new OnTrackChangedListener() {
 			@Override
 			public void onTrackChanged(long trackId) {
@@ -62,7 +70,7 @@ public class StopFragment extends Fragment {
 				BusProvider.getInstance().post(new TrackChangedEvent(trackId));
 			}
 		});
-		c.Save.setOnClickListener(
+		onSave =
 			new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -78,20 +86,11 @@ public class StopFragment extends Fragment {
 					intent.putExtra(BaseColumns._ID, id);
 					
 					final WorkflowNotifier n = new WorkflowNotifier(getActivity());
-					
+					n.canceNotificationForMileage(id);
 					getActivity().setResult(Activity.RESULT_OK, intent);
 					getActivity().finish();
 				}
-			});
-		
-		c.Cancel.setOnClickListener(
-				new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						getActivity().setResult(Activity.RESULT_CANCELED);
-						getActivity().finish();
-					}
-				});
+			};
 		
 		c.StopButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -102,7 +101,6 @@ public class StopFragment extends Fragment {
 					@Override
 					public void onTrackStopped() {
 						values.put("type", 2);
-						final long start = values.getAsLong("odometer");
 						final float distance = new TrackRepository(getActivity()).getDistance(trackId);
 						values.put("distance", distance);
 						values.put("odometer", start + distance);
@@ -125,8 +123,6 @@ public class StopFragment extends Fragment {
 		final HeartbeatInput Heartbeat;
 		final MileageInput Distance;
 		final TrackInput Track;
-		final View Save;
-		final View Cancel;
 		final Button StopButton;
 		
 		public Controls() {
@@ -136,12 +132,10 @@ public class StopFragment extends Fragment {
 			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
 			Distance		= (MileageInput)view.findViewById(R.id.mileage);
 			Track		= (TrackInput)fm.findFragmentById(R.id.track);
-			Save		= (View)view.findViewById(R.id.bSave);
-			Cancel		= (View)view.findViewById(R.id.bSaveAndNew);
 			StopButton	= (Button)view.findViewById(R.id.bStop);		
 		}
 		
-		private void bind(ContentValues values) {
+		void bind(ContentValues values) {
 			Heartbeat.setValues(values);
 			Distance.setAmount(values.getAsLong("distance"));
 			Track.setValue(values.getAsLong("track_id"));
