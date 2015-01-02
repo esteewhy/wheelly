@@ -3,7 +3,6 @@ package com.wheelly.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,14 +35,9 @@ import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.wheelly.R;
-import com.wheelly.activity.Heartbeat;
 import com.wheelly.activity.LocationsList;
 import com.wheelly.activity.Preferences;
-import com.wheelly.activity.Refuel;
-import com.wheelly.activity.Start;
-import com.wheelly.activity.Stop;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
-import com.wheelly.db.HeartbeatBroker;
 import com.wheelly.db.MileageBroker;
 import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.util.BackupHelper;
@@ -87,10 +81,10 @@ public class EventListFragment extends ListFragment {
 	final OnClickListener heartbeatStarter = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			final long id = (Long)v.getTag();
-			Intent intent = new Intent(getActivity(), Heartbeat.class);
-			intent.putExtra(BaseColumns._ID, id);
-			startActivityForResult(intent, EDIT_REQUEST);
+			//final long id = (Long)v.getTag();
+			//Intent intent = new Intent(getActivity(), Heartbeat.class);
+			//intent.putExtra(BaseColumns._ID, id);
+			//startActivityForResult(intent, EDIT_REQUEST);
 		}
 	};
 	
@@ -100,6 +94,7 @@ public class EventListFragment extends ListFragment {
 		setListAdapter(createListAdapter());
 		registerForContextMenu(getListView());
 		setHasOptionsMenu(true);
+		getLoaderManager().initLoader(LIST_LOADER, null, loaderCallbacks);
 	}
 	
 	public SimpleCursorAdapter createListAdapter() {
@@ -202,14 +197,6 @@ public class EventListFragment extends ListFragment {
 		setEmptyText(getString(R.string.no_mileages));
 	}
 	
-	@Override
-	public void onResume() {
-		if(null == getLoaderManager().getLoader(LIST_LOADER)) {
-			getLoaderManager().initLoader(LIST_LOADER, null, loaderCallbacks);
-		}
-		super.onResume();
-	}
-	
 	protected void deleteItem(final long id) {
 		getActivity().getContentResolver().delete(
 			Heartbeats.CONTENT_URI,
@@ -220,7 +207,7 @@ public class EventListFragment extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, final long id) {
-		editItem(id);
+		editItem(id, -1);
 	}
 	
 	@Override
@@ -256,19 +243,15 @@ public class EventListFragment extends ListFragment {
 				new BackupHelper(ctx).restore();
 				break;
 			case R.id.opt_menu_mileage_start: {
-				Intent intent = new Intent(getActivity(), Start.class);
-				startActivityForResult(intent, NEW_REQUEST);
+				editItem(0, 1);
 			}
 			break;
 			case R.id.opt_menu_mileage_stop: {
-				Intent intent = new Intent(getActivity(), Stop.class);
-				intent.putExtra(BaseColumns._ID, new MileageBroker(getActivity()).getLastPendingId());
-				startActivityForResult(intent, NEW_REQUEST);
+				editItem(new MileageBroker(getActivity()).getLastPendingId(), 2);
 			}
 			break;
 			case R.id.opt_menu_refuel: {
-				Intent intent = new Intent(getActivity(), Refuel.class);
-				startActivityForResult(intent, NEW_REQUEST);
+				editItem(0, 4);
 			}
 			break;
 			default:
@@ -299,7 +282,7 @@ public class EventListFragment extends ListFragment {
 			
 			switch (item.getItemId()) {
 				case R.id.ctx_menu_edit:
-					editItem(mi.id);
+					editItem(mi.id, 0);
 					return true;
 				case R.id.ctx_menu_delete:
 					new AlertDialog.Builder(getActivity())
@@ -318,27 +301,29 @@ public class EventListFragment extends ListFragment {
 		}
 		return super.onContextItemSelected(item);
 	}
-
 	
-	protected void editItem(long id) {
-		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(id);
+	protected void editItem(long id, int type) {
+		final Bundle args = new Bundle();
 		
-		if(values.getAsLong("_id") == id) {
-			final int type = values.getAsInteger("type");
-			
-			Class<?> activityClass = 
-				(type & 1) != 0
-					? Start.class
-					: (type & 2) != 0
-						? Stop.class
-						: (type & 4) != 0
-							? Refuel.class
-							: Heartbeat.class;
-			
-			Intent intent = new Intent(getActivity(), activityClass);
-			intent.putExtra(BaseColumns._ID, id);
-			startActivityForResult(intent, EDIT_REQUEST);
-			return;
+		if(id > 0) {
+			args.putLong(BaseColumns._ID, id);
 		}
+		if(type > 0) {
+			args.putInt("type", type);
+		}
+		
+		if(null != onOpen) {
+			onOpen.onOpenItem(args);
+		}
+	}
+	
+	private OnOpenItemListener onOpen;
+	public EventListFragment setOnOpenItemListener(OnOpenItemListener listener) {
+		onOpen = listener;
+		return this;
+	}
+	
+	public static interface OnOpenItemListener {
+		public void onOpenItem(Bundle args);
 	}
 }

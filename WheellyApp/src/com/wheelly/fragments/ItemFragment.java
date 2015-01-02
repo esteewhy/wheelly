@@ -1,12 +1,12 @@
 package com.wheelly.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.issue40537.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View.OnClickListener;
+
 import com.wheelly.R;
 
 public abstract class ItemFragment extends Fragment {
@@ -21,7 +21,10 @@ public abstract class ItemFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.item_menu, menu);
+		
+		if(isVisible()) {
+			inflater.inflate(R.menu.item_menu, menu);
+		}
 	}
 	
 	@Override
@@ -34,11 +37,34 @@ public abstract class ItemFragment extends Fragment {
 			}
 			break;
 		case android.R.id.home:
-			getActivity().setResult(Activity.RESULT_CANCELED);
-			getActivity().finish();
-			return true;
+			if(null != finishListener) {
+				finishListener.fragmentCancelled();
+				return true;
+			}
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+	
+	protected void finish(Bundle extras) {
+		if(null != finishListener) {
+			finishListener.fragmentFinished(extras);
+		}
+	}
+	
+	protected Bundle getArgumentsOrDefault() {
+		final Bundle args = getArguments();
+		return null != args ? args : new Bundle();
+	}
+	
+	protected OnFragmentResultListener finishListener;
+	
+	public void setOnFinishedListener(OnFragmentResultListener listener) {
+		finishListener = listener;
+	}
+	
+	public static interface OnFragmentResultListener {
+		public void fragmentFinished(Bundle extras);
+		public void fragmentCancelled();
 	}
 }

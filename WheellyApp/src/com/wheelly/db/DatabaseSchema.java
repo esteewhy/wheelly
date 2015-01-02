@@ -18,19 +18,6 @@ public final class DatabaseSchema {
 		public static final String LastPendingIdSql =
 			"SELECT _id FROM heartbeats WHERE type = 34 LIMIT 1";
 		
-		//Calculates amount of refuels occurred in progress of a given trip.
-		private static final String EnRouteRefuelAmount =
-			"SELECT Sum(r.amount)"
-			+ " FROM refuels r"
-			+ " INNER JOIN heartbeats rh"
-			+ "  ON r.heartbeat_id = rh." + _ID
-			+ " WHERE rh._created BETWEEN start._created AND stop._created"
-			//not strictly necessary, but to reassure order
-			;//+ "  AND rh.odometer BETWEEN start.odometer AND stop.odometer";
-		
-		private static final String FuelField =
-			"COALESCE(stop.fuel - start.fuel - COALESCE((" + EnRouteRefuelAmount + "), 0), m.calc_amount)";
-		
 		public static final String Tables = "mileages m"
 			+ " LEFT OUTER JOIN heartbeats start"
 			+ " 	ON m.start_heartbeat_id = start." + _ID

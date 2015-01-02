@@ -1,18 +1,15 @@
 package com.wheelly.fragments;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 
 import com.wheelly.R;
 import com.wheelly.app.HeartbeatInput;
@@ -22,48 +19,46 @@ import com.wheelly.service.WorkflowNotifier;
 import com.wheelly.service.Tracker.TrackListener;
 
 public class StartFragment extends ItemFragment {
+	OnClickListener onStart;
+	OnMenuItemClickListener onConfigStartMenuItem;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.start_edit, null);
+		return inflater.inflate(R.layout.start_edit, container, false);
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		final Intent intent = getActivity().getIntent();
-		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(intent.getLongExtra(BaseColumns._ID, 0));
+		final Bundle args = getArgumentsOrDefault();
+		final long id = args.getLong(BaseColumns._ID, -1);
+		final ContentValues values = new HeartbeatBroker(getActivity()).loadOrCreate(id);
+		final HeartbeatInput input = (HeartbeatInput)getChildFragmentManager().findFragmentById(R.id.heartbeat);
+		input.setValues(values);
 		
-		final Controls c = new Controls();
-		
-		c.Heartbeat.setValues(values);
 		onSave =
 			new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					final boolean isNew = !values.containsKey(BaseColumns._ID) || values.getAsLong(BaseColumns._ID) < 0;
-					values.putAll(c.Heartbeat.getValues());
+					values.putAll(input.getValues());
 					values.put("type", 1);
+					final boolean hasStop = values.containsKey("stop_id");
+					values.remove("stop_id");
 					final long id = new HeartbeatBroker(getActivity()).updateOrInsert(values);
-					intent.putExtra(BaseColumns._ID, id);
 					
-					if(isNew) {
-						final ContentValues stopHeartbeat = new ContentValues();
-						stopHeartbeat.putAll(values);
-						stopHeartbeat.put("type", 34);
-						stopHeartbeat.remove(BaseColumns._ID);
-						final WorkflowNotifier n = new WorkflowNotifier(getActivity());
-						n.notifyAboutPendingMileage(new HeartbeatBroker(getActivity()).updateOrInsert(stopHeartbeat));
+					if(isNew && !hasStop) {
+						prepareStopHeartbeat(values, 0);
 					}
 					
-					getActivity().setResult(Activity.RESULT_OK, intent);
-					getActivity().finish();
+					args.putLong(BaseColumns._ID, id);
+					finish(args);
 				}
 			};
 		
-		c.StartButton.setOnClickListener(
+		onStart =
 				new OnClickListener() {
 					@Override
 					public void onClick(final View v) {
@@ -71,41 +66,61 @@ public class StartFragment extends ItemFragment {
 						.setStartTrackListener(new TrackListener() {
 							@Override
 							public void onStartTrack(long trackId) {
-								ContentValues stopHeartbeat = new ContentValues();
-								stopHeartbeat.putAll(values);
-								stopHeartbeat.put("track_id", trackId);
-								stopHeartbeat.put("type", 34);
-								stopHeartbeat.remove("_id");
-								final WorkflowNotifier n = new WorkflowNotifier(getActivity());
-								n.notifyAboutPendingMileage(new HeartbeatBroker(getActivity()).updateOrInsert(stopHeartbeat));
-								v.setEnabled(false);
+								prepareStopHeartbeat(input.getValues(), trackId);
+								//v.setEnabled(false);
 							}
 							
 							@Override
 							public void onTrackStopped() {
-								v.setEnabled(true);
+								//v.setEnabled(true);
 							}
 						})
 						.Start()) {
-							v.setEnabled(false);
+							//v.setEnabled(false);
 						}
 					}
-				});
+				};
+		onConfigStartMenuItem =
+			new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					item.setVisible(true);
+					return true;
+				}
+			};
 	}
 	
-	/**
-	 * Encapsulates UI objects.
-	 */
-	private class Controls {
-		final HeartbeatInput Heartbeat;
-		final Button StartButton;
+	private void prepareStopHeartbeat(ContentValues values, long trackId) {
+		ContentValues stopHeartbeat = new ContentValues();
+		stopHeartbeat.putAll(values);
 		
-		public Controls() {
-			final FragmentManager fm = getChildFragmentManager();
-			final View view = getView();
-			
-			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
-			StartButton	= (Button)view.findViewById(R.id.bStart);		
+		if(trackId > 0) {
+			stopHeartbeat.put("track_id", trackId);
 		}
+		
+		stopHeartbeat.put("type", 34);
+		stopHeartbeat.remove("_id");
+		final long stopId = new HeartbeatBroker(getActivity()).updateOrInsert(stopHeartbeat);
+		final WorkflowNotifier n = new WorkflowNotifier(getActivity());
+		n.notifyAboutPendingMileage(stopId);
+		values.put("stop_id", stopId);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		final MenuItem mi = menu.findItem(R.id.opt_menu_start);
+		if(null != onConfigStartMenuItem && null != mi) {
+			onConfigStartMenuItem.onMenuItemClick(mi);
+		}
+		super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(R.id.opt_menu_start == item.getItemId() && null != onStart) {
+			onStart.onClick(null);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

@@ -1,7 +1,7 @@
 package com.wheelly.service;
 
 import com.wheelly.R;
-import com.wheelly.activity.Stop;
+import com.wheelly.activity.Main;
 import com.wheelly.db.MileageBroker;
 
 import android.app.Notification;
@@ -26,9 +26,9 @@ public class WorkflowNotifier extends Notifier {
 	}
 	
 	public void notifyAboutPendingMileage(long id) {
-		Intent intent = new Intent(context, Stop.class);
+		Intent intent = new Intent(context, Main.class);
+		intent.setAction("Edit");
 		intent.putExtra(BaseColumns._ID, id);
-		//intent.putExtra("ui_command", TripControlBar.UI_STOP);
 		
 		final Notification n =
 			new NotificationCompat.Builder(context)
