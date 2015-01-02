@@ -2,17 +2,17 @@ package com.wheelly.fragments;
 
 import java.util.Date;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 
 import com.squareup.otto.sample.BusProvider;
 import com.wheelly.R;
@@ -31,21 +31,29 @@ import com.wheelly.widget.MileageInput.OnAmountChangedListener;
 import com.wheelly.content.TrackRepository;
 
 public class StopFragment extends ItemFragment {
+	OnClickListener onStop;
+	OnMenuItemClickListener onConfigStopMenuItem;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.stop_edit, null);
+		return inflater.inflate(R.layout.stop_edit, container, false);
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		final Intent intent = getActivity().getIntent();
-		final long id = intent.getLongExtra(BaseColumns._ID, 0);
+		final Bundle args = getArgumentsOrDefault();
+		final long id = args.getLong(BaseColumns._ID, 0);
 		final ContentValues values = new MileageBroker(getActivity()).loadOrCreate(id);
 		final long start = values.getAsLong("odometer");
+		final long startPlaceId = values.getAsLong("place_id");
+		
+		if(34 == values.getAsInteger("type")) {
+			values.put("_created", DateUtils.dbFormat.format(new Date()));
+			values.put("place_id", 0);
+		}
 		
 		final Controls c = new Controls();
 		c.bind(values);
@@ -83,37 +91,66 @@ public class StopFragment extends ItemFragment {
 					values.remove("type");;
 					values.put("type", 2);
 					final long id = new HeartbeatBroker(getActivity()).updateOrInsert(values);
-					intent.putExtra(BaseColumns._ID, id);
+					args.putLong(BaseColumns._ID, id);
 					
 					final WorkflowNotifier n = new WorkflowNotifier(getActivity());
 					n.canceNotificationForMileage(id);
-					getActivity().setResult(Activity.RESULT_OK, intent);
-					getActivity().finish();
+					finish(args);
 				}
 			};
 		
-		c.StopButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final long trackId = values.getAsLong("track_id");
-				new OpenGpsTracker(getActivity())
-				.setStartTrackListener(new TrackListener() {
-					@Override
-					public void onTrackStopped() {
-						values.put("type", 2);
-						final float distance = new TrackRepository(getActivity()).getDistance(trackId);
-						values.put("distance", distance);
-						values.put("odometer", start + distance);
-						values.put("_created", DateUtils.dbFormat.format(new Date()));
-						c.bind(values);
-					}
-					
-					@Override
-					public void onStartTrack(long trackId) {}
-				})
-				.Stop(trackId);
-			}
-		});
+		onStop =
+			new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					final long trackId = values.getAsLong("track_id");
+					new OpenGpsTracker(getActivity())
+					.setStartTrackListener(new TrackListener() {
+						@Override
+						public void onTrackStopped() {
+							values.putAll(c.Heartbeat.getValues());
+							values.put("type", 2);
+							final TrackRepository trackRepository = new TrackRepository(getActivity());
+							final float distance = trackRepository.getDistance(trackId);
+							values.put("distance", distance);
+							values.put("odometer", start + distance);
+							values.put("_created", DateUtils.dbFormat.format(new Date()));
+							trackRepository.renameTrack(trackId, startPlaceId, c.Heartbeat.getValues().getAsLong("place_id"));
+							c.bind(values);
+						}
+						
+						@Override
+						public void onStartTrack(long trackId) {}
+					})
+					.Stop(trackId);
+				}
+			};
+		onConfigStopMenuItem =
+			new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					item.setVisible(values.getAsInteger("type") == 34);
+					return true;
+				}
+			};
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		final MenuItem mi = menu.findItem(R.id.opt_menu_stop);
+		if(null != onConfigStopMenuItem && null != mi) {
+			onConfigStopMenuItem.onMenuItemClick(mi);
+		}
+		super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(R.id.opt_menu_stop == item.getItemId() && null != onStop) {
+			onStop.onClick(null);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	/**
@@ -123,7 +160,6 @@ public class StopFragment extends ItemFragment {
 		final HeartbeatInput Heartbeat;
 		final MileageInput Distance;
 		final TrackInput Track;
-		final Button StopButton;
 		
 		public Controls() {
 			final FragmentManager fm = getChildFragmentManager();
@@ -132,7 +168,6 @@ public class StopFragment extends ItemFragment {
 			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
 			Distance		= (MileageInput)view.findViewById(R.id.mileage);
 			Track		= (TrackInput)fm.findFragmentById(R.id.track);
-			StopButton	= (Button)view.findViewById(R.id.bStop);		
 		}
 		
 		void bind(ContentValues values) {
@@ -140,7 +175,6 @@ public class StopFragment extends ItemFragment {
 			Distance.setAmount(values.getAsLong("distance"));
 			Track.setValue(values.getAsLong("track_id"));
 			BusProvider.getInstance().post(new TrackChangedEvent(values.getAsLong("track_id")));
-			StopButton.setEnabled(values.getAsInteger("type") == 34);
 		}
 	}
 }

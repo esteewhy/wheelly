@@ -1,8 +1,6 @@
 package com.wheelly.fragments;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.app.FragmentManager;
@@ -23,16 +21,17 @@ public class RefuelFragment extends ItemFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.refuel_edit, null);
+		return inflater.inflate(R.layout.refuel_edit, container, false);
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		final Intent intent = getActivity().getIntent();
-		final long id = intent.getLongExtra(BaseColumns._ID, 0);
-		final ContentValues refuel = new RefuelBroker(getActivity()).loadOrCreate(id);
+		final Bundle args = getArgumentsOrDefault();
+		final long id = args.getLong(BaseColumns._ID, -1);
+		final RefuelBroker broker = new RefuelBroker(getActivity());
+		final ContentValues refuel = broker.loadOrCreate(id);
 		final Controls c = new Controls();
 		
 		c.Heartbeat.setValues(refuel);
@@ -53,13 +52,10 @@ public class RefuelFragment extends ItemFragment {
 					refuel.put("cost", (float)c.Cost.getAmount() / 100);
 					refuel.put("transaction_id", c.Financisto.getValue());
 					
-					intent.putExtra(BaseColumns._ID,
-						new RefuelBroker(getActivity())
-							.updateOrInsert(refuel, heartbeat)
+					args.putLong(BaseColumns._ID,
+						broker.updateOrInsert(refuel, heartbeat)
 					);
-					
-					getActivity().setResult(Activity.RESULT_OK, intent);
-					getActivity().finish();
+					finish(args);
 				}
 			};
 	}

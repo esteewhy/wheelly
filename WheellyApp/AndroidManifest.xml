@@ -49,9 +49,9 @@
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
 		<activity
 				android:label="@string/app_name"
-				android:configChanges="orientation|keyboardHidden"
 				android:taskAffinity=".Main"
-				android:name="com.wheelly.activity.Main">
+				android:name="com.wheelly.activity.Main"
+				android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -59,44 +59,7 @@
 		</activity>
 		
 		<activity android:name=".activity.Heartbeat"
-			android:configChanges="orientation|keyboardHidden" 
 			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Refuel"
-			android:launchMode="singleTop" />
-		
-		<activity android:name=".activity.HeartbeatDialog"
-			android:theme="@style/Theme.Dialog"
-			android:launchMode="singleTop" />
-		
-		<activity android:name=".activity.Mileage"
-			android:configChanges="orientation|keyboardHidden" 
-			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Mileage"
-			android:launchMode="singleTop" />
-		
-		<activity android:name=".activity.Refuel"
-			android:configChanges="orientation|keyboardHidden" 
-			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Refuel"
-			android:launchMode="singleTop" />
-		
-		<activity android:name=".activity.Start"
-			android:configChanges="orientation|keyboardHidden" 
-			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Start"
-			android:launchMode="singleTop" />
-			
-		<activity android:name=".activity.Stop"
-			android:configChanges="orientation|keyboardHidden" 
-			android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-			android:taskAffinity=".activity.Stop"
-			android:launchMode="singleTop" />
-		
-		<activity
-			android:name	="ru.orangesoftware.financisto.activity.DateFilterActivity"
-			android:label	="@string/filter"
-			android:theme	="@style/Theme.Dialog"
-			android:configChanges="orientation|keyboardHidden"
 			android:launchMode="singleTop" />
 		
 		<activity
@@ -124,13 +87,6 @@
 		<activity android:name="com.wheelly.activity.LocationsList"
 			android:label="@string/locations"
 			android:launchMode="singleTop" />
-		
-		<activity android:name=".io.docs.SyncDocsActivity"
-			android:launchMode="singleTop"/>
-		
-		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.AccountChooserActivity" />
-		<activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.UploadResultActivity" />
-		<activity android:name="com.google.android.apps.mytracks.io.docs.SendDocsActivity" />
 		
 		<provider
 			android:authorities="com.wheelly"

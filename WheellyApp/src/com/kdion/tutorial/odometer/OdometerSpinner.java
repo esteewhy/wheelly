@@ -209,7 +209,7 @@ public class OdometerSpinner extends View
 		int wSpec = MeasureSpec.getSize(widthMeasureSpec);
 		
 		int hSpec = MeasureSpec.getSize(heightMeasureSpec);
-		int hMode = MeasureSpec.getMode(heightMeasureSpec);
+		//int hMode = MeasureSpec.getMode(heightMeasureSpec);
 		
 		int width = wSpec;
 		int height = hSpec;
