@@ -31,7 +31,7 @@ import com.wheelly.widget.MileageInput.OnAmountChangedListener;
 import com.wheelly.content.TrackRepository;
 
 public class StopFragment extends ItemFragment {
-	OnClickListener onStop;
+	OnMenuItemClickListener onStop;
 	OnMenuItemClickListener onConfigStopMenuItem;
 	
 	@Override
@@ -100,9 +100,9 @@ public class StopFragment extends ItemFragment {
 			};
 		
 		onStop =
-			new OnClickListener() {
+			new OnMenuItemClickListener() {
 				@Override
-				public void onClick(View v) {
+				public boolean onMenuItemClick(MenuItem v) {
 					final long trackId = values.getAsLong("track_id");
 					new OpenGpsTracker(getActivity())
 					.setStartTrackListener(new TrackListener() {
@@ -123,6 +123,8 @@ public class StopFragment extends ItemFragment {
 						public void onStartTrack(long trackId) {}
 					})
 					.Stop(trackId);
+					v.setEnabled(false);
+					return true;
 				}
 			};
 		onConfigStopMenuItem =
@@ -147,7 +149,7 @@ public class StopFragment extends ItemFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(R.id.opt_menu_stop == item.getItemId() && null != onStop) {
-			onStop.onClick(null);
+			onStop.onMenuItemClick(item);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -166,7 +168,7 @@ public class StopFragment extends ItemFragment {
 			final View view = getView();
 			
 			Heartbeat	= (HeartbeatInput)fm.findFragmentById(R.id.heartbeat);
-			Distance		= (MileageInput)view.findViewById(R.id.mileage);
+			Distance	= (MileageInput)view.findViewById(R.id.mileage);
 			Track		= (TrackInput)fm.findFragmentById(R.id.track);
 		}
 		

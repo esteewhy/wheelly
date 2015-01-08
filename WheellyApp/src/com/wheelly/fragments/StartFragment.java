@@ -19,7 +19,7 @@ import com.wheelly.service.WorkflowNotifier;
 import com.wheelly.service.Tracker.TrackListener;
 
 public class StartFragment extends ItemFragment {
-	OnClickListener onStart;
+	OnMenuItemClickListener onStart;
 	OnMenuItemClickListener onConfigStartMenuItem;
 	
 	@Override
@@ -59,15 +59,15 @@ public class StartFragment extends ItemFragment {
 			};
 		
 		onStart =
-				new OnClickListener() {
+				new OnMenuItemClickListener() {
 					@Override
-					public void onClick(final View v) {
+					public boolean onMenuItemClick(final MenuItem v) {
 						if(new OpenGpsTracker(getActivity())
 						.setStartTrackListener(new TrackListener() {
 							@Override
 							public void onStartTrack(long trackId) {
 								prepareStopHeartbeat(input.getValues(), trackId);
-								//v.setEnabled(false);
+								v.setEnabled(false);
 							}
 							
 							@Override
@@ -78,6 +78,7 @@ public class StartFragment extends ItemFragment {
 						.Start()) {
 							//v.setEnabled(false);
 						}
+						return true;
 					}
 				};
 		onConfigStartMenuItem =
@@ -118,7 +119,7 @@ public class StartFragment extends ItemFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(R.id.opt_menu_start == item.getItemId() && null != onStart) {
-			onStart.onClick(null);
+			onStart.onMenuItemClick(item);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
