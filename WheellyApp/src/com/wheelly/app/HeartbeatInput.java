@@ -54,7 +54,11 @@ public final class HeartbeatInput extends Fragment {
 	 * Assign values to controls. Preserves original values.
 	 */
 	public void setValues(ContentValues values) {
-		this.values = values;
+		if(this.values == null) {
+			this.values = new ContentValues();
+		}
+		// Never assign directly, always copy
+		this.values.putAll(values);
 		c.OdometerEditText.setAmount(values.getAsLong("odometer"));
 		c.FuelAmountEditor.setAmount(values.getAsInteger("fuel"));
 		c.CreatedDateTimeBar.setDateTime(values.getAsString("_created"));

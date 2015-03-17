@@ -65,6 +65,7 @@ public class StopFragment extends ItemFragment {
 				}
 			}
 		});
+		
 		c.Track.setOnTrackChangedListener(new OnTrackChangedListener() {
 			@Override
 			public void onTrackChanged(long trackId) {
@@ -78,6 +79,7 @@ public class StopFragment extends ItemFragment {
 				BusProvider.getInstance().post(new TrackChangedEvent(trackId));
 			}
 		});
+		
 		onSave =
 			new OnClickListener() {
 				@Override
