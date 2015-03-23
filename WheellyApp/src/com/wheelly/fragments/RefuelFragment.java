@@ -47,13 +47,14 @@ public class RefuelFragment extends ItemFragment {
 				public void onClick(View v) {
 					
 					final ContentValues heartbeat = c.Heartbeat.getValues();
+					refuel.putAll(heartbeat);
 					refuel.put("amount", (float)c.Amount.getAmount() / 100);
 					refuel.put("unit_price", (float)c.Price.getAmount() / 100);
 					refuel.put("cost", (float)c.Cost.getAmount() / 100);
 					refuel.put("transaction_id", c.Financisto.getValue());
 					
 					args.putLong(BaseColumns._ID,
-						broker.updateOrInsert(refuel, heartbeat)
+						broker.updateOrInsert(refuel)
 					);
 					finish(args);
 				}

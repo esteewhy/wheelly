@@ -60,8 +60,7 @@ public class RefuelBroker {
 		}
 	}
 	
-	public long updateOrInsert(ContentValues refuel, ContentValues heartbeat) {
-		refuel.putAll(heartbeat);
+	public long updateOrInsert(ContentValues refuel) {
 		long id = refuel.getAsLong(BaseColumns._ID);
 		ContentResolver cr = context.getContentResolver();
 		
