@@ -1,7 +1,9 @@
 package com.wheelly.db;
 
+import java.util.Date;
 import com.wheelly.db.DatabaseSchema.Heartbeats;
 import com.wheelly.db.DatabaseSchema.Refuels;
+import com.wheelly.util.DateUtils;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -42,7 +44,11 @@ public class RefuelBroker {
 		
 		try {
 			if(cursor.moveToFirst()) {
-				return deserialize(cursor);
+				final ContentValues values = deserialize(cursor);
+				if(id <= 0) {
+					values.put("_created", DateUtils.dbFormat.format(new Date()));
+				}
+				return values;
 			} else {
 				final ContentValues r = new ContentValues();
 				r.put(BaseColumns._ID,	0);
