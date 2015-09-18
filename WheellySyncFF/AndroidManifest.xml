@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.wheelly.sync"
+    android:sharedUserId="com.wheelly.sharedID"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="18" />
+
+    <!--
+       Note that we do not include the Announcements manifest
+       fragments here: the received intents call into Fennec, so
+       there's minimal point right now.  We don't include the Health
+       Report Upload fragments either: not only do the intents call
+       back into Fennec, the Health Report Content Provider needs to
+       run in the Fennec process.
+    -->
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/icon"
+        android:label="@string/sync_app_name" >
+        <activity
+            android:name="com.wheelly.sync.setup.activities.WheellySetupSyncActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:icon="@drawable/icon"
+            android:label="Wheelly Sync"
+            android:taskAffinity="com.wheelly.sync.setup"
+            android:theme="@style/SyncTheme"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" >
+
+            <!-- android:configChanges: SetupSyncActivity will handle orientation changes; no longer restarts activity (default) -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!--
+                     Adding a launcher will make Firefox Sync appear
+                     on the Apps screen, which we only want when testing.
+                -->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            </intent-filter>
+        </activity>
+
+        <!--
+             On tablets, SyncTheme is in a dialog, which is not what
+             we want for install instructions.
+        -->
+        <activity
+            android:name="org.mozilla.gecko.sync.setup.activities.WebViewActivity"
+            android:theme="@style/Gecko" />
+        <activity
+            android:name="com.wheelly.sync.setup.activities.WheellyAccountActivity"
+            android:clearTaskOnLaunch="true"
+            android:theme="@style/SyncTheme"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="org.mozilla.gecko.sync.setup.activities.RedirectToSetupActivity"
+            android:clearTaskOnLaunch="true"
+            android:theme="@style/SyncTheme"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!--
+             Secondary Sync activities. These depend on other activities for context
+             (display a result, or a next step). Since these don't make sense as stand-alone
+             activities, set excludeFromRecents="true"
+        -->
+        <activity
+            android:name="org.mozilla.gecko.sync.setup.activities.SetupFailureActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/SyncTheme" />
+        <activity
+            android:name="org.mozilla.gecko.sync.setup.activities.SetupSuccessActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/SyncTheme" />
+        <receiver android:name="org.mozilla.gecko.sync.receivers.UpgradeReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="org.mozilla.gecko.sync.receivers.SyncAccountDeletedReceiver"
+            android:permission="org.mozilla.fennec_sync_test.permission.PER_ACCOUNT_TYPE" >
+            <intent-filter>
+
+                <!--
+                     This needs to be kept the same as
+                     GlobalConstants.SYNC_ACCOUNT_DELETED_ACTION.
+                -->
+                <action android:name="org.mozilla.fennec_sync_test.accounts.SYNC_ACCOUNT_DELETED_ACTION" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="com.wheelly.sync.SyncAuthenticatorService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/sync_authenticator" />
+        </service>
+        <service
+            android:name="com.wheelly.sync.syncadapter.WheellySyncService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_syncadapter" />
+        </service>
+    </application>
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:label="Sync tests"
+        android:targetPackage="org.mozilla.gecko" />
+</manifest>

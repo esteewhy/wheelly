@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ok">OK</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+	<string name="view">View</string>
+	<string name="edit">Edit</string>
+	<string name="delete">Delete</string>
+	<string name="color">Color</string>
+	<string name="amount">Amount</string>
+	<string name="total">Total:</string>
+	<string name="filter">Filter</string>
+	<string name="no_filter">No filter</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="period">Period</string>
+	<string name="preferences">Preferences</string>
+	<string name="no_mileages">Mileage consists of a recorded start and stop time, odometer and fuel level. You want to create ont every time starting a trip. "Close" it when You\'ve arrived to the destination. Press "Menu" button then select "Add".</string>
+	<string name="no_heartbeats">Heartbeat is a special type of record, holding basic counters of Your car. Normaly it gets created simultaneously when entering other types of records like Refuel or Mileage. Also, You are welcome to create heartbeats as frequent as possible, this way You can greatly increase usage statistics accuracy. Press "Menu" button then select "Add".</string>
+	<string name="no_refuels">You want to enter a new Refuel record each time after visiting fuel pump. Press "Menu" button then select "Add".</string>
+	<string name="location">Location</string>
+	<string name="destination">Destination</string>
+	<string name="track">Track</string>
+	<string name="locations">Locations</string>
+	<string name="tracks">Tracks</string>
+	<string name="no_track"><i>Select existing track</i></string>
+	<string name="no_locations">No locations</string>
+	<string name="no_fix">Unknown location</string>
+	<string name="calculator">Calculator</string>
+	<string name="location_name">Location name</string>
+	<string name="satellite_on">Satellite On</string>	
+	<string name="satellite_off">Satellite Off</string>
+	<string name="move_marker_to_center">Marker to center</string>
+	<string name="move_go_to_marker">Go to marker</string>
+	<string name="tap_location">Tap \'My location\' marker to manually adjust location</string>
+	<string name="service_is_not_available">Service is not available, please try again later</string>	
+	<string name="resolve_address">Resolve address</string>
+	<string name="resolving_address">Resolving address..</string>
+	
+	<string name="delete_mileage_confirm">Delete mileage?</string>
+	<string name="delete_heartbeat_confirm">Delete heartbeat?</string>
+	<string name="delete_refuel_confirm">Delete refuel?</string>
+
+    <string name="start">Start</string>
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    <string name="heartbeat_button_caption">%1$05d / %2$02d</string> 
+    <string name="item_add">Add</string>
+    
+    <string name="item_install_mytracks">Install MyTracks</string>
+    <string name="advertise_mytracks">Google\'s MyTracks application can help Wheelly record your routes. You can install MyTracks from the options menu.</string>
+    <string name="item_install_financisto">Install Financisto</string>
+    <string name="advertise_financisto">Financisto application helps tracking your expenses. You can install it from the options menu.</string>
+    <string name="andicar_no_backups">To import data from AndiCar please create at least one backup.</string>
+    
+    
+    <string name="fuel_input_label"><b>Fuel</b>, <i>litres</i></string>
+    <string name="fuel_burnt"><b>Fuel burnt</b>, <i>litres</i></string>
+    <string name="fuel_consumption"><b>Fuel consumption</b>, <i>l/100km</i></string>
+    <string name="location_input_label"><b>Location</b></string>
+    <string name="odometer_input_label"><b>Odometer</b>, <i>km</i></string>
+    <string name="mileage_input_label"><b>Mileage</b>, <i>km</i></string>
+    <string name="refuel_amount_input_label"><b>Amount</b>, <i>litres</i></string>
+    <string name="refuel_price_input_label"><b>Unit price</b>, <i>uah</i></string>
+    <string name="refuel_cost_input_label"><b>Total cost</b>, <i>uah</i></string>
+	
+    <string name="origin"><b>Origin</b></string>
+    <string name="finish"><b>Finish</b></string>
+    <string name="departure"><b>Departure</b></string>
+    
+    <string name="transaction_create">New transaction&#8230;</string>
+    <string name="transaction_edit">Transaction: <b>%1$d</b></string>
+    
+    <string name="mileages">Mileages</string>
+    <string name="refuels">Refuels</string>
+    <string name="heartbeats">Heartbeats</string>
+    
+    <string name="vehicle">Vehicle</string>
+    <string name="fuel_capacity">Fuel capacity</string>
+    <string name="fuel_capacity_summary">Fuel tank capacity</string>
+	
+	<string name="filter_value_not_found">Not found&#8230;</string>
+	<string name="amount_cannot_exceed_capacity">Amount entered cannot exceed fuel tank capacity</string>
+	
+	<!-- My Tracks -->
+	<string name="send_google_docs"
+		translation_description="When sending a track to Google, under the 'Send to...' dialog, the
+      checkbox option to send to Google Docs.
+
+      Screenshot: send_google_choose_service.png">Google Docs</string>
+	<!-- do not translate  -->
+	
+	
+	    <string name="map_view_google">Google Map</string>
+    <string name="map_view_osm">OpenStreetMap</string>
+
+    <string name="enable_my_location">Enable MyLocation</string>
+    <string name="disable_my_location">Disable MyLocation</string>
+    <string name="google_maps_api_key">0cJI0WVHtbB0sFFAHH9xV7Y28WcYuFrk7Kj6imQ</string>
+    <string name="internalEmpty">0x00ff0001</string>
+    
+    <string name="new_location">New location</string>
+    
+    <string-array name="spinner_items">
+       <item>Dhaka</item>
+       <item>[Add vehicle]</item>
+	</string-array>
+</resources>

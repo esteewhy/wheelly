@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:compat="http://schemas.android.com/apk/res-auto">
+	<item
+		android:id		="@+id/opt_menu_mileage_start"
+		android:icon	="@drawable/hb_start"
+		android:title	="@string/start"
+		android:orderInCategory="-100"
+		compat:showAsAction="always"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_mileage_stop"
+		android:icon	="@drawable/hb_stop"
+		android:title	="@string/stop"
+		android:orderInCategory="-99"
+		compat:showAsAction="always"
+		android:showAsAction="always" />
+	<item
+		android:id		="@+id/opt_menu_refuel"
+		android:icon	="@drawable/hb_refuel"
+		android:title	="@string/refuels"
+		android:orderInCategory="-98"
+		compat:showAsAction="always"
+		android:showAsAction="always" />
+	
+	<item android:id	="@+id/opt_menu_locations"
+		android:title	="@string/locations"
+		android:icon	="@android:drawable/ic_menu_myplaces" />
+	<item android:id	="@+id/opt_menu_preferences"
+		android:title	="@string/preferences"
+		android:icon	="@android:drawable/ic_menu_preferences" />
+	<item
+		android:id		="@+id/opt_menu_backup"
+		android:icon	="@android:drawable/ic_menu_save"
+		android:title	="SD Backup" />
+	<item
+		android:id		="@+id/opt_menu_restore"
+		android:icon	="@drawable/ic_menu_archive"
+		android:title	="SD Restore" />
+</menu>

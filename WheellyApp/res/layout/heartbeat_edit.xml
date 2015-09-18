@@ -1,0 +1,6 @@
+<fragment
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	class		="com.wheelly.app.HeartbeatInput"
+	android:id	="@+id/heartbeat"
+	android:layout_height	="wrap_content"
+	android:layout_width	="fill_parent" />

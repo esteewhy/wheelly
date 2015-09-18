@@ -1,13 +1,7 @@
-bin
+.google_apis/*
+gen/*
+bin/*
+libs/*
 .orig
 resource-matrices
-gen
-libs
 R.java
-.google_apis
-syntax: regexp
-^FinancistoRes/gen$
-syntax: regexp
-^MyTracksRes/gen$
-syntax: regexp
-^MyTracksRes/gen$
