@@ -7,4 +7,4 @@ CREATE VIEW next_event AS
 		AND h._created < next._created
 		AND SUBSTR(h._created, 1, 10) = SUBSTR(next._created, 1, 10)
 		AND h._id != next._id
-		AND type != 4
+		AND h.type != 4

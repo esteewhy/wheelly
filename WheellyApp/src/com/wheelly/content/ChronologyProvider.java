@@ -48,7 +48,6 @@ public class ChronologyProvider extends ContentProvider {
 	static {
 		final String a = DatabaseSchema.CONTENT_AUTHORITY;
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH) {{
-			addURI(a, "heartbeats", HEARTBEATS);
 			addURI(a, "timeline", TIMELINE);
 			
 			addURI(a, "mileages/#", MILEAGES_ID);
@@ -61,9 +60,8 @@ public class ChronologyProvider extends ContentProvider {
 			addURI(a, "heartbeats/defaults", HEARTBEATS_DEFAULTS);
 		}};
 		
-		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, Mileages.Tables, "mileages" });
-		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "refuels", "refuels" });
-		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_TYPE, Heartbeats.Tables, "heartbeats" });
+		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
+		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
 		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
@@ -277,17 +275,13 @@ public class ChronologyProvider extends ContentProvider {
 	
 	private static void updateRelatedRecordsOfMileage(long id, SQLiteDatabase db) {
 		db.execSQL("UPDATE heartbeats SET sync_state = 2"
-				+" WHERE sync_state == 1"
-				+" AND _id IN "
-				+"(SELECT m.stop_heartbeat_id FROM mileages m WHERE m._id == ?)",
+				+" WHERE sync_state == 1 AND _id = ?",
 			new Object[] { id });
 	}
 	
 	private static void updateRelatedRecordsOfRefuel(long id, SQLiteDatabase db) {
 		db.execSQL("UPDATE heartbeats SET sync_state = 2"
-				+" WHERE sync_state == 1"
-				+" AND _id IN "
-				+"(SELECT r.heartbeat_id FROM refuels r WHERE r._id == ?)",
+				+" WHERE sync_state == 1 AND _id = ?",
 			new Object[] { id });
 	}
 	

@@ -18,22 +18,6 @@ public final class DatabaseSchema {
 		public static final String LastPendingIdSql =
 			"SELECT _id FROM heartbeats WHERE type = 34 LIMIT 1";
 		
-		public static final String Tables = "mileages m"
-			+ " LEFT OUTER JOIN heartbeats start"
-			+ " 	ON m.start_heartbeat_id = start." + _ID
-			+ " LEFT OUTER JOIN locations start_place"
-			+ "		ON start.place_id = start_place." + _ID
-			+ " LEFT OUTER JOIN heartbeats stop"
-			+ " 	ON m.stop_heartbeat_id = stop." + _ID
-			+ " LEFT OUTER JOIN locations stop_place"
-			+ "		ON stop.place_id = stop_place." + _ID
-			+ " LEFT OUTER JOIN locations dest"
-			+ "		ON m.location_id = dest." + _ID
-			+ " LEFT OUTER JOIN next_mileages n"
-			+ "		ON n.mileage_id = m." + _ID
-			+ " LEFT OUTER JOIN prev_mileages p"
-			+ "		ON p.mileage_id = m." + _ID;
-		
 		public static final String[] DefaultProjection = {
 			"-1 " + _ID,
 			"0 mileage",
@@ -103,23 +87,6 @@ public final class DatabaseSchema {
 	}
 	
 	public static final class Heartbeats {
-		public static final String[] ListProjection = {
-			"h._id",
-			"h._created",
-			"h.odometer",
-			"h.fuel",
-			"l.name place",
-			"h.sync_state",
-			"h.type",
-			"l.color color",
-		};
-		
-		public static final String Tables = "heartbeats h"
-			+ " LEFT JOIN locations l ON h.place_id = l." + _ID
-			+ " LEFT JOIN mileages m1 ON m1.start_heartbeat_id = h." + _ID
-			+ " LEFT JOIN mileages m2 ON m2.stop_heartbeat_id = h." + _ID
-			+ " LEFT JOIN refuels r ON r.heartbeat_id = h." + _ID;
-		
 		public static final Uri CONTENT_URI =
 			BASE_CONTENT_URI.buildUpon().appendPath(PATH_HEARTBEATS).build();
 		public static final String CONTENT_ITEM_TYPE =
