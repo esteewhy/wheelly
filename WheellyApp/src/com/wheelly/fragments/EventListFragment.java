@@ -17,7 +17,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.FloatMath;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -149,7 +148,7 @@ public class EventListFragment extends ListFragment {
 							if(4 == leg) {
 								final Float fuel = cursor.getFloat(cursor.getColumnIndex("amount"));
 								final int progress = pb.getProgress();
-								pb.setProgress(progress - (int)FloatMath.ceil(fuel));
+								pb.setProgress(progress - (int)Math.ceil(fuel));
 								pb.setSecondaryProgress(progress);
 							} else {
 								pb.setSecondaryProgress(0);
@@ -170,7 +169,7 @@ public class EventListFragment extends ListFragment {
 							final long leg = cursor.getLong(cursor.getColumnIndex("leg"));
 							if(2 == leg || 3 == leg) {
 								final Float distance = cursor.getFloat(cursor.getColumnIndex("distance"));
-								((TextView)view).setText("+".concat(Integer.toString((int)FloatMath.ceil(distance))));
+								((TextView)view).setText("+".concat(Integer.toString((int)Math.ceil(distance))));
 								return true;
 							}
 							return false;
