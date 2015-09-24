@@ -49,6 +49,7 @@ public class ChronologyProvider extends ContentProvider {
 		final String a = DatabaseSchema.CONTENT_AUTHORITY;
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH) {{
 			addURI(a, "timeline", TIMELINE);
+			addURI(a, "heartbeats", HEARTBEATS);
 			
 			addURI(a, "mileages/#", MILEAGES_ID);
 			addURI(a, "refuels/#", REFUELS_ID);
@@ -63,7 +64,8 @@ public class ChronologyProvider extends ContentProvider {
 		DataSchemaLookup.put(MILEAGES_ID, new String[] { Mileages.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(REFUELS_ID, new String[] { Refuels.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
 		DataSchemaLookup.put(HEARTBEATS_ID, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
-		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, null });
+		DataSchemaLookup.put(HEARTBEATS, new String[] { Heartbeats.CONTENT_ITEM_TYPE, "heartbeats", "heartbeats" });
+		DataSchemaLookup.put(TIMELINE, new String[] { Timeline.CONTENT_TYPE, Timeline.Tables, Timeline.Tables });
 		DataSchemaLookup.put(TIMELINE_ID, new String[] { Timeline.CONTENT_ITEM_TYPE, Timeline.Tables, null });
 		
 		UriMap.put(HEARTBEATS, Heartbeats.CONTENT_URI);

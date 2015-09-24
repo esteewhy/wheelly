@@ -3,6 +3,7 @@ package com.wheelly.db;
 import java.util.Date;
 
 import com.wheelly.db.DatabaseSchema.Heartbeats;
+import com.wheelly.db.DatabaseSchema.Timeline;
 import com.wheelly.util.DateUtils;
 
 import android.content.ContentResolver;
@@ -32,7 +33,7 @@ public class HeartbeatBroker {
 				? cr.query(
 					ContentUris.withAppendedId(Heartbeats.CONTENT_URI, id),
 					null, null, null, null)
-				: cr.query(Heartbeats.CONTENT_URI,
+				: cr.query(Timeline.CONTENT_URI,
 					null, null, null,
 					"_created DESC LIMIT 1");
 		

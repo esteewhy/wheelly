@@ -145,7 +145,7 @@ public final class DatabaseSchema {
 			+ " LEFT JOIN stop_events stop		ON stop.heartbeat_id = h._id"
 			+ " LEFT JOIN start_events start	ON start.heartbeat_id = h._id"
 			+ " LEFT JOIN locations ls			ON start.place_id = ls._id"
-			+ " LEFT JOIN refuels r				ON r.heartbeat_id = h._id"
+			//+ " LEFT JOIN refuels r				ON r.heartbeat_id = h._id"
 			+ " LEFT JOIN prev_event p			ON p.heartbeat_id = h._id"
 			+ " LEFT JOIN next_event n			ON n.heartbeat_id = h._id";
 		

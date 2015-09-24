@@ -81,7 +81,9 @@ public class Widget extends AppWidgetProvider {
     	
         RemoteViews updateViews = new RemoteViews(context.getPackageName(), layoutId);
         updateViews.setProgressBar(R.id.fuel_gauge, 60, recentHeartbeat.getAsInteger("fuel"), false);
-        updateViews.setTextViewText(R.id.odometer, String.valueOf(recentHeartbeat.getAsLong("odometer")));
+        updateViews.setTextViewText(R.id.odometer,
+        	String.valueOf(recentHeartbeat.getAsLong("odometer"))
+        );
         addTapOnClick(context, updateViews);
         return updateViews;
     }
